@@ -1,0 +1,46 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.alphasystem.project</groupId>
+		<artifactId>jar</artifactId>
+		<version>3.0.0-SNAPSHOT</version>
+	</parent>
+	<groupId>com.alphasystem.arabic</groupId>
+	<artifactId>morphological-analysis-mongo-repository</artifactId>
+	<dependencies>
+		<dependency>
+			<groupId>com.alphasystem.arabic</groupId>
+			<artifactId>morphological-analysis-mongo-model</artifactId>
+			<version>${ma-model.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alphasystem.mongo</groupId>
+			<artifactId>mongo-repository-base</artifactId>
+			<version>${mongo-repository.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${org.springframework.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jqurantree</groupId>
+			<artifactId>jqurantree</artifactId>
+			<version>${jqurantree.version}</version>
+		</dependency>
+	</dependencies>
+	<properties>
+		<mongo-repository.version>${project.version}</mongo-repository.version>
+		<ma-model.version>${project.version}</ma-model.version>
+		<jqurantree.version>1.0.0</jqurantree.version>
+		<maven.test.skip>true</maven.test.skip>
+	</properties>
+</project>
