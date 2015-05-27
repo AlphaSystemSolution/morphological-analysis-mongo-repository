@@ -3,19 +3,6 @@
  */
 package com.alphasystem.morphologicalanalysis.util;
 
-import static java.lang.String.format;
-import static java.lang.System.out;
-import static java.util.Collections.sort;
-import static org.jqurantree.orthography.Document.getChapter;
-import static org.jqurantree.orthography.Document.getVerse;
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Component;
-
 import com.alphasystem.morphologicalanalysis.model.Chapter;
 import com.alphasystem.morphologicalanalysis.model.Location;
 import com.alphasystem.morphologicalanalysis.model.Token;
@@ -24,6 +11,18 @@ import com.alphasystem.morphologicalanalysis.repository.ChapterRepository;
 import com.alphasystem.morphologicalanalysis.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.repository.TokenRepository;
 import com.alphasystem.morphologicalanalysis.repository.VerseRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+import static java.lang.String.format;
+import static java.lang.System.out;
+import static java.util.Collections.sort;
+import static org.jqurantree.orthography.Document.getChapter;
+import static org.jqurantree.orthography.Document.getVerse;
 
 /**
  * @author sali
@@ -63,6 +62,7 @@ public class MorphologicalAnalysisRepositoryUtil {
 		org.jqurantree.orthography.Chapter ch = getChapter(chapterNumber);
 		Chapter chapter = new Chapter(chapterNumber, ch.getName().toUnicode());
 		int verseCount = ch.getVerseCount();
+		chapter.setVerseCount(verseCount);
 		for (int verseNumber = 1; verseNumber <= verseCount; verseNumber++) {
 			org.jqurantree.orthography.Verse jqVerse = getVerse(chapterNumber,
 					verseNumber);
@@ -121,29 +121,13 @@ public class MorphologicalAnalysisRepositoryUtil {
 		return chapterRepository;
 	}
 
-	public LocationRepository getLocationRepository() {
-		return locationRepository;
-	}
-
-	public MongoTemplate getMongoTemplate() {
-		return mongoTemplate;
-	}
-
-	public TokenRepository getTokenRepository() {
-		return tokenRepository;
-	}
-
-	public VerseRepository getVerseRepository() {
-		return verseRepository;
-	}
-
-	public boolean isVerbose() {
-		return verbose;
-	}
-
 	@Autowired
 	public void setChapterRepository(ChapterRepository chapterRepository) {
 		this.chapterRepository = chapterRepository;
+	}
+
+	public LocationRepository getLocationRepository() {
+		return locationRepository;
 	}
 
 	@Autowired
@@ -151,9 +135,17 @@ public class MorphologicalAnalysisRepositoryUtil {
 		this.locationRepository = locationRepository;
 	}
 
+	public MongoTemplate getMongoTemplate() {
+		return mongoTemplate;
+	}
+
 	@Autowired
 	public void setMongoTemplate(MongoTemplate mongoTemplate) {
 		this.mongoTemplate = mongoTemplate;
+	}
+
+	public TokenRepository getTokenRepository() {
+		return tokenRepository;
 	}
 
 	@Autowired
@@ -161,12 +153,20 @@ public class MorphologicalAnalysisRepositoryUtil {
 		this.tokenRepository = tokenRepository;
 	}
 
-	public void setVerbose(boolean verbose) {
-		this.verbose = verbose;
+	public VerseRepository getVerseRepository() {
+		return verseRepository;
 	}
 
 	@Autowired
 	public void setVerseRepository(VerseRepository verseRepository) {
 		this.verseRepository = verseRepository;
+	}
+
+	public boolean isVerbose() {
+		return verbose;
+	}
+
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
 	}
 }
