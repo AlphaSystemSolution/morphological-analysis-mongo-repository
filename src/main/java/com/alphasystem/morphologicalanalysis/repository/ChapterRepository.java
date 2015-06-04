@@ -3,7 +3,7 @@
  */
 package com.alphasystem.morphologicalanalysis.repository;
 
-import com.alphasystem.morphologicalanalysis.model.Chapter;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.persistence.mongo.repository.BaseRepository;
 
 /**
@@ -16,6 +16,6 @@ public interface ChapterRepository extends BaseRepository<Chapter> {
 	 * @param chapterNumber
 	 * @return
 	 */
-	public Chapter findByChapterNumber(Integer chapterNumber);
+	Chapter findByChapterNumber(Integer chapterNumber);
 
 }

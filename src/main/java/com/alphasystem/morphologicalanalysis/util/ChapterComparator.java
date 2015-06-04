@@ -3,9 +3,9 @@
  */
 package com.alphasystem.morphologicalanalysis.util;
 
-import java.util.Comparator;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 
-import com.alphasystem.morphologicalanalysis.model.Chapter;
+import java.util.Comparator;
 
 /**
  * @author sali

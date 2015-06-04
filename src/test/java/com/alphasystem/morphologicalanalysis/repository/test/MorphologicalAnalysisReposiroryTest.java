@@ -3,9 +3,9 @@
  */
 package com.alphasystem.morphologicalanalysis.repository.test;
 
-import com.alphasystem.morphologicalanalysis.model.Chapter;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -77,13 +77,13 @@ public class MorphologicalAnalysisReposiroryTest {
 		return mongoTemplate;
 	}
 
-	public MorphologicalAnalysisRepositoryUtil getRepositoryUtil() {
-		return repositoryUtil;
-	}
-
 	@Autowired
 	public void setMongoTemplate(MongoTemplate mongoTemplate) {
 		this.mongoTemplate = mongoTemplate;
+	}
+
+	public MorphologicalAnalysisRepositoryUtil getRepositoryUtil() {
+		return repositoryUtil;
 	}
 
 	@Autowired

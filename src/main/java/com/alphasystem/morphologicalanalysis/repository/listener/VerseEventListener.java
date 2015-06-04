@@ -3,13 +3,12 @@
  */
 package com.alphasystem.morphologicalanalysis.repository.listener;
 
-import static com.alphasystem.morphologicalanalysis.jquran.JQuranTreeAdapter.getVerse;
-
-import org.springframework.stereotype.Component;
-
-import com.alphasystem.morphologicalanalysis.model.Verse;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
 import com.alphasystem.persistence.mongo.repository.DocumentEventListener;
 import com.mongodb.DBObject;
+import org.springframework.stereotype.Component;
+
+import static com.alphasystem.morphologicalanalysis.jquran.JQuranTreeAdapter.getVerse;
 
 /**
  * @author sali

@@ -3,10 +3,10 @@
  */
 package com.alphasystem.morphologicalanalysis.repository;
 
-import java.util.List;
-
-import com.alphasystem.morphologicalanalysis.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.persistence.mongo.repository.BaseRepository;
+
+import java.util.List;
 
 /**
  * @author sali
@@ -19,8 +19,8 @@ public interface TokenRepository extends BaseRepository<Token> {
 	 * @param verseNumber
 	 * @return
 	 */
-	public List<Token> findByChapterNumberAndVerseNumber(Integer chapterNumber,
-			Integer verseNumber);
+	List<Token> findByChapterNumberAndVerseNumber(Integer chapterNumber,
+												  Integer verseNumber);
 
 	/**
 	 * @param chapterNumber
@@ -28,6 +28,6 @@ public interface TokenRepository extends BaseRepository<Token> {
 	 * @param tokenNumber
 	 * @return
 	 */
-	public Token findByChapterNumberAndVerseNumberAndTokenNumber(
+	Token findByChapterNumberAndVerseNumberAndTokenNumber(
 			Integer chapterNumber, Integer verseNumber, Integer tokenNumber);
 }

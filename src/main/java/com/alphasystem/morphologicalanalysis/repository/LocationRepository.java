@@ -3,10 +3,10 @@
  */
 package com.alphasystem.morphologicalanalysis.repository;
 
-import java.util.List;
-
-import com.alphasystem.morphologicalanalysis.model.Location;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.persistence.mongo.repository.BaseRepository;
+
+import java.util.List;
 
 /**
  * @author sali
@@ -20,7 +20,7 @@ public interface LocationRepository extends BaseRepository<Location> {
 	 * @param tokenNumber
 	 * @return
 	 */
-	public List<Location> findByChapterNumberAndVerseNumberAndTokenNumber(
+	List<Location> findByChapterNumberAndVerseNumberAndTokenNumber(
 			Integer chapterNumber, Integer verseNumber, Integer tokenNumber);
 
 	/**
@@ -30,7 +30,7 @@ public interface LocationRepository extends BaseRepository<Location> {
 	 * @param locationNumber
 	 * @return
 	 */
-	public Location findByChapterNumberAndVerseNumberAndTokenNumberAndLocationNumber(
+	Location findByChapterNumberAndVerseNumberAndTokenNumberAndLocationNumber(
 			Integer chapterNumber, Integer verseNumber, Integer tokenNumber,
 			Integer locationNumber);
 }
