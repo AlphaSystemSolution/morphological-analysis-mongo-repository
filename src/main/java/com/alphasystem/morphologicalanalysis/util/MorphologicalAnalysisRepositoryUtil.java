@@ -3,14 +3,17 @@
  */
 package com.alphasystem.morphologicalanalysis.util;
 
-import com.alphasystem.morphologicalanalysis.repository.ChapterRepository;
-import com.alphasystem.morphologicalanalysis.repository.LocationRepository;
-import com.alphasystem.morphologicalanalysis.repository.TokenRepository;
-import com.alphasystem.morphologicalanalysis.repository.VerseRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.FragmentRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.RelationshipRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
+import com.alphasystem.morphologicalanalysis.wordbyword.repository.ChapterRepository;
+import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
+import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
+import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
+import com.alphasystem.morphologicalanalysis.wordbyword.util.ChapterComparator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -40,6 +43,10 @@ public class MorphologicalAnalysisRepositoryUtil {
 	private TokenRepository tokenRepository;
 
 	private LocationRepository locationRepository;
+
+	private FragmentRepository fragmentRepository;
+
+	private RelationshipRepository relationshipRepository;
 
 	private Query findAllChaptersQuery;
 
@@ -160,6 +167,24 @@ public class MorphologicalAnalysisRepositoryUtil {
 	@Autowired
 	public void setVerseRepository(VerseRepository verseRepository) {
 		this.verseRepository = verseRepository;
+	}
+
+	public RelationshipRepository getRelationshipRepository() {
+		return relationshipRepository;
+	}
+
+	@Autowired
+	public void setRelationshipRepository(RelationshipRepository relationshipRepository) {
+		this.relationshipRepository = relationshipRepository;
+	}
+
+	public FragmentRepository getFragmentRepository() {
+		return fragmentRepository;
+	}
+
+	@Autowired
+	public void setFragmentRepository(FragmentRepository fragmentRepository) {
+		this.fragmentRepository = fragmentRepository;
 	}
 
 	public boolean isVerbose() {

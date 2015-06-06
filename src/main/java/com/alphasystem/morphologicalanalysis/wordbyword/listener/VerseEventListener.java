@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.alphasystem.morphologicalanalysis.repository.listener;
+package com.alphasystem.morphologicalanalysis.wordbyword.listener;
 
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
 import com.alphasystem.persistence.mongo.repository.DocumentEventListener;

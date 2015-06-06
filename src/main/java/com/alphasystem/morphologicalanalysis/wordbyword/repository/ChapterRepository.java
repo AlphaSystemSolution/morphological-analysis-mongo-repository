@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.alphasystem.morphologicalanalysis.repository;
+package com.alphasystem.morphologicalanalysis.wordbyword.repository;
 
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.persistence.mongo.repository.BaseRepository;

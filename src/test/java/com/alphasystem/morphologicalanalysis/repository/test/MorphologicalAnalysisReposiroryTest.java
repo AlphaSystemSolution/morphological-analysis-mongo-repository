@@ -6,14 +6,12 @@ package com.alphasystem.morphologicalanalysis.repository.test;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.Test;
 
 import java.util.List;
 
@@ -26,9 +24,8 @@ import static java.lang.System.*;
  * @author sali
  * 
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { MorphologicalAnalysisSpringConfiguration.class })
-public class MorphologicalAnalysisReposiroryTest {
+public class MorphologicalAnalysisReposiroryTest extends AbstractTestNGSpringContextTests {
 
 	static {
 		setProperty(MONGO_DB_NAME_PROPERTY, "MORPHOLOGICAL_ANALYSIS_DB");
@@ -90,10 +87,6 @@ public class MorphologicalAnalysisReposiroryTest {
 	public void setRepositoryUtil(
 			MorphologicalAnalysisRepositoryUtil repositoryUtil) {
 		this.repositoryUtil = repositoryUtil;
-	}
-
-	@Before
-	public void setup() {
 	}
 
 }

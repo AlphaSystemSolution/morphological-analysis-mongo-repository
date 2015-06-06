@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.alphasystem.morphologicalanalysis.util;
+package com.alphasystem.morphologicalanalysis.wordbyword.util;
 
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 
