@@ -15,6 +15,7 @@ import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenReposito
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.util.ChapterComparator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -147,6 +148,7 @@ public class MorphologicalAnalysisRepositoryUtil {
 	}
 
 	@Autowired
+	@Qualifier(value = "wordByWordTemplate")
 	public void setMongoTemplate(MongoTemplate mongoTemplate) {
 		this.mongoTemplate = mongoTemplate;
 	}

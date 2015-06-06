@@ -1,7 +1,10 @@
 package com.alphasystem.morphologicalanalysis.repository.test;
 
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
+import com.alphasystem.morphologicalanalysis.spring.support.GraphConfig;
+import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
+import com.alphasystem.morphologicalanalysis.spring.support.WordByWordConfig;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.NounProperties;
@@ -27,7 +30,8 @@ import static org.testng.Reporter.log;
 /**
  * @author sali
  */
-@ContextConfiguration(classes = {MorphologicalAnalysisSpringConfiguration.class})
+@ContextConfiguration(classes = {MongoConfig.class, WordByWordConfig.class, GraphConfig.class,
+        MorphologicalAnalysisSpringConfiguration.class})
 public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests {
 
     private static final int DEFAULT_CHAPTER_NUMBER = 1;
