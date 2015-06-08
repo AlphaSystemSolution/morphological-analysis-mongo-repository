@@ -62,6 +62,6 @@
 		<mongo-repository.version>${project.version}</mongo-repository.version>
 		<ma-model.version>${project.version}</ma-model.version>
 		<jqurantree.version>1.0.0</jqurantree.version>
-		<maven.test.skip>false</maven.test.skip>
+		<maven.test.skip>true</maven.test.skip>
 	</properties>
 </project>
