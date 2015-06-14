@@ -48,7 +48,7 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
     @Test
     public void createChapter() {
         log(format("Creating chapter: %s", DEFAULT_CHAPTER_NUMBER), true);
-        getRepositoryUtil().createChapterByJQuran(DEFAULT_CHAPTER_NUMBER);
+        getRepositoryUtil().createChapter(DEFAULT_CHAPTER_NUMBER);
         log(format("Chapter %s created", DEFAULT_CHAPTER_NUMBER), true);
 
         Verse verse = repositoryUtil.getVerseRepository().
