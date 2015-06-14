@@ -3,6 +3,7 @@
  */
 package com.alphasystem.morphologicalanalysis.util;
 
+import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
 import com.alphasystem.morphologicalanalysis.graph.repository.FragmentRepository;
 import com.alphasystem.morphologicalanalysis.graph.repository.RelationshipRepository;
@@ -15,6 +16,7 @@ import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepos
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.util.ChapterComparator;
+import com.alphasystem.tanzil.TanzilTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -26,8 +28,6 @@ import java.util.List;
 import static java.lang.String.format;
 import static java.lang.System.out;
 import static java.util.Collections.sort;
-import static org.jqurantree.orthography.Document.getChapter;
-import static org.jqurantree.orthography.Document.getVerse;
 
 /**
  * @author sali
@@ -36,81 +36,53 @@ import static org.jqurantree.orthography.Document.getVerse;
 public class MorphologicalAnalysisRepositoryUtil {
 
     private MongoTemplate mongoTemplate;
-
     private ChapterRepository chapterRepository;
-
     private VerseRepository verseRepository;
-
     private TokenRepository tokenRepository;
-
     private LocationRepository locationRepository;
-
     private FragmentRepository fragmentRepository;
-
     private RelationshipRepository relationshipRepository;
-
     private DependencyGraphRepository dependencyGraphRepository;
+    private TanzilTool tanzilTool;
     private Query findAllChaptersQuery;
     private boolean verbose;
 
     public MorphologicalAnalysisRepositoryUtil() {
+        tanzilTool = TanzilTool.getInstance();
         Query findAllChaptersQuery = new Query();
         findAllChaptersQuery.fields().include("chapterNumber")
                 .include("verseCount").include("chapterName");
     }
 
-    public DependencyGraphRepository getDependencyGraphRepository() {
-        return dependencyGraphRepository;
-    }
+    // Business methods
 
-    @Autowired
-    public void setDependencyGraphRepository(DependencyGraphRepository dependencyGraphRepository) {
-        this.dependencyGraphRepository = dependencyGraphRepository;
-    }
-
-    /**
-     * @param chapterNumber
-     */
     public void createChapter(int chapterNumber) {
         if (verbose) {
             out.println(format("Start creating chapter {%s}", chapterNumber));
         }
-        org.jqurantree.orthography.Chapter ch = getChapter(chapterNumber);
-        Chapter chapter = new Chapter(chapterNumber, ch.getName().toUnicode());
-        int verseCount = ch.getVerseCount();
+        com.alphasystem.tanzil.model.Chapter ch = tanzilTool.getChapter(chapterNumber);
+        Chapter chapter = new Chapter(chapterNumber, ch.getName());
+        List<com.alphasystem.tanzil.model.Verse> verses = ch.getVerses();
+        int verseCount = verses.size();
         chapter.setVerseCount(verseCount);
         for (int verseNumber = 1; verseNumber <= verseCount; verseNumber++) {
-            org.jqurantree.orthography.Verse jqVerse = getVerse(chapterNumber,
-                    verseNumber);
+            com.alphasystem.tanzil.model.Verse vs = verses.get(verseNumber - 1);
             if (verbose) {
                 out.println(format("Start creating verse {%s}", verseNumber));
             }
             Verse verse = new Verse(chapterNumber, verseNumber);
-            Iterable<org.jqurantree.orthography.Token> jqTokens = jqVerse
-                    .getTokens();
             int tokenNumber = 1;
-            for (org.jqurantree.orthography.Token jqToken : jqTokens) {
-                String tokenText = jqToken.toUnicode();
-                Token token = new Token(chapterNumber, verseNumber,
-                        tokenNumber, tokenText);
-
+            List<ArabicWord> tokens = vs.getTokens();
+            for (ArabicWord aw : tokens) {
+                Token token = new Token(chapterNumber, verseNumber, tokenNumber, aw.toUnicode());
                 // we will create one location for each token
-                Location location = new Location(chapterNumber, verseNumber,
-                        tokenNumber, 1);
-                int tokenLength = tokenText.length();
-                if (tokenLength <= 1) {
-                    // if token text length is exactly one then set start and
-                    // end index
-                    location.setStartIndex(0);
-                    location.setEndIndex(tokenLength);
-                }
+                Location location = new Location(chapterNumber, verseNumber, tokenNumber, 1);
                 locationRepository.save(location);
                 token.addLocation(location);
-
-                tokenNumber++;
                 tokenRepository.save(token);
                 verse.addToken(token);
-            }// end of token loop
+                tokenNumber++;
+            } // end of token loop
             verseRepository.save(verse);
             if (verbose) {
                 out.println(format("Finished creating verse {%s}", verseNumber));
@@ -133,6 +105,7 @@ public class MorphologicalAnalysisRepositoryUtil {
         return chapters;
     }
 
+    // Getter & Setters
     public ChapterRepository getChapterRepository() {
         return chapterRepository;
     }
@@ -194,6 +167,15 @@ public class MorphologicalAnalysisRepositoryUtil {
     @Autowired
     public void setFragmentRepository(FragmentRepository fragmentRepository) {
         this.fragmentRepository = fragmentRepository;
+    }
+
+    public DependencyGraphRepository getDependencyGraphRepository() {
+        return dependencyGraphRepository;
+    }
+
+    @Autowired
+    public void setDependencyGraphRepository(DependencyGraphRepository dependencyGraphRepository) {
+        this.dependencyGraphRepository = dependencyGraphRepository;
     }
 
     public boolean isVerbose() {

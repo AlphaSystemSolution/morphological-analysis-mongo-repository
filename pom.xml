@@ -26,9 +26,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.jqurantree</groupId>
-			<artifactId>jqurantree</artifactId>
-			<version>${jqurantree.version}</version>
+			<groupId>com.alphasystem</groupId>
+			<artifactId>tanzil-adapter</artifactId>
+			<version>${tanzil-adapter.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.testng</groupId>
@@ -61,7 +61,7 @@
 	<properties>
 		<mongo-repository.version>${project.version}</mongo-repository.version>
 		<ma-model.version>${project.version}</ma-model.version>
-		<jqurantree.version>1.0.0</jqurantree.version>
+		<tanzil-adapter.version>${project.version}</tanzil-adapter.version>
 		<maven.test.skip>true</maven.test.skip>
 	</properties>
 </project>
