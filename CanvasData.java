@@ -1,7 +1,10 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.model;
 
+import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 
 import java.io.Externalizable;
@@ -18,11 +21,37 @@ import static javafx.collections.FXCollections.observableArrayList;
  */
 public class CanvasData implements Externalizable {
 
+    private final StringProperty id;
     private final ObjectProperty<CanvasMetaData> canvasMetaDataObject;
     private ObservableList<GraphNode> nodes = observableArrayList();
+    private DependencyGraph dependencyGraph;
 
     public CanvasData(CanvasMetaData canvasMetaData) {
+        id = new SimpleStringProperty();
         this.canvasMetaDataObject = new SimpleObjectProperty<>(canvasMetaData);
+    }
+
+    public DependencyGraph getDependencyGraph() {
+        return dependencyGraph;
+    }
+
+    public void setDependencyGraph(DependencyGraph dependencyGraph) {
+        this.dependencyGraph = dependencyGraph;
+        if (this.dependencyGraph != null) {
+            setId(this.dependencyGraph.getId());
+        }
+    }
+
+    public final String getId() {
+        return id.get();
+    }
+
+    public final void setId(String id) {
+        this.id.set(id);
+    }
+
+    public final StringProperty idProperty() {
+        return id;
     }
 
     public boolean add(GraphNode graphNode) {
@@ -63,9 +92,10 @@ public class CanvasData implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(getId());
         out.writeObject(getCanvasMetaData());
         List<GraphNode> nodes = new ArrayList<>();
-        if(this.nodes != null && !this.nodes.isEmpty()){
+        if (this.nodes != null && !this.nodes.isEmpty()) {
             nodes.addAll(this.nodes);
         }
         out.writeObject(nodes);
@@ -73,6 +103,7 @@ public class CanvasData implements Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        setId((String) in.readObject());
         setCanvasMetaData((CanvasMetaData) in.readObject());
         this.nodes.setAll((List<GraphNode>) in.readObject());
     }
