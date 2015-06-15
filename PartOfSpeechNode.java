@@ -5,10 +5,12 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.NounProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.PART_OF_SPEECH;
 
@@ -16,6 +18,8 @@ import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNod
  * @author sali
  */
 public class PartOfSpeechNode extends GraphNode {
+
+    private static final long serialVersionUID = 8910009645217482464L;
 
     /**
      * x location for circle.
@@ -27,43 +31,41 @@ public class PartOfSpeechNode extends GraphNode {
      */
     private final DoubleProperty cy;
 
-    private final BooleanProperty excluded;
+    private PartOfSpeech partOfSpeech;
 
-    private final PartOfSpeech partOfSpeech;
+    private Location location;
 
-    private final Location location;
-
-    private final AbstractProperties properties;
+    private AbstractProperties properties;
 
     /**
      *
      */
     public PartOfSpeechNode() {
-        this(null, null, null, 0d, 0d, 0d, 0d, false);
+        this(null, null, 0d, 0d, 0d, 0d);
     }
 
     /**
      * @param partOfSpeech
      * @param location
-     * @param id
      * @param x
      * @param y
      * @param cx
      * @param cy
-     * @param excluded
      */
-    public PartOfSpeechNode(PartOfSpeech partOfSpeech, Location location, String id, Double x, Double y,
-                            Double cx, Double cy, Boolean excluded) {
-        super(PART_OF_SPEECH, id, getText(partOfSpeech, location.getProperties()), x, y);
+    public PartOfSpeechNode(PartOfSpeech partOfSpeech, Location location, Double x, Double y,
+                            Double cx, Double cy) {
+        super(PART_OF_SPEECH, null, getText(partOfSpeech, location), x, y);
         this.partOfSpeech = partOfSpeech;
-        this.location = location;
-        this.properties = location.getProperties();
-        this.excluded = new SimpleBooleanProperty(excluded);
+        setLocation(location);
         this.cx = new SimpleDoubleProperty(cx);
         this.cy = new SimpleDoubleProperty(cy);
     }
 
-    private static String getText(PartOfSpeech partOfSpeech, AbstractProperties properties) {
+    private static String getText(PartOfSpeech partOfSpeech, Location location) {
+        if (location == null || partOfSpeech == null) {
+            return null;
+        }
+        AbstractProperties properties = location.getProperties();
         StringBuilder builder = new StringBuilder(partOfSpeech.getLabel().toUnicode());
         switch (partOfSpeech) {
             case NOUN:
@@ -79,12 +81,24 @@ public class PartOfSpeechNode extends GraphNode {
         return partOfSpeech;
     }
 
+    private void setPartOfSpeech(PartOfSpeech partOfSpeech) {
+        this.partOfSpeech = partOfSpeech;
+    }
+
     public AbstractProperties getProperties() {
         return properties;
     }
 
     public Location getLocation() {
         return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+        if (this.location != null) {
+            this.properties = this.location.getProperties();
+            setId(this.location.getId());
+        }
     }
 
     public final double getCx() {
@@ -111,20 +125,24 @@ public class PartOfSpeechNode extends GraphNode {
         return cy;
     }
 
-    public final boolean isExcluded() {
-        return excluded.get();
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeObject(getPartOfSpeech());
+        out.writeDouble(getCx());
+        out.writeDouble(getCy());
     }
 
-    public final void setExcluded(boolean excluded) {
-        this.excluded.set(excluded);
-    }
-
-    public final BooleanProperty excludedProperty() {
-        return excluded;
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+        setPartOfSpeech((PartOfSpeech) in.readObject());
+        setCx(in.readDouble());
+        setCy(in.readDouble());
     }
 
     @Override
     public String toString() {
-        return getText(partOfSpeech, properties);
+        return getText(partOfSpeech, location);
     }
 }

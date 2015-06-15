@@ -10,6 +10,8 @@ import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNod
  */
 public class HiddenNode extends TerminalNode {
 
+    private static final long serialVersionUID = 6414341448851608265L;
+
     /**
      *
      */

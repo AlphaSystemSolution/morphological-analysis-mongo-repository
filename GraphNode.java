@@ -3,10 +3,19 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph.model;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import javafx.beans.property.*;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
+import static com.alphasystem.util.IdGenerator.nextId;
+
 /**
  * @author sali
  */
-public abstract class GraphNode {
+public abstract class GraphNode implements Externalizable {
+
+    private static final long serialVersionUID = -3432601105627610562L;
 
     protected final StringProperty id;
 
@@ -21,6 +30,13 @@ public abstract class GraphNode {
     protected final DoubleProperty translateX;
 
     protected final DoubleProperty translateY;
+
+    /**
+     *
+     */
+    protected GraphNode() {
+        this(null, nextId(), null, 0d, 0d);
+    }
 
     /**
      * @param nodeType
@@ -94,6 +110,10 @@ public abstract class GraphNode {
         return nodeType.get();
     }
 
+    protected void setNodeType(GraphNodeType nodeType) {
+        this.nodeType.set(nodeType);
+    }
+
     public final ObjectProperty<GraphNodeType> nodeTypeProperty() {
         return nodeType;
     }
@@ -134,6 +154,27 @@ public abstract class GraphNode {
         return y;
     }
 
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(getId());
+        out.writeObject(getNodeType());
+        out.writeObject(getText());
+        out.writeDouble(getX());
+        out.writeDouble(getY());
+        out.writeDouble(getTranslateX());
+        out.writeDouble(getTranslateY());
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        setId((String) in.readObject());
+        setNodeType((GraphNodeType) in.readObject());
+        setText((String) in.readObject());
+        setX(in.readDouble());
+        setY(in.readDouble());
+        setTranslateX(in.readDouble());
+        setTranslateY(in.readDouble());
+    }
 
     @Override
     public String toString() {

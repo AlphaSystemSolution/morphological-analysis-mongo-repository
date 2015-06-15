@@ -6,6 +6,10 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.PHRASE;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType.NONE;
 
@@ -13,6 +17,8 @@ import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.Rel
  * @author sali
  */
 public class PhraseNode extends LineSupport {
+
+    private static final long serialVersionUID = 449280304391482565L;
 
     /**
      * x location for circle.
@@ -89,4 +95,19 @@ public class PhraseNode extends LineSupport {
         return cy;
     }
 
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeDouble(getCx());
+        out.writeDouble(getCx());
+        out.writeObject(getGrammaticalRelationship());
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+        setCx(in.readDouble());
+        setCy(in.readDouble());
+        setGrammaticalRelationship((RelationshipType) in.readObject());
+    }
 }

@@ -7,6 +7,8 @@ import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNod
  */
 public class EmptyNode extends TerminalNode {
 
+    private static final long serialVersionUID = 2734913914878955243L;
+
     /**
      * Default Constructor.
      */

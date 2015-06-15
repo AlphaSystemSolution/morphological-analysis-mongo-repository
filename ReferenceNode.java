@@ -9,6 +9,8 @@ import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNod
  */
 public class ReferenceNode extends TerminalNode {
 
+    private static final long serialVersionUID = 168512397691715688L;
+
     /**
      *
      */

@@ -9,6 +9,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.RELATIONSHIP;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType.NONE;
 import static javafx.scene.paint.Color.web;
@@ -17,6 +21,8 @@ import static javafx.scene.paint.Color.web;
  * @author sali
  */
 public class RelationshipNode extends GraphNode {
+
+    private static final long serialVersionUID = 1815348680369408820L;
 
     private final DoubleProperty startX;
 
@@ -174,6 +180,10 @@ public class RelationshipNode extends GraphNode {
 
     public Color getStroke() {
         return stroke.get();
+    }
+
+    public void setStroke(Color stroke) {
+        this.stroke.set(stroke);
     }
 
     public ObjectProperty<Color> strokeProperty() {
@@ -336,4 +346,38 @@ public class RelationshipNode extends GraphNode {
         return curvePointY.get();
     }
 
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeDouble(getStartX());
+        out.writeDouble(getStartY());
+        out.writeDouble(getControlX1());
+        out.writeDouble(getControlY1());
+        out.writeDouble(getControlX2());
+        out.writeDouble(getControlY1());
+        out.writeDouble(getEndX());
+        out.writeDouble(getEndY());
+        out.writeDouble(getT1());
+        out.writeDouble(getT2());
+        out.writeObject(getGrammaticalRelationship());
+        out.writeObject(getStroke());
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+        setStartX(in.readDouble());
+        setStartY(in.readDouble());
+        setControlX1(in.readDouble());
+        setControlY1(in.readDouble());
+        setControlX2(in.readDouble());
+        setControlY2(in.readDouble());
+        setEndX(in.readDouble());
+        setEndY(in.readDouble());
+        setT1(in.readDouble());
+        setT2(in.readDouble());
+        setGrammaticalRelationship((RelationshipType) in.readObject());
+        setStroke((Color) in.readObject());
+        updateArrow();
+    }
 }

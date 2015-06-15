@@ -4,10 +4,16 @@ import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 /**
  * @author sali
  */
 public abstract class LineSupport extends GraphNode {
+
+    private static final long serialVersionUID = -5586158992561748359L;
 
     /**
      * x1 location for line
@@ -28,6 +34,10 @@ public abstract class LineSupport extends GraphNode {
      * y2 location for line
      */
     protected final DoubleProperty y2;
+
+    protected LineSupport() {
+        this(null, null, null, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d);
+    }
 
     /**
      * @param nodeType
@@ -97,5 +107,23 @@ public abstract class LineSupport extends GraphNode {
 
     public final DoubleProperty y2Property() {
         return y2;
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeDouble(getX1());
+        out.writeDouble(getY1());
+        out.writeDouble(getX2());
+        out.writeDouble(getY2());
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+        setX1(in.readDouble());
+        setY1(in.readDouble());
+        setX2(in.readDouble());
+        setY2(in.readDouble());
     }
 }

@@ -8,6 +8,9 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.List;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.TERMINAL;
@@ -19,6 +22,8 @@ import static org.apache.commons.lang3.ArrayUtils.isEmpty;
  * @author sali
  */
 public class TerminalNode extends LineSupport {
+
+    private static final long serialVersionUID = 3916613726425333716L;
 
     /**
      * x location for translation
@@ -109,8 +114,7 @@ public class TerminalNode extends LineSupport {
                     if (PART_OF_SPEECH_EXCLUDE_LIST.contains(partOfSpeech)) {
                         continue;
                     }
-                    this.partOfSpeeches.add(new PartOfSpeechNode(partOfSpeech, location, location.getId(),
-                            -1d, -1d, -1d, -1d, false));
+                    this.partOfSpeeches.add(new PartOfSpeechNode(partOfSpeech, location, -1d, -1d, -1d, -1d));
                 }
             }
         } else {
@@ -182,4 +186,39 @@ public class TerminalNode extends LineSupport {
         return token;
     }
 
+    public void setToken(Token token) {
+        this.token = token;
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        super.writeExternal(out);
+        out.writeDouble(getX3());
+        out.writeDouble(getY3());
+        int size = (partOfSpeeches == null || partOfSpeeches.isEmpty()) ? 0 : partOfSpeeches.size();
+        out.writeInt(size);
+        if (size > 0) {
+            partOfSpeeches.forEach(partOfSpeechNode -> {
+                try {
+                    out.writeObject(partOfSpeechNode);
+                } catch (IOException e) {
+                }
+            });
+        }
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+        setX3(in.readDouble());
+        setY3(in.readDouble());
+        int size = in.readInt();
+        if (size > 0) {
+            PartOfSpeechNode[] nodes = new PartOfSpeechNode[size];
+            for (int i = 0; i < size; i++) {
+                nodes[i] = (PartOfSpeechNode) in.readObject();
+            }
+            partOfSpeeches.setAll(nodes);
+        }
+    }
 }
