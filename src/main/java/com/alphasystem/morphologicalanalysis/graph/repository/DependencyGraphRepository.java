@@ -18,14 +18,17 @@ public interface DependencyGraphRepository extends BaseRepository<DependencyGrap
     List<DependencyGraph> findByChapterNumberAndVerseNumber(Integer chapterNumber, Integer verseNumber);
 
     /**
+     *
      * @param chapterNumber
      * @param verseNumber
-     * @param segmentNumber
+     * @param firstTokenIndex
+     * @param lastTokenIndex
      * @return
      */
-    DependencyGraph findByChapterNumberAndVerseNumberAndSegmentNumber(Integer chapterNumber,
-                                                                      Integer verseNumber,
-                                                                      Integer segmentNumber);
+    DependencyGraph findByChapterNumberAndVerseNumberAndFirstTokenIndexAndLastTokenIndex(Integer chapterNumber,
+                                                                                         Integer verseNumber,
+                                                                                         Integer firstTokenIndex,
+                                                                                         Integer lastTokenIndex);
 
     /**
      * @param chapterNumber

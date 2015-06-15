@@ -128,16 +128,32 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         log(format("Count for chapter number %s and verse number %s is : %s",
                 DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, count), true);
         int segmentNumber = (int) (count + 1);
-        DependencyGraph dependencyGraph = new DependencyGraph(DEFAULT_CHAPTER_NUMBER,
-                DEFAULT_VERSE_NUMBER, segmentNumber);
         List<Token> tokens = repositoryUtil.getTokenRepository().findByChapterNumberAndVerseNumber(
                 DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER);
+        Token firstToken = tokens.get(0);
+        Token lastToken = tokens.get(tokens.size() - 1);
+        DependencyGraph dependencyGraph = new DependencyGraph(DEFAULT_CHAPTER_NUMBER,
+                DEFAULT_VERSE_NUMBER, firstToken.getTokenNumber(), lastToken.getTokenNumber());
+
         dependencyGraph.setTokens(tokens);
         Relationship relationship = repositoryUtil.getRelationshipRepository()
                 .findByDisplayName("1:2:4:2::1:2:3:1");
         dependencyGraph.getRelationships().add(relationship);
 
         repositoryUtil.getDependencyGraphRepository().save(dependencyGraph);
+    }
+
+    @Test(dependsOnMethods = "createDependencyGraph")
+    public void checkDependencyGraph() {
+        List<DependencyGraph> list = repositoryUtil.getDependencyGraphRepository().findByChapterNumberAndVerseNumber(
+                DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER);
+        assertNotNull(list);
+        assertEquals(list.size(), 1);
+        DependencyGraph dg = list.get(0);
+        List<Token> tokens = dg.getTokens();
+        assertNotNull(tokens);
+        assertEquals(!tokens.isEmpty(), true);
+        tokens.forEach(token -> System.out.println("token = " + token));
     }
 
     public MorphologicalAnalysisRepositoryUtil getRepositoryUtil() {
