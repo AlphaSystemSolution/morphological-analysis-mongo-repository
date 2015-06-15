@@ -4,12 +4,19 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.util.ArrayList;
+import java.util.List;
+
 import static javafx.collections.FXCollections.observableArrayList;
 
 /**
  * @author sali
  */
-public class CanvasData {
+public class CanvasData implements Externalizable {
 
     private final ObjectProperty<CanvasMetaData> canvasMetaDataObject;
     private ObservableList<GraphNode> nodes = observableArrayList();
@@ -52,5 +59,21 @@ public class CanvasData {
 
     public final ObjectProperty<CanvasMetaData> canvasMetaDataObjectProperty() {
         return canvasMetaDataObject;
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(getCanvasMetaData());
+        List<GraphNode> nodes = new ArrayList<>();
+        if(this.nodes != null && !this.nodes.isEmpty()){
+            nodes.addAll(this.nodes);
+        }
+        out.writeObject(nodes);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        setCanvasMetaData((CanvasMetaData) in.readObject());
+        this.nodes.setAll((List<GraphNode>) in.readObject());
     }
 }

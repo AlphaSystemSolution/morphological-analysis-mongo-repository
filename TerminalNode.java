@@ -11,6 +11,7 @@ import javafx.collections.ObservableList;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.TERMINAL;
@@ -195,16 +196,11 @@ public class TerminalNode extends LineSupport {
         super.writeExternal(out);
         out.writeDouble(getX3());
         out.writeDouble(getY3());
-        int size = (partOfSpeeches == null || partOfSpeeches.isEmpty()) ? 0 : partOfSpeeches.size();
-        out.writeInt(size);
-        if (size > 0) {
-            partOfSpeeches.forEach(partOfSpeechNode -> {
-                try {
-                    out.writeObject(partOfSpeechNode);
-                } catch (IOException e) {
-                }
-            });
+        List<PartOfSpeechNode> nodes = new ArrayList<>();
+        if(partOfSpeeches != null && !partOfSpeeches.isEmpty()){
+            nodes.addAll(partOfSpeeches);
         }
+        out.writeObject(nodes);
     }
 
     @Override
@@ -212,13 +208,7 @@ public class TerminalNode extends LineSupport {
         super.readExternal(in);
         setX3(in.readDouble());
         setY3(in.readDouble());
-        int size = in.readInt();
-        if (size > 0) {
-            PartOfSpeechNode[] nodes = new PartOfSpeechNode[size];
-            for (int i = 0; i < size; i++) {
-                nodes[i] = (PartOfSpeechNode) in.readObject();
-            }
-            partOfSpeeches.setAll(nodes);
-        }
+        List<PartOfSpeechNode> nodes = (List<PartOfSpeechNode>) in.readObject();
+        partOfSpeeches.setAll(nodes);
     }
 }

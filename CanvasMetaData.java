@@ -5,12 +5,17 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 /**
  * Bean to capture canvas meta data.
  *
  * @author sali
  */
-public class CanvasMetaData {
+public class CanvasMetaData implements Externalizable {
 
     private final IntegerProperty width;
     private final IntegerProperty height;
@@ -88,5 +93,23 @@ public class CanvasMetaData {
 
     public IntegerProperty widthProperty() {
         return width;
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeInt(getWidth());
+        out.writeInt(getHeight());
+        out.writeBoolean(isShowGridLines());
+        out.writeBoolean(isShowOutLines());
+        out.writeBoolean(isDebugMode());
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        setWidth(in.readInt());
+        setHeight(in.readInt());
+        setShowGridLines(in.readBoolean());
+        setShowOutLines(in.readBoolean());
+        setDebugMode(in.readBoolean());
     }
 }
