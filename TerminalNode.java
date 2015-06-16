@@ -5,7 +5,9 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 
 import java.io.IOException;
@@ -39,7 +41,7 @@ public class TerminalNode extends LineSupport {
     /**
      *
      */
-    protected Token token;
+    protected ObjectProperty<Token> token;
 
     /**
      *
@@ -50,13 +52,12 @@ public class TerminalNode extends LineSupport {
      *
      */
     public TerminalNode() {
-        this(null, null, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 0.0, 0.0);
+        this(null, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 0.0, 0.0);
     }
 
     /**
      *
      * @param token
-     * @param id
      * @param x
      * @param y
      * @param x1
@@ -66,9 +67,9 @@ public class TerminalNode extends LineSupport {
      * @param x3
      * @param y3
      */
-    public TerminalNode(Token token, String id, Double x, Double y, Double x1, Double y1, Double x2,
+    public TerminalNode(Token token, Double x, Double y, Double x1, Double y1, Double x2,
                         Double y2, Double x3, Double y3) {
-        this(token, id, x, y, x1, y1, x2, y2, x3, y3, 0d, 0d);
+        this(token, x, y, x1, y1, x2, y2, x3, y3, 0d, 0d);
     }
 
     /**
@@ -81,16 +82,15 @@ public class TerminalNode extends LineSupport {
      * @param translateX
      * @param translateY
      */
-    public TerminalNode(Token token, String id, Double x, Double y, Double x1, Double y1, Double x2,
+    public TerminalNode(Token token, Double x, Double y, Double x1, Double y1, Double x2,
                         Double y2, Double x3, Double y3, Double translateX, Double translateY,
                         PartOfSpeechNode... partOfSpeechNodes) {
-        this(TERMINAL, token, id, x, y, x1, y1, x2, y2, x3, y3, translateX, translateY, partOfSpeechNodes);
+        this(TERMINAL, token, x, y, x1, y1, x2, y2, x3, y3, translateX, translateY, partOfSpeechNodes);
     }
 
     /**
      * @param nodeType
      * @param token
-     * @param id
      * @param x
      * @param y
      * @param x1
@@ -102,25 +102,25 @@ public class TerminalNode extends LineSupport {
      * @param translateX
      * @param translateY
      */
-    protected TerminalNode(GraphNodeType nodeType, Token token, String id, Double x, Double y,
+    protected TerminalNode(GraphNodeType nodeType, Token token, Double x, Double y,
                            Double x1, Double y1, Double x2, Double y2, Double x3, Double y3,
                            Double translateX, Double translateY, PartOfSpeechNode... partOfSpeechNodes) {
-        this(nodeType, id, getTokenValue(token), x, y, x1, y1, x2, y2, x3, y3, translateX, translateY);
-        this.token = token == null ? new Token() : token;
-        if (isEmpty(partOfSpeechNodes)) {
-            List<Location> locations = this.token.getLocations();
-            if (locations != null && !locations.isEmpty()) {
-                for (Location location : locations) {
-                    PartOfSpeech partOfSpeech = location.getPartOfSpeech();
-                    if (PART_OF_SPEECH_EXCLUDE_LIST.contains(partOfSpeech)) {
-                        continue;
-                    }
-                    this.partOfSpeeches.add(new PartOfSpeechNode(partOfSpeech, location, -1d, -1d, -1d, -1d));
-                }
+        this(nodeType, null, null, x, y, x1, y1, x2, y2, x3, y3, translateX, translateY);
+        this.token = new SimpleObjectProperty<>();
+        tokenProperty().addListener((observable, oldToken, newToken) -> {
+            if (newToken == null) {
+                this.partOfSpeeches.remove(0, this.partOfSpeeches.size());
+            } else {
+                setText(getTokenValue(newToken));
+                setId(newToken.getId());
             }
-        } else {
+        });
+        setToken(token);
+        loadPartOfSpeechNodes();
+        if (!isEmpty(partOfSpeechNodes)) {
             this.partOfSpeeches.setAll(partOfSpeechNodes);
         }
+
     }
 
     /**
@@ -151,12 +151,31 @@ public class TerminalNode extends LineSupport {
         return (token == null) ? null : token.getTokenWord().toUnicode();
     }
 
+    private void loadPartOfSpeechNodes() {
+        this.partOfSpeeches.remove(0, this.partOfSpeeches.size());
+        Token token = getToken();
+        if (token == null) {
+            return;
+        }
+        List<Location> locations = token.getLocations();
+        if (locations != null && !locations.isEmpty()) {
+            for (Location location : locations) {
+                PartOfSpeech partOfSpeech = location.getPartOfSpeech();
+                if (PART_OF_SPEECH_EXCLUDE_LIST.contains(partOfSpeech)) {
+                    continue;
+                }
+                this.partOfSpeeches.add(new PartOfSpeechNode(location, -1d, -1d, -1d, -1d));
+            }
+        }
+    }
+
     public ObservableList<PartOfSpeechNode> getPartOfSpeeches() {
         return partOfSpeeches;
     }
 
     public void setPartOfSpeeches(ObservableList<PartOfSpeechNode> partOfSpeeches) {
-        this.partOfSpeeches = partOfSpeeches;
+        this.partOfSpeeches.remove(0, this.partOfSpeeches.size());
+        this.partOfSpeeches.addAll(partOfSpeeches);
     }
 
     public final Double getX3() {
@@ -183,12 +202,16 @@ public class TerminalNode extends LineSupport {
         return y3;
     }
 
-    public Token getToken() {
-        return token;
+    public final Token getToken() {
+        return token.get();
     }
 
-    public void setToken(Token token) {
-        this.token = token;
+    public final void setToken(Token token) {
+        this.token.set(token);
+    }
+
+    public final ObjectProperty<Token> tokenProperty() {
+        return token;
     }
 
     @Override

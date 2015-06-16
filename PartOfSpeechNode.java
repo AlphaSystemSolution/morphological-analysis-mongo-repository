@@ -6,7 +6,9 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.NounProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -30,32 +32,40 @@ public class PartOfSpeechNode extends GraphNode {
      * y location for circle
      */
     private final DoubleProperty cy;
-
+    private final ObjectProperty<Location> location;
     private PartOfSpeech partOfSpeech;
-
-    private Location location;
-
     private AbstractProperties properties;
 
     /**
      *
      */
     public PartOfSpeechNode() {
-        this(null, null, 0d, 0d, 0d, 0d);
+        this(null, 0d, 0d, 0d, 0d);
     }
 
     /**
-     * @param partOfSpeech
      * @param location
      * @param x
      * @param y
      * @param cx
      * @param cy
      */
-    public PartOfSpeechNode(PartOfSpeech partOfSpeech, Location location, Double x, Double y,
+    public PartOfSpeechNode(Location location, Double x, Double y,
                             Double cx, Double cy) {
-        super(PART_OF_SPEECH, null, getText(partOfSpeech, location), x, y);
-        this.partOfSpeech = partOfSpeech;
+        super(PART_OF_SPEECH, null, null, x, y);
+        this.location = new SimpleObjectProperty<>();
+        locationProperty().addListener((observable, oldLocation, newLocation) -> {
+            setPartOfSpeech(null);
+            setId(null);
+            setText(null);
+            setProperties(null);
+            if (newLocation != null) {
+                setPartOfSpeech(newLocation.getPartOfSpeech());
+                setId(newLocation.getId());
+                setText(getText(getPartOfSpeech(), getLocation()));
+                setProperties(newLocation.getProperties());
+            }
+        });
         setLocation(location);
         this.cx = new SimpleDoubleProperty(cx);
         this.cy = new SimpleDoubleProperty(cy);
@@ -89,16 +99,20 @@ public class PartOfSpeechNode extends GraphNode {
         return properties;
     }
 
-    public Location getLocation() {
-        return location;
+    private void setProperties(AbstractProperties properties) {
+        this.properties = properties;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
-        if (this.location != null) {
-            this.properties = this.location.getProperties();
-            setId(this.location.getId());
-        }
+    public final Location getLocation() {
+        return location.get();
+    }
+
+    public final void setLocation(Location location) {
+        this.location.set(location);
+    }
+
+    public final ObjectProperty<Location> locationProperty() {
+        return location;
     }
 
     public final double getCx() {
@@ -143,6 +157,6 @@ public class PartOfSpeechNode extends GraphNode {
 
     @Override
     public String toString() {
-        return getText(partOfSpeech, location);
+        return getText(partOfSpeech, getLocation());
     }
 }

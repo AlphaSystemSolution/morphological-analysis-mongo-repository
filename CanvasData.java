@@ -2,9 +2,9 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph.model;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 
 import java.io.Externalizable;
@@ -21,25 +21,37 @@ import static javafx.collections.FXCollections.observableArrayList;
  */
 public class CanvasData implements Externalizable {
 
-    private final StringProperty id;
+    private static final long serialVersionUID = 7648139043189886298L;
+
+    private final ReadOnlyStringWrapper id;
     private final ObjectProperty<CanvasMetaData> canvasMetaDataObject;
+    private final ObjectProperty<DependencyGraph> dependencyGraph;
     private ObservableList<GraphNode> nodes = observableArrayList();
-    private DependencyGraph dependencyGraph;
+
+    public CanvasData() {
+        this(new CanvasMetaData());
+    }
 
     public CanvasData(CanvasMetaData canvasMetaData) {
-        id = new SimpleStringProperty();
+        id = new ReadOnlyStringWrapper();
+        dependencyGraph = new SimpleObjectProperty<>();
         this.canvasMetaDataObject = new SimpleObjectProperty<>(canvasMetaData);
+        dependencyGraph.addListener((observable, oldValue, newValue) -> {
+            String id = newValue == null ? null : newValue.getId();
+            setId(id);
+        });
     }
 
-    public DependencyGraph getDependencyGraph() {
+    public final DependencyGraph getDependencyGraph() {
+        return dependencyGraph.get();
+    }
+
+    public final void setDependencyGraph(DependencyGraph dependencyGraph) {
+        this.dependencyGraph.set(dependencyGraph);
+    }
+
+    public final ObjectProperty<DependencyGraph> dependencyGraphProperty() {
         return dependencyGraph;
-    }
-
-    public void setDependencyGraph(DependencyGraph dependencyGraph) {
-        this.dependencyGraph = dependencyGraph;
-        if (this.dependencyGraph != null) {
-            setId(this.dependencyGraph.getId());
-        }
     }
 
     public final String getId() {
@@ -50,8 +62,8 @@ public class CanvasData implements Externalizable {
         this.id.set(id);
     }
 
-    public final StringProperty idProperty() {
-        return id;
+    public final ReadOnlyStringProperty idProperty() {
+        return id.getReadOnlyProperty();
     }
 
     public boolean add(GraphNode graphNode) {

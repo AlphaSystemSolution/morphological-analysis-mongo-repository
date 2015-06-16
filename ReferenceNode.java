@@ -15,12 +15,11 @@ public class ReferenceNode extends TerminalNode {
      *
      */
     public ReferenceNode() {
-        this(null, null, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d);
+        this(null, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d);
     }
 
     /**
      * @param token
-     * @param id
      * @param x
      * @param y
      * @param x1
@@ -30,14 +29,13 @@ public class ReferenceNode extends TerminalNode {
      * @param x3
      * @param y3
      */
-    public ReferenceNode(Token token, String id, Double x, Double y, Double x1, Double y1, Double x2,
+    public ReferenceNode(Token token, Double x, Double y, Double x1, Double y1, Double x2,
                          Double y2, Double x3, Double y3) {
-        this(token, id, x, y, x1, y1, x2, y2, x3, y3, 0d, 0d);
+        this(token, x, y, x1, y1, x2, y2, x3, y3, 0d, 0d);
     }
 
     /**
      * @param token
-     * @param id
      * @param x
      * @param y
      * @param x1
@@ -49,8 +47,8 @@ public class ReferenceNode extends TerminalNode {
      * @param translateX
      * @param translateY
      */
-    public ReferenceNode(Token token, String id, Double x, Double y, Double x1, Double y1, Double x2,
+    public ReferenceNode(Token token, Double x, Double y, Double x1, Double y1, Double x2,
                          Double y2, Double x3, Double y3, Double translateX, Double translateY) {
-        super(REFERENCE, token, id, x, y, x1, y1, x2, y2, x3, y3, translateX, translateY);
+        super(REFERENCE, token, x, y, x1, y1, x2, y2, x3, y3, translateX, translateY);
     }
 }
