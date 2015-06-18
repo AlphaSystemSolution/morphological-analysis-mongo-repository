@@ -5,9 +5,7 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.NounProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import java.io.IOException;
@@ -19,19 +17,10 @@ import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNod
 /**
  * @author sali
  */
-public class PartOfSpeechNode extends GraphNode {
+public class PartOfSpeechNode extends LinkSupport {
 
     private static final long serialVersionUID = 8910009645217482464L;
 
-    /**
-     * x location for circle.
-     */
-    private final DoubleProperty cx;
-
-    /**
-     * y location for circle
-     */
-    private final DoubleProperty cy;
     private final ObjectProperty<Location> location;
     private PartOfSpeech partOfSpeech;
     private AbstractProperties properties;
@@ -50,9 +39,8 @@ public class PartOfSpeechNode extends GraphNode {
      * @param cx
      * @param cy
      */
-    public PartOfSpeechNode(Location location, Double x, Double y,
-                            Double cx, Double cy) {
-        super(PART_OF_SPEECH, null, null, x, y);
+    public PartOfSpeechNode(Location location, Double x, Double y, Double cx, Double cy) {
+        super(PART_OF_SPEECH, null, null, x, y, cx, cy);
         this.location = new SimpleObjectProperty<>();
         locationProperty().addListener((observable, oldLocation, newLocation) -> {
             setPartOfSpeech(null);
@@ -67,8 +55,6 @@ public class PartOfSpeechNode extends GraphNode {
             }
         });
         setLocation(location);
-        this.cx = new SimpleDoubleProperty(cx);
-        this.cy = new SimpleDoubleProperty(cy);
     }
 
     private static String getText(PartOfSpeech partOfSpeech, Location location) {
@@ -115,44 +101,16 @@ public class PartOfSpeechNode extends GraphNode {
         return location;
     }
 
-    public final double getCx() {
-        return cx.get();
-    }
-
-    public final void setCx(double cx) {
-        this.cx.set(cx);
-    }
-
-    public final DoubleProperty cxProperty() {
-        return cx;
-    }
-
-    public final double getCy() {
-        return cy.get();
-    }
-
-    public final void setCy(double cy) {
-        this.cy.set(cy);
-    }
-
-    public final DoubleProperty cyProperty() {
-        return cy;
-    }
-
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeObject(getPartOfSpeech());
-        out.writeDouble(getCx());
-        out.writeDouble(getCy());
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
         setPartOfSpeech((PartOfSpeech) in.readObject());
-        setCx(in.readDouble());
-        setCy(in.readDouble());
     }
 
     @Override
