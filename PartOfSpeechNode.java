@@ -1,6 +1,7 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.model;
 
 import com.alphasystem.arabic.model.ArabicLetters;
+import com.alphasystem.morphologicalanalysis.common.model.Related;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.NounProperties;
@@ -71,6 +72,11 @@ public class PartOfSpeechNode extends LinkSupport {
                 break;
         }
         return builder.toString();
+    }
+
+    @Override
+    public Related getRelated() {
+        return getLocation();
     }
 
     public PartOfSpeech getPartOfSpeech() {

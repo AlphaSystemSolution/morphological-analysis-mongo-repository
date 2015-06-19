@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.model;
 
+import com.alphasystem.morphologicalanalysis.common.model.Related;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -44,6 +45,11 @@ public class PhraseNode extends LinkSupport {
                       Double y1, Double x2, Double y2, Double cx, Double cy) {
         super(PHRASE, id, relationshipType.getLabel().toUnicode(), x, y, x1, y1, x2, y2, 0.0, 0.0, cx, cy);
         this.grammaticalRelationship = new SimpleObjectProperty<>(relationshipType);
+    }
+
+    @Override
+    public Related getRelated() {
+        return null;
     }
 
     public final RelationshipType getGrammaticalRelationship() {

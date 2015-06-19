@@ -1,11 +1,9 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.model;
 
+import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
 import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CubicCurveHelper;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 
@@ -14,7 +12,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.RELATIONSHIP;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType.NONE;
+import static com.alphasystem.util.IdGenerator.nextId;
+import static javafx.scene.paint.Color.BLACK;
 import static javafx.scene.paint.Color.web;
 
 /**
@@ -24,9 +23,9 @@ public class RelationshipNode extends GraphNode {
 
     private static final long serialVersionUID = 1815348680369408820L;
 
-    private final DoubleProperty startX;
+    private final ReadOnlyDoubleWrapper startX;
 
-    private final DoubleProperty startY;
+    private final ReadOnlyDoubleWrapper startY;
 
     private final DoubleProperty controlX1;
 
@@ -36,9 +35,9 @@ public class RelationshipNode extends GraphNode {
 
     private final DoubleProperty controlY2;
 
-    private final DoubleProperty endX;
+    private final ReadOnlyDoubleWrapper endX;
 
-    private final DoubleProperty endY;
+    private final ReadOnlyDoubleWrapper endY;
 
     private final DoubleProperty t1;
 
@@ -56,68 +55,95 @@ public class RelationshipNode extends GraphNode {
 
     private final DoubleProperty curvePointY;
 
-    private final ObjectProperty<RelationshipType> grammaticalRelationship;
+    private final ObjectProperty<Relationship> relationship;
 
-    private final ObjectProperty<Color> stroke;
+    private final ObjectProperty<LinkSupport> dependentNode;
+
+    private final ObjectProperty<LinkSupport> ownerNode;
+
+    private final ReadOnlyObjectWrapper<Color> stroke;
 
     /**
      *
      */
     public RelationshipNode() {
-        this(NONE, null, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0.5, 0.55);
+        this(null, null, null, 0d, 0d, 0d, 0d, 0d, 0d, 0.5, 0.55);
     }
 
     /**
-     * @param relationshipType
-     * @param id
+     * @param relationship
+     * @param dependentNode
+     * @param ownerNode
      * @param x
      * @param y
-     * @param startX
-     * @param startY
      * @param controlX1
      * @param controlY1
      * @param controlX2
      * @param controlY2
-     * @param endX
-     * @param endY
      */
-    public RelationshipNode(RelationshipType relationshipType, String id, Double x, Double y,
-                            Double startX, Double startY, Double controlX1, Double controlY1, Double controlX2,
-                            Double controlY2, Double endX, Double endY, Double t1, Double t2) {
-        super(RELATIONSHIP, id, relationshipType.getLabel().toUnicode(), x, y);
-        this.grammaticalRelationship = new SimpleObjectProperty<>(relationshipType);
-        this.stroke = new SimpleObjectProperty<>(web(relationshipType.getColorCode()));
-        this.startX = new SimpleDoubleProperty(startX);
-        this.startY = new SimpleDoubleProperty(startY);
-        this.controlX1 = new SimpleDoubleProperty(controlX1);
-        this.controlY1 = new SimpleDoubleProperty(controlY1);
-        this.controlX2 = new SimpleDoubleProperty(controlX2);
-        this.controlY2 = new SimpleDoubleProperty(controlY2);
-        this.endX = new SimpleDoubleProperty(endX);
-        this.endY = new SimpleDoubleProperty(endY);
-        this.t1 = new SimpleDoubleProperty(t1);
-        this.t2 = new SimpleDoubleProperty(t2);
+    public RelationshipNode(Relationship relationship, LinkSupport dependentNode, LinkSupport ownerNode,
+                            Double x, Double y, Double controlX1, Double controlY1, Double controlX2,
+                            Double controlY2, Double t1, Double t2) {
+        super(RELATIONSHIP, null, null, x, y);
+        this.relationship = new SimpleObjectProperty<>();
+        this.dependentNode = new SimpleObjectProperty<>();
+        this.ownerNode = new SimpleObjectProperty<>();
+        this.stroke = new ReadOnlyObjectWrapper<>();
+        this.startX = new ReadOnlyDoubleWrapper();
+        this.startY = new ReadOnlyDoubleWrapper();
+        this.controlX1 = new SimpleDoubleProperty();
+        this.controlY1 = new SimpleDoubleProperty();
+        this.controlX2 = new SimpleDoubleProperty();
+        this.controlY2 = new SimpleDoubleProperty();
+        this.endX = new ReadOnlyDoubleWrapper();
+        this.endY = new ReadOnlyDoubleWrapper();
+        this.t1 = new SimpleDoubleProperty();
+        this.t2 = new SimpleDoubleProperty();
         this.arrowPointX1 = new SimpleDoubleProperty();
         this.arrowPointY1 = new SimpleDoubleProperty();
         this.arrowPointX2 = new SimpleDoubleProperty();
         this.arrowPointY2 = new SimpleDoubleProperty();
         this.curvePointX = new SimpleDoubleProperty();
         this.curvePointY = new SimpleDoubleProperty();
-        updateArrow();
         initListeners();
+        setRelationship(relationship);
+        setDependentNode(dependentNode);
+        setOwnerNode(ownerNode);
+        setControlX1(controlX1);
+        setControlY1(controlY1);
+        setControlX2(controlX2);
+        setControlY2(controlY2);
+        setT1(t1);
+        setT2(t2);
     }
 
     private void initListeners() {
-        grammaticalRelationshipProperty().addListener((observable, oldValue, newValue) -> {
-            this.stroke.setValue(web(newValue.getColorCode()));
+        relationshipProperty().addListener((observable, oldValue, newValue) -> {
+            setStroke(BLACK);
+            setId(nextId());
+            setText(null);
+            if (newValue != null) {
+                RelationshipType relationship = newValue.getRelationship();
+                setStroke(web(relationship.getColorCode()));
+                setId(newValue.getId());
+                setText(relationship.getLabel().toUnicode());
+            }
         });
-        startXProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && newValue != oldValue) {
+        dependentNodeProperty().addListener((observable, oldValue, newValue) -> {
+            setStartX(0d);
+            setStartY(0d);
+            if (newValue != null) {
+                setStartX(newValue.getCx());
+                setStartY(newValue.getCy());
                 updateArrow();
             }
         });
-        startYProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && newValue != oldValue) {
+        ownerNodeProperty().addListener((observable, oldValue, newValue) -> {
+            setEndX(0d);
+            setEndY(0d);
+            if (newValue != null) {
+                setEndX(newValue.getCx());
+                setEndY(newValue.getCy());
                 updateArrow();
             }
         });
@@ -137,16 +163,6 @@ public class RelationshipNode extends GraphNode {
             }
         });
         controlY2Property().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && newValue != oldValue) {
-                updateArrow();
-            }
-        });
-        endXProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && newValue != oldValue) {
-                updateArrow();
-            }
-        });
-        endYProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null && newValue != oldValue) {
                 updateArrow();
             }
@@ -182,24 +198,48 @@ public class RelationshipNode extends GraphNode {
         return stroke.get();
     }
 
-    public void setStroke(Color stroke) {
+    private void setStroke(Color stroke) {
         this.stroke.set(stroke);
     }
 
-    public ObjectProperty<Color> strokeProperty() {
-        return stroke;
+    public ReadOnlyObjectProperty<Color> strokeProperty() {
+        return stroke.getReadOnlyProperty();
     }
 
-    public final RelationshipType getGrammaticalRelationship() {
-        return grammaticalRelationship.get();
+    public final Relationship getRelationship() {
+        return relationship.get();
     }
 
-    public final void setGrammaticalRelationship(RelationshipType relationshipType) {
-        this.grammaticalRelationship.set(relationshipType);
+    public final void setRelationship(Relationship relationship) {
+        this.relationship.set(relationship);
     }
 
-    public final ObjectProperty<RelationshipType> grammaticalRelationshipProperty() {
-        return grammaticalRelationship;
+    public final ObjectProperty<Relationship> relationshipProperty() {
+        return relationship;
+    }
+
+    public final LinkSupport getOwnerNode() {
+        return ownerNode.get();
+    }
+
+    public final void setOwnerNode(LinkSupport ownerNode) {
+        this.ownerNode.set(ownerNode);
+    }
+
+    public final ObjectProperty<LinkSupport> ownerNodeProperty() {
+        return ownerNode;
+    }
+
+    public final LinkSupport getDependentNode() {
+        return dependentNode.get();
+    }
+
+    public final void setDependentNode(LinkSupport dependentNode) {
+        this.dependentNode.set(dependentNode);
+    }
+
+    public final ObjectProperty<LinkSupport> dependentNodeProperty() {
+        return dependentNode;
     }
 
     public double getControlX1() {
@@ -274,28 +314,28 @@ public class RelationshipNode extends GraphNode {
         return endY;
     }
 
-    public double getStartX() {
+    public final double getStartX() {
         return startX.get();
     }
 
-    public void setStartX(double startX) {
+    private final void setStartX(double startX) {
         this.startX.set(startX);
     }
 
-    public final DoubleProperty startXProperty() {
-        return startX;
+    public final ReadOnlyDoubleProperty startXProperty() {
+        return startX.getReadOnlyProperty();
     }
 
-    public double getStartY() {
+    public final double getStartY() {
         return startY.get();
     }
 
-    public void setStartY(double startY) {
+    private final void setStartY(double startY) {
         this.startY.set(startY);
     }
 
-    public final DoubleProperty startYProperty() {
-        return startY;
+    public final ReadOnlyDoubleProperty startYProperty() {
+        return startY.getReadOnlyProperty();
     }
 
     public final double getT1() {
@@ -359,7 +399,6 @@ public class RelationshipNode extends GraphNode {
         out.writeDouble(getEndY());
         out.writeDouble(getT1());
         out.writeDouble(getT2());
-        out.writeObject(getGrammaticalRelationship());
         out.writeObject(getStroke());
     }
 
@@ -376,7 +415,6 @@ public class RelationshipNode extends GraphNode {
         setEndY(in.readDouble());
         setT1(in.readDouble());
         setT2(in.readDouble());
-        setGrammaticalRelationship((RelationshipType) in.readObject());
         setStroke((Color) in.readObject());
         updateArrow();
     }

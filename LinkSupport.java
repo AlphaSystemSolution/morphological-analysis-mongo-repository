@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.model;
 
+import com.alphasystem.morphologicalanalysis.common.model.Related;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -70,6 +71,8 @@ public abstract class LinkSupport extends LineSupport {
     public final DoubleProperty cyProperty() {
         return cy;
     }
+
+    public abstract Related getRelated();
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
