@@ -97,7 +97,7 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         repositoryUtil.getLocationRepository().save(location);
     }
 
-    @Test(dependsOnMethods = "populateToken3")
+    // @Test(dependsOnMethods = "populateToken3")
     public void populateRelationship() {
         Relationship relationship = new Relationship();
 
@@ -113,7 +113,7 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         repositoryUtil.getRelationshipRepository().save(relationship);
     }
 
-    @Test(dependsOnMethods = "populateRelationship")
+    // @Test(dependsOnMethods = "populateRelationship")
     public void checkRelationship() {
         RelationshipRepository repository = repositoryUtil.getRelationshipRepository();
         Relationship relationship = repository.findByDisplayName("1:2:4:2::1:2:3:1");
@@ -121,7 +121,8 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         log(format("Found relationship %s", relationship.getId()), true);
     }
 
-    @Test(dependsOnMethods = "populateRelationship")
+    // @Test(dependsOnMethods = "populateRelationship")
+    @Test(dependsOnMethods = "populateToken3")
     public void createDependencyGraph() {
         DependencyGraphRepository repository = repositoryUtil.getDependencyGraphRepository();
         Long count = repository.countByChapterNumberAndVerseNumber(DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER);
@@ -136,11 +137,28 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
                 DEFAULT_VERSE_NUMBER, firstToken.getTokenNumber(), lastToken.getTokenNumber());
 
         dependencyGraph.setTokens(tokens);
-        Relationship relationship = repositoryUtil.getRelationshipRepository()
-                .findByDisplayName("1:2:4:2::1:2:3:1");
-        dependencyGraph.getRelationships().add(relationship);
+//        Relationship relationship = repositoryUtil.getRelationshipRepository()
+//                .findByDisplayName("1:2:4:2::1:2:3:1");
+        dependencyGraph.getRelationships().add(createRelationship());
 
         repositoryUtil.getDependencyGraphRepository().save(dependencyGraph);
+    }
+
+    private Relationship createRelationship() {
+        Relationship relationship = new Relationship();
+
+        LocationRepository repository = repositoryUtil.getLocationRepository();
+        Location location = repository.findByChapterNumberAndVerseNumberAndTokenNumberAndLocationNumber
+                (DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, 4, 2);
+        assertNotNull(location);
+        relationship.setDependent(location);
+
+        location = repository.findByChapterNumberAndVerseNumberAndTokenNumberAndLocationNumber
+                (DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, 3, 1);
+        assertNotNull(location);
+        relationship.setOwner(location);
+        relationship.setRelationship(MUDAF_ILAIH);
+        return relationship;
     }
 
     @Test(dependsOnMethods = "createDependencyGraph")
