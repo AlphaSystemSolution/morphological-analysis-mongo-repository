@@ -3,7 +3,6 @@ package com.alphasystem.morphologicalanalysis.repository.test;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
-import com.alphasystem.morphologicalanalysis.graph.repository.RelationshipRepository;
 import com.alphasystem.morphologicalanalysis.spring.support.GraphConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
@@ -97,31 +96,6 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         repositoryUtil.getLocationRepository().save(location);
     }
 
-    // @Test(dependsOnMethods = "populateToken3")
-    public void populateRelationship() {
-        Relationship relationship = new Relationship();
-
-        LocationRepository repository = repositoryUtil.getLocationRepository();
-        Location location = repository.findByChapterNumberAndVerseNumberAndTokenNumberAndLocationNumber
-                (DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, 4, 2);
-        relationship.setDependent(location);
-
-        location = repository.findByChapterNumberAndVerseNumberAndTokenNumberAndLocationNumber
-                (DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, 3, 1);
-        relationship.setOwner(location);
-        relationship.setRelationship(MUDAF_ILAIH);
-        repositoryUtil.getRelationshipRepository().save(relationship);
-    }
-
-    // @Test(dependsOnMethods = "populateRelationship")
-    public void checkRelationship() {
-        RelationshipRepository repository = repositoryUtil.getRelationshipRepository();
-        Relationship relationship = repository.findByDisplayName("1:2:4:2::1:2:3:1");
-        assertNotNull(relationship);
-        log(format("Found relationship %s", relationship.getId()), true);
-    }
-
-    // @Test(dependsOnMethods = "populateRelationship")
     @Test(dependsOnMethods = "populateToken3")
     public void createDependencyGraph() {
         DependencyGraphRepository repository = repositoryUtil.getDependencyGraphRepository();
@@ -137,8 +111,6 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
                 DEFAULT_VERSE_NUMBER, firstToken.getTokenNumber(), lastToken.getTokenNumber());
 
         dependencyGraph.setTokens(tokens);
-//        Relationship relationship = repositoryUtil.getRelationshipRepository()
-//                .findByDisplayName("1:2:4:2::1:2:3:1");
         dependencyGraph.getRelationships().add(createRelationship());
 
         repositoryUtil.getDependencyGraphRepository().save(dependencyGraph);
