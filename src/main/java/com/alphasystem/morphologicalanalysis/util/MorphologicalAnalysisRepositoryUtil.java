@@ -77,13 +77,13 @@ public class MorphologicalAnalysisRepositoryUtil {
                 Token token = new Token(chapterNumber, verseNumber, tokenNumber, aw.toUnicode());
                 // we will create one location for each token
                 Location location = new Location(chapterNumber, verseNumber, tokenNumber, 1);
-                locationRepository.save(location);
+                // locationRepository.save(location);
                 token.addLocation(location);
-                tokenRepository.save(token);
+                // tokenRepository.save(token);
                 verse.addToken(token);
                 tokenNumber++;
             } // end of token loop
-            verseRepository.save(verse);
+            // verseRepository.save(verse);
             if (verbose) {
                 out.println(format("Finished creating verse {%s}", verseNumber));
             }
