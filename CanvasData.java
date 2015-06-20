@@ -26,6 +26,7 @@ public class CanvasData implements Externalizable {
     private final ReadOnlyStringWrapper id;
     private final ObjectProperty<CanvasMetaData> canvasMetaDataObject;
     private final ObjectProperty<DependencyGraph> dependencyGraph;
+    private final ObjectProperty<GraphNode> selectedNode;
     private ObservableList<GraphNode> nodes = observableArrayList();
 
     public CanvasData() {
@@ -35,11 +36,24 @@ public class CanvasData implements Externalizable {
     public CanvasData(CanvasMetaData canvasMetaData) {
         id = new ReadOnlyStringWrapper();
         dependencyGraph = new SimpleObjectProperty<>();
+        selectedNode = new SimpleObjectProperty<>();
         this.canvasMetaDataObject = new SimpleObjectProperty<>(canvasMetaData);
         dependencyGraph.addListener((observable, oldValue, newValue) -> {
             String id = newValue == null ? null : newValue.getId();
             setId(id);
         });
+    }
+
+    public final GraphNode getSelectedNode() {
+        return selectedNode.get();
+    }
+
+    public final void setSelectedNode(GraphNode selectedNode) {
+        this.selectedNode.set(selectedNode);
+    }
+
+    public final ObjectProperty<GraphNode> selectedNodeProperty() {
+        return selectedNode;
     }
 
     public final DependencyGraph getDependencyGraph() {
