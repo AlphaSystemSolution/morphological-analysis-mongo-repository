@@ -399,7 +399,6 @@ public class RelationshipNode extends GraphNode {
         out.writeDouble(getEndY());
         out.writeDouble(getT1());
         out.writeDouble(getT2());
-        out.writeObject(getStroke());
     }
 
     @Override
@@ -415,7 +414,6 @@ public class RelationshipNode extends GraphNode {
         setEndY(in.readDouble());
         setT1(in.readDouble());
         setT2(in.readDouble());
-        setStroke((Color) in.readObject());
         updateArrow();
     }
 }
