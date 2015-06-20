@@ -78,7 +78,7 @@ public abstract class LinkSupport extends LineSupport {
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
         out.writeDouble(getCx());
-        out.writeDouble(getCx());
+        out.writeDouble(getCy());
     }
 
     @Override
