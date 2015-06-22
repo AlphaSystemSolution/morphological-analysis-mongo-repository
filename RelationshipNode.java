@@ -1,7 +1,6 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.model;
 
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
-import com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CubicCurveHelper;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import javafx.beans.property.*;
 import javafx.geometry.Point2D;
@@ -12,6 +11,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.RELATIONSHIP;
+import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CubicCurveHelper.calculateCurvePoint;
 import static com.alphasystem.util.IdGenerator.nextId;
 import static javafx.scene.paint.Color.BLACK;
 import static javafx.scene.paint.Color.web;
@@ -180,7 +180,7 @@ public class RelationshipNode extends GraphNode {
     }
 
     private void updateArrow() {
-        Point2D point = CubicCurveHelper.calculateCurvePoint(getT1(), getStartX(), getStartY(), getControlX1(), getControlY1(),
+        Point2D point = calculateCurvePoint(getT1(), getStartX(), getStartY(), getControlX1(), getControlY1(),
                 getControlX2(), getControlY2(), getEndX(), getEndY());
         arrowPointX1.setValue(point.getX());
         arrowPointY1.setValue(point.getY() + 5);
@@ -188,7 +188,7 @@ public class RelationshipNode extends GraphNode {
         arrowPointX2.setValue(point.getX());
         arrowPointY2.setValue(point.getY() - 5);
 
-        point = CubicCurveHelper.calculateCurvePoint(getT2(), getStartX(), getStartY(), getControlX1(), getControlY1(),
+        point = calculateCurvePoint(getT2(), getStartX(), getStartY(), getControlX1(), getControlY1(),
                 getControlX2(), getControlY2(), getEndX(), getEndY());
         curvePointX.setValue(point.getX());
         curvePointY.setValue(point.getY());
@@ -224,6 +224,14 @@ public class RelationshipNode extends GraphNode {
 
     public final void setOwnerNode(LinkSupport ownerNode) {
         this.ownerNode.set(ownerNode);
+        if (getOwnerNode() != null) {
+            getOwnerNode().cxProperty().addListener((observable, oldValue, newValue) -> {
+                setEndX((Double) newValue);
+            });
+            getOwnerNode().cyProperty().addListener((observable, oldValue, newValue) -> {
+                setEndY((Double) newValue);
+            });
+        }
     }
 
     public final ObjectProperty<LinkSupport> ownerNodeProperty() {
@@ -236,6 +244,14 @@ public class RelationshipNode extends GraphNode {
 
     public final void setDependentNode(LinkSupport dependentNode) {
         this.dependentNode.set(dependentNode);
+        if (getDependentNode() != null) {
+            getDependentNode().cxProperty().addListener((observable, oldValue, newValue) -> {
+                setStartX((Double) newValue);
+            });
+            getDependentNode().cyProperty().addListener((observable, oldValue, newValue) -> {
+                setStartY((Double) newValue);
+            });
+        }
     }
 
     public final ObjectProperty<LinkSupport> dependentNodeProperty() {
@@ -399,6 +415,8 @@ public class RelationshipNode extends GraphNode {
         out.writeDouble(getEndY());
         out.writeDouble(getT1());
         out.writeDouble(getT2());
+        out.writeObject(getDependentNode());
+        out.writeObject(getOwnerNode());
     }
 
     @Override
@@ -414,6 +432,8 @@ public class RelationshipNode extends GraphNode {
         setEndY(in.readDouble());
         setT1(in.readDouble());
         setT2(in.readDouble());
+        setDependentNode((LinkSupport) in.readObject());
+        setOwnerNode((LinkSupport) in.readObject());
         updateArrow();
     }
 }
