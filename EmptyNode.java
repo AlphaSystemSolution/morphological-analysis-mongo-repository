@@ -1,5 +1,11 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.model;
 
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.EMPTY;
 
 /**
@@ -13,28 +19,12 @@ public class EmptyNode extends TerminalNode {
      * Default Constructor.
      */
     public EmptyNode() {
-        this(null, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, null);
+        this(null, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, 0d, null);
     }
 
     /**
-     * @param id
-     * @param x
-     * @param y
-     * @param x1
-     * @param y1
-     * @param x2
-     * @param y2
-     * @param x3
-     * @param y3
-     * @param partOfSpeechNode
-     */
-    public EmptyNode(String id, Double x, Double y, Double x1, Double y1, Double x2,
-                     Double y2, Double x3, Double y3, PartOfSpeechNode partOfSpeechNode) {
-        this(id, x, y, x1, y1, x2, y2, x3, y3, 0d, 0d, partOfSpeechNode);
-    }
-
-    /**
-     * @param id
+     *
+     * @param token
      * @param x
      * @param y
      * @param x1
@@ -45,12 +35,22 @@ public class EmptyNode extends TerminalNode {
      * @param y3
      * @param translateX
      * @param translateY
-     * @param partOfSpeechNode
+     * @param partOfSpeechNodes
      */
-    public EmptyNode(String id, Double x, Double y, Double x1, Double y1, Double x2,
-                     Double y2, Double x3, Double y3, Double translateX, Double translateY,
-                     PartOfSpeechNode partOfSpeechNode) {
-        super(EMPTY, id, "(*)", x, y, x1, y1, x2, y2, x3, y3, translateX, translateY);
-        getPartOfSpeeches().setAll(partOfSpeechNode);
+    public EmptyNode(Token token, Double x, Double y, Double x1, Double y1,
+                     Double x2, Double y2, Double x3, Double y3,
+                     Double translateX, Double translateY,
+                     PartOfSpeechNode... partOfSpeechNodes) {
+        super(EMPTY, token, x, y, x1, y1, x2, y2, x3, y3, translateX, translateY, partOfSpeechNodes);
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        super.writeExternal(out);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
     }
 }

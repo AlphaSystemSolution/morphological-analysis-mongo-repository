@@ -133,17 +133,17 @@ public class RelationshipNode extends GraphNode {
             setStartX(0d);
             setStartY(0d);
             if (newValue != null) {
-                setStartX(newValue.getCx());
-                setStartY(newValue.getCy());
-                updateArrow();
+                setStartX(newValue.getCx() + newValue.getTranslateX());
+                setStartY(newValue.getCy() + newValue.getTranslateY());
             }
+            updateArrow();
         });
         ownerNodeProperty().addListener((observable, oldValue, newValue) -> {
             setEndX(0d);
             setEndY(0d);
             if (newValue != null) {
-                setEndX(newValue.getCx());
-                setEndY(newValue.getCy());
+                setEndX(newValue.getCx() + newValue.getTranslateX());
+                setEndY(newValue.getCy() + newValue.getTranslateY());
                 updateArrow();
             }
         });
@@ -224,12 +224,19 @@ public class RelationshipNode extends GraphNode {
 
     public final void setOwnerNode(LinkSupport ownerNode) {
         this.ownerNode.set(ownerNode);
-        if (getOwnerNode() != null) {
-            getOwnerNode().cxProperty().addListener((observable, oldValue, newValue) -> {
-                setEndX((Double) newValue);
+        LinkSupport node = getOwnerNode();
+        if (node != null) {
+            node.cxProperty().addListener((observable, oldValue, newValue) -> {
+                setEndX(((Double) newValue) + node.getTranslateX());
             });
-            getOwnerNode().cyProperty().addListener((observable, oldValue, newValue) -> {
-                setEndY((Double) newValue);
+            node.cyProperty().addListener((observable, oldValue, newValue) -> {
+                setEndY(((Double) newValue) + node.getTranslateY());
+            });
+            node.translateXProperty().addListener((observable, oldValue, newValue) -> {
+                setEndX(node.getCx() + ((Double) newValue));
+            });
+            node.translateYProperty().addListener((observable, oldValue, newValue) -> {
+                setEndY(node.getCy() + ((Double) newValue));
             });
         }
     }
@@ -244,12 +251,19 @@ public class RelationshipNode extends GraphNode {
 
     public final void setDependentNode(LinkSupport dependentNode) {
         this.dependentNode.set(dependentNode);
-        if (getDependentNode() != null) {
-            getDependentNode().cxProperty().addListener((observable, oldValue, newValue) -> {
-                setStartX((Double) newValue);
+        LinkSupport node = getDependentNode();
+        if (node != null) {
+            node.cxProperty().addListener((observable, oldValue, newValue) -> {
+                setStartX(((Double) newValue) + node.getTranslateX());
             });
-            getDependentNode().cyProperty().addListener((observable, oldValue, newValue) -> {
-                setStartY((Double) newValue);
+            node.cyProperty().addListener((observable, oldValue, newValue) -> {
+                setStartY(((Double) newValue) + node.getTranslateY());
+            });
+            node.translateXProperty().addListener((observable, oldValue, newValue) -> {
+                setStartX(node.getCx() + ((Double) newValue));
+            });
+            node.translateYProperty().addListener((observable, oldValue, newValue) -> {
+                setStartY(node.getCy() + ((Double) newValue));
             });
         }
     }
