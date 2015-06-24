@@ -101,6 +101,7 @@ public class TerminalNode extends LineSupport {
      * @param y3
      * @param translateX
      * @param translateY
+     * @param partOfSpeechNodes
      */
     protected TerminalNode(GraphNodeType nodeType, Token token, Double x, Double y,
                            Double x1, Double y1, Double x2, Double y2, Double x3, Double y3,
