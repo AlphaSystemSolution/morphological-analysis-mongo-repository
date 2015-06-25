@@ -2,6 +2,7 @@ package com.alphasystem.morphologicalanalysis.repository.test;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
+import com.alphasystem.morphologicalanalysis.graph.model.Terminal;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
 import com.alphasystem.morphologicalanalysis.spring.support.GraphConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
@@ -19,6 +20,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.GenderType.MASCULINE;
@@ -111,7 +113,12 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         DependencyGraph dependencyGraph = new DependencyGraph(DEFAULT_CHAPTER_NUMBER,
                 DEFAULT_VERSE_NUMBER, firstToken.getTokenNumber(), lastToken.getTokenNumber());
 
-        dependencyGraph.setTokens(tokens);
+        List<Terminal> terminals = new ArrayList<>();
+        for (Token token : tokens) {
+            terminals.add(new Terminal(token));
+        }
+
+        dependencyGraph.setTerminals(terminals);
         dependencyGraph.getRelationships().add(createRelationship());
 
         repositoryUtil.getDependencyGraphRepository().save(dependencyGraph);
@@ -141,10 +148,10 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         assertNotNull(list);
         assertEquals(list.size(), 1);
         DependencyGraph dg = list.get(0);
-        List<Token> tokens = dg.getTokens();
-        assertNotNull(tokens);
-        assertEquals(!tokens.isEmpty(), true);
-        tokens.forEach(token -> System.out.println("token = " + token));
+        List<Terminal> terminals = dg.getTerminals();
+        assertNotNull(terminals);
+        assertEquals(!terminals.isEmpty(), true);
+        terminals.forEach(terminal -> System.out.println("token = " + terminal.getToken()));
     }
 
     @Test(dependsOnMethods = "checkDependencyGraph")
