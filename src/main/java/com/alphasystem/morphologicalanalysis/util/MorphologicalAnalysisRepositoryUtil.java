@@ -49,7 +49,7 @@ public class MorphologicalAnalysisRepositoryUtil {
 
     public MorphologicalAnalysisRepositoryUtil() {
         tanzilTool = TanzilTool.getInstance();
-        Query findAllChaptersQuery = new Query();
+        findAllChaptersQuery = new Query();
         findAllChaptersQuery.fields().include("chapterNumber")
                 .include("verseCount").include("chapterName");
     }

@@ -27,4 +27,19 @@ public interface VerseRepository extends BaseRepository<Verse> {
 	 */
 	Verse findByChapterNumberAndVerseNumber(Integer chapterNumber,
 											Integer verseNumber);
+
+    /**
+     * Returns {@link List} of verses for the given <code>chapter</code> for the given range.
+     * <p>
+     * <p>
+     * <strong>NOTE:</strong> both <code>verseNumberFrom</code> and <code>verseNumberTo</code> are excluded.
+     * </p>
+     *
+     * @param chapterNumber
+     * @param verseNumberFrom
+     * @param verseNumberTo
+     * @return
+     */
+    List<Verse> findByChapterNumberAndVerseNumberBetween(Integer chapterNumber, Integer verseNumberFrom,
+                                                         Integer verseNumberTo);
 }
