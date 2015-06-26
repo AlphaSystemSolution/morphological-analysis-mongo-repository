@@ -7,6 +7,7 @@ import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
 import com.alphasystem.morphologicalanalysis.graph.repository.FragmentRepository;
 import com.alphasystem.morphologicalanalysis.graph.repository.RelationshipRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.TerminalRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -43,6 +44,7 @@ public class MorphologicalAnalysisRepositoryUtil {
     private FragmentRepository fragmentRepository;
     private RelationshipRepository relationshipRepository;
     private DependencyGraphRepository dependencyGraphRepository;
+    private TerminalRepository terminalRepository;
     private TanzilTool tanzilTool;
     private Query findAllChaptersQuery;
     private boolean verbose;
@@ -176,6 +178,15 @@ public class MorphologicalAnalysisRepositoryUtil {
     @Autowired
     public void setDependencyGraphRepository(DependencyGraphRepository dependencyGraphRepository) {
         this.dependencyGraphRepository = dependencyGraphRepository;
+    }
+
+    public TerminalRepository getTerminalRepository() {
+        return terminalRepository;
+    }
+
+    @Autowired
+    public void setTerminalRepository(TerminalRepository terminalRepository) {
+        this.terminalRepository = terminalRepository;
     }
 
     public boolean isVerbose() {
