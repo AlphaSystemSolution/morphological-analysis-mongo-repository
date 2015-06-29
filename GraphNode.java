@@ -8,12 +8,14 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
+import static com.alphasystem.util.AppUtil.isGivenType;
+import static com.alphasystem.util.HashCodeUtil.hash;
 import static com.alphasystem.util.IdGenerator.nextId;
 
 /**
  * @author sali
  */
-public abstract class GraphNode implements Externalizable {
+public abstract class GraphNode implements Externalizable, Comparable<GraphNode> {
 
     private static final long serialVersionUID = -3432601105627610562L;
 
@@ -174,6 +176,42 @@ public abstract class GraphNode implements Externalizable {
         setY(in.readDouble());
         setTranslateX(in.readDouble());
         setTranslateY(in.readDouble());
+    }
+
+    @Override
+    public int hashCode() {
+        return hash(super.hashCode(), getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        boolean result = super.equals(obj);
+        if (isGivenType(getClass(), obj)) {
+            GraphNode gn = (GraphNode) obj;
+            result = gn.getId().equals(getId());
+        }
+        return result;
+    }
+
+    @Override
+    public int compareTo(GraphNode o) {
+        int result = 0;
+        if (o == null) {
+            result = 1;
+        } else {
+            String id1 = getId();
+            String id2 = o.getId();
+            if (id1 == null && id2 == null) {
+                result = 0;
+            } else if (id2 == null) {
+                result = 1;
+            } else if (id1 == null) {
+                result = -1;
+            } else {
+                result = id1.compareTo(id2);
+            }
+        }
+        return result;
     }
 
     @Override
