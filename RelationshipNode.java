@@ -9,6 +9,7 @@ import javafx.scene.paint.Color;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Objects;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.RELATIONSHIP;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CubicCurveHelper.calculateCurvePoint;
@@ -148,35 +149,29 @@ public class RelationshipNode extends GraphNode {
             }
         });
         controlX1Property().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && newValue != oldValue) {
-                updateArrow();
-            }
+            updateArrow(oldValue, newValue);
         });
         controlY1Property().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && newValue != oldValue) {
-                updateArrow();
-            }
+            updateArrow(oldValue, newValue);
         });
         controlX2Property().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && newValue != oldValue) {
-                updateArrow();
-            }
+            updateArrow(oldValue, newValue);
         });
         controlY2Property().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && newValue != oldValue) {
-                updateArrow();
-            }
+            updateArrow(oldValue, newValue);
         });
         t1Property().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && newValue != oldValue) {
-                updateArrow();
-            }
+            updateArrow(oldValue, newValue);
         });
         t2Property().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null && newValue != oldValue) {
-                updateArrow();
-            }
+            updateArrow(oldValue, newValue);
         });
+    }
+
+    private void updateArrow(Number oldValue, Number newValue) {
+        if (!Objects.equals(newValue, oldValue)) {
+            updateArrow();
+        }
     }
 
     private void updateArrow() {
@@ -348,7 +343,7 @@ public class RelationshipNode extends GraphNode {
         return startX.get();
     }
 
-    private final void setStartX(double startX) {
+    private void setStartX(double startX) {
         this.startX.set(startX);
     }
 
@@ -360,7 +355,7 @@ public class RelationshipNode extends GraphNode {
         return startY.get();
     }
 
-    private final void setStartY(double startY) {
+    private void setStartY(double startY) {
         this.startY.set(startY);
     }
 
