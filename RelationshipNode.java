@@ -148,24 +148,12 @@ public class RelationshipNode extends GraphNode {
                 updateArrow();
             }
         });
-        controlX1Property().addListener((observable, oldValue, newValue) -> {
-            updateArrow(oldValue, newValue);
-        });
-        controlY1Property().addListener((observable, oldValue, newValue) -> {
-            updateArrow(oldValue, newValue);
-        });
-        controlX2Property().addListener((observable, oldValue, newValue) -> {
-            updateArrow(oldValue, newValue);
-        });
-        controlY2Property().addListener((observable, oldValue, newValue) -> {
-            updateArrow(oldValue, newValue);
-        });
-        t1Property().addListener((observable, oldValue, newValue) -> {
-            updateArrow(oldValue, newValue);
-        });
-        t2Property().addListener((observable, oldValue, newValue) -> {
-            updateArrow(oldValue, newValue);
-        });
+        controlX1Property().addListener((observable, oldValue, newValue) -> updateArrow(oldValue, newValue));
+        controlY1Property().addListener((observable, oldValue, newValue) -> updateArrow(oldValue, newValue));
+        controlX2Property().addListener((observable, oldValue, newValue) -> updateArrow(oldValue, newValue));
+        controlY2Property().addListener((observable, oldValue, newValue) -> updateArrow(oldValue, newValue));
+        t1Property().addListener((observable, oldValue, newValue) -> updateArrow(oldValue, newValue));
+        t2Property().addListener((observable, oldValue, newValue) -> updateArrow(oldValue, newValue));
     }
 
     private void updateArrow(Number oldValue, Number newValue) {
