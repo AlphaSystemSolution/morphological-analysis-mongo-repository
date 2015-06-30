@@ -1,11 +1,9 @@
 package com.alphasystem.morphologicalanalysis.repository.test;
 
-import com.alphasystem.morphologicalanalysis.common.model.Related;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
 import com.alphasystem.morphologicalanalysis.graph.model.Terminal;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
-import com.alphasystem.morphologicalanalysis.graph.repository.RelationshipRepository;
 import com.alphasystem.morphologicalanalysis.spring.support.GraphConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
@@ -23,7 +21,6 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -194,19 +191,6 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         Location location = locationRepository.findByDisplayName(format("%s:%s:%s:%s",
                 DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, 4, 2));
         log(format("Location found: %s (%s)", location, location.getLocationWord().toBuckWalter()), true);
-    }
-
-    @Test(dependsOnMethods = "loadLocation")
-    public void loadRelationship() {
-        RelationshipRepository relationshipRepository = repositoryUtil.getRelationshipRepository();
-        Relationship relationship = relationshipRepository.findByDisplayName("1:2:4:2::1:2:3:1");
-        Related owner = relationship.getOwner();
-        Class<? extends Related> aClass = owner.getClass();
-        log(aClass.getName(), true);
-        Method[] methods = aClass.getMethods();
-        for (Method method : methods) {
-            log(method.getName(), true);
-        }
     }
 
 }

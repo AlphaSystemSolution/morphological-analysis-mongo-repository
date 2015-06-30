@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.wordbyword.listener;
 
+import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -29,14 +30,15 @@ public class LocationEventListener extends DocumentEventListener<Location> {
         TokenRepository tokenRepository = repositoryUtil.getTokenRepository();
         Token token = tokenRepository.findByChapterNumberAndVerseNumberAndTokenNumber(source.getChapterNumber(),
                 source.getVerseNumber(), source.getTokenNumber());
-        if(token == null){
+        if (token == null) {
             err.println(format("Token is null for location {%s}", source));
         }
         Integer startIndex = source.getStartIndex();
         Integer endIndex = source.getEndIndex();
-        if(startIndex <= 0 && endIndex <= 0){
+        if (startIndex <= 0 && endIndex <= 0) {
             return;
         }
-        source.setLocationWord(getSubWord(token.getTokenWord(), startIndex, endIndex));
+        ArabicWord locationWord = getSubWord(token.getTokenWord(), startIndex, endIndex);
+        source.setLocationWord(locationWord);
     }
 }
