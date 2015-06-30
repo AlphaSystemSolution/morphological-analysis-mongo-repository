@@ -1,6 +1,9 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.model;
 
+import com.alphasystem.morphologicalanalysis.common.model.Related;
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
 import javafx.beans.property.*;
 import javafx.geometry.Point2D;
@@ -13,7 +16,9 @@ import java.util.Objects;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.RELATIONSHIP;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CubicCurveHelper.calculateCurvePoint;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
 import static com.alphasystem.util.IdGenerator.nextId;
+import static java.lang.String.format;
 import static javafx.scene.paint.Color.BLACK;
 import static javafx.scene.paint.Color.web;
 
@@ -23,6 +28,10 @@ import static javafx.scene.paint.Color.web;
 public class RelationshipNode extends GraphNode {
 
     private static final long serialVersionUID = 1815348680369408820L;
+
+    private static final char LEFT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK = '\u00AB';
+
+    private static final char RIGHT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK = '\u00BB';
 
     private final ReadOnlyDoubleWrapper startX;
 
@@ -122,12 +131,12 @@ public class RelationshipNode extends GraphNode {
         relationshipProperty().addListener((observable, oldValue, newValue) -> {
             setStroke(BLACK);
             setId(nextId());
-            setText(null);
+            setText((String) null);
             if (newValue != null) {
                 RelationshipType relationship = newValue.getRelationship();
                 setStroke(web(relationship.getColorCode()));
                 setId(newValue.getId());
-                setText(relationship.getLabel().toUnicode());
+                setText(newValue);
             }
         });
         dependentNodeProperty().addListener((observable, oldValue, newValue) -> {
@@ -154,6 +163,29 @@ public class RelationshipNode extends GraphNode {
         controlY2Property().addListener((observable, oldValue, newValue) -> updateArrow(oldValue, newValue));
         t1Property().addListener((observable, oldValue, newValue) -> updateArrow(oldValue, newValue));
         t2Property().addListener((observable, oldValue, newValue) -> updateArrow(oldValue, newValue));
+    }
+
+    private void setText(Relationship relationship) {
+        RelationshipType type = relationship.getRelationship();
+        String text = type.getLabel().toUnicode();
+        Related owner = relationship.getOwner();
+        System.out.println("<<<<<<<<<< "+owner.getClass().getName());
+        PartOfSpeech ownerPos = NOUN;
+        Location ownerLocation = null;
+        try {
+            ownerLocation = (Location) owner;
+            ownerPos = ownerLocation.getPartOfSpeech();
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+        }
+        switch (ownerPos){
+            case ACCUSSATIVE_PARTICLE:
+                text = format("%s %s %s", ownerPos.getLabel().toUnicode(), LEFT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK,
+                        ownerLocation.getLocationWord().toUnicode(), RIGHT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK);
+                break;
+        }
+
+        setText(text);
     }
 
     private void updateArrow(Number oldValue, Number newValue) {
