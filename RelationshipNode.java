@@ -2,9 +2,11 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph.model;
 
 import com.alphasystem.morphologicalanalysis.common.model.Related;
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
+import com.alphasystem.morphologicalanalysis.util.RepositoryTool;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType;
+import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import javafx.beans.property.*;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
@@ -16,7 +18,6 @@ import java.util.Objects;
 
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.RELATIONSHIP;
 import static com.alphasystem.morphologicalanalysis.ui.dependencygraph.util.CubicCurveHelper.calculateCurvePoint;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.NOUN;
 import static com.alphasystem.util.IdGenerator.nextId;
 import static java.lang.String.format;
 import static javafx.scene.paint.Color.BLACK;
@@ -72,6 +73,9 @@ public class RelationshipNode extends GraphNode {
     private final ObjectProperty<LinkSupport> ownerNode;
 
     private final ReadOnlyObjectWrapper<Color> stroke;
+
+    private final LocationRepository locationRepository = RepositoryTool.getInstance()
+            .getRepositoryUtil().getLocationRepository();
 
     /**
      *
@@ -169,20 +173,17 @@ public class RelationshipNode extends GraphNode {
         RelationshipType type = relationship.getRelationship();
         String text = type.getLabel().toUnicode();
         Related owner = relationship.getOwner();
-        System.out.println("<<<<<<<<<< "+owner.getClass().getName());
-        PartOfSpeech ownerPos = NOUN;
-        Location ownerLocation = null;
-        try {
-            ownerLocation = (Location) owner;
-            ownerPos = ownerLocation.getPartOfSpeech();
-        } catch (ClassCastException e) {
-            e.printStackTrace();
-        }
-        switch (ownerPos){
-            case ACCUSSATIVE_PARTICLE:
-                text = format("%s %s %s", ownerPos.getLabel().toUnicode(), LEFT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK,
-                        ownerLocation.getLocationWord().toUnicode(), RIGHT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK);
-                break;
+
+        Location ol = locationRepository.findByDisplayName(owner.getDisplayName());
+        if (ol != null) {
+            PartOfSpeech pos = ol.getPartOfSpeech();
+            switch (pos) {
+                case ACCUSSATIVE_PARTICLE:
+                    text = format("%s %s %s %s", type.getLabel().toUnicode(),
+                            LEFT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK, ol.getLocationWord().toUnicode(),
+                            RIGHT_POINTING_DOUBLE_ANGLE_QUOTATION_MARK);
+                    break;
+            }
         }
 
         setText(text);
