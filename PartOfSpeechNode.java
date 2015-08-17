@@ -1,11 +1,12 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.model;
 
-import com.alphasystem.arabic.model.ArabicLetters;
 import com.alphasystem.morphologicalanalysis.common.model.Related;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.AbstractProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.NounProperties;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.VerbProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbMode;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
+import static com.alphasystem.arabic.model.ArabicLetters.WORD_SPACE;
 import static com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType.PART_OF_SPEECH;
 
 /**
@@ -67,8 +69,15 @@ public class PartOfSpeechNode extends LinkSupport {
         switch (partOfSpeech) {
             case NOUN:
                 NounProperties np = (NounProperties) properties;
-                builder.append(ArabicLetters.WORD_SPACE.toUnicode()).
-                        append(np.getStatus().getLabel().toUnicode());
+                builder.append(WORD_SPACE.toUnicode()).append(np.getStatus().getLabel().toUnicode());
+                break;
+            case VERB:
+                VerbProperties vp = (VerbProperties) properties;
+                builder.append(WORD_SPACE.toUnicode()).append(vp.getVerbType().getLabel().toUnicode());
+                final VerbMode mode = vp.getMode();
+                if(mode != null){
+                    builder.append(WORD_SPACE.toUnicode()).append(mode.getLabel().toUnicode());
+                }
                 break;
         }
         return builder.toString();
