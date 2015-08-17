@@ -41,13 +41,13 @@ public class DeleteData extends AbstractTestNGSpringContextTests {
     }
 
     @Test
-    @Parameters({"id"})
-    public void deleteDependencyGraph(String id) {
+    @Parameters({"displayName"})
+    public void deleteDependencyGraph(String displayName) {
         DependencyGraphRepository dependencyGraphRepository = repositoryUtil.getDependencyGraphRepository();
 
-        DependencyGraph dependencyGraph = dependencyGraphRepository.findOne(id);
+        DependencyGraph dependencyGraph = dependencyGraphRepository.findByDisplayName(displayName);
         if (dependencyGraph == null) {
-            System.out.println(format("No DependencyGraph found with ID {%s}", id));
+            System.out.println(format("No DependencyGraph found with ID {%s}", displayName));
             return;
         }
 
@@ -67,12 +67,18 @@ public class DeleteData extends AbstractTestNGSpringContextTests {
         RelationshipRepository relationshipRepository = repositoryUtil.getRelationshipRepository();
         List<Relationship> relationships = dependencyGraph.getRelationships();
         for (Relationship relationship : relationships) {
+            if(relationship == null){
+                continue;
+            }
             relationshipRepository.delete(relationship);
         }
 
         FragmentRepository fragmentRepository = repositoryUtil.getFragmentRepository();
         List<Fragment> fragments = dependencyGraph.getFragments();
         for (Fragment fragment : fragments) {
+            if(fragment == null){
+                continue;
+            }
             fragmentRepository.delete(fragment);
         }
 

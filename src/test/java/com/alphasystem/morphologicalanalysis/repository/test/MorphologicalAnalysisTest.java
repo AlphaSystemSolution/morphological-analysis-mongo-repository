@@ -16,6 +16,7 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeClass;
@@ -191,6 +192,14 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         Location location = locationRepository.findByDisplayName(format("%s:%s:%s:%s",
                 DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, 4, 2));
         log(format("Location found: %s (%s)", location, location.getLocationWord().toBuckWalter()), true);
+    }
+
+    @Test(dependsOnMethods = "loadLocation")
+    public void testQuery(){
+        BasicQuery basicQuery = new BasicQuery("{\"displayName\" : \"1:2:1\"}");
+        Token token = repositoryUtil.getMongoTemplate().findOne(basicQuery, Token.class);
+        assertNotNull(token);
+        log(format("Token found: %s", token));
     }
 
 }
