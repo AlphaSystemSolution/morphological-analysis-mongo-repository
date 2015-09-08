@@ -1,9 +1,9 @@
 package com.alphasystem.morphologicalanalysis.repository.test;
 
-import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
+import com.alphasystem.morphologicalanalysis.graph.model.PartOfSpeechNode;
 import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
-import com.alphasystem.morphologicalanalysis.graph.model.Terminal;
-import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
+import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
+import com.alphasystem.morphologicalanalysis.graph.repository.TerminalNodeRepository;
 import com.alphasystem.morphologicalanalysis.spring.support.GraphConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
@@ -22,7 +22,6 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.GenderType.MASCULINE;
@@ -33,6 +32,7 @@ import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.Num
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.DEFINITE_ARTICLE;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType.MUDAF_ILAIH;
 import static java.lang.String.format;
+import static java.util.Collections.reverse;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Reporter.log;
@@ -51,7 +51,7 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
     private MorphologicalAnalysisRepositoryUtil repositoryUtil;
 
     @BeforeClass
-    public void beforeSuite(){
+    public void beforeSuite() {
         repositoryUtil.getMongoTemplate().getDb().dropDatabase();
     }
 
@@ -107,22 +107,22 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         repositoryUtil.getLocationRepository().save(location);
     }
 
-    @Test(dependsOnMethods = "populateToken3")
-    public void createDependencyGraph() {
+    // @Test(dependsOnMethods = "populateToken3")
+    /*public void createDependencyGraph() {
         DependencyGraphRepository repository = repositoryUtil.getDependencyGraphRepository();
         Long count = repository.countByChapterNumberAndVerseNumber(DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER);
         log(format("Count for chapter number %s and verse number %s is : %s",
                 DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, count), true);
         int segmentNumber = (int) (count + 1);
-        List<Token> tokens = repositoryUtil.getTokenRepository().findByChapterNumberAndVerseNumber(
+        List<Token> locations = repositoryUtil.getTokenRepository().findByChapterNumberAndVerseNumber(
                 DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER);
-        Token firstToken = tokens.get(0);
-        Token lastToken = tokens.get(tokens.size() - 1);
+        Token firstToken = locations.get(0);
+        Token lastToken = locations.get(locations.size() - 1);
         DependencyGraph dependencyGraph = new DependencyGraph(DEFAULT_CHAPTER_NUMBER,
                 DEFAULT_VERSE_NUMBER, firstToken.getTokenNumber(), lastToken.getTokenNumber());
 
         List<Terminal> terminals = new ArrayList<>();
-        for (Token token : tokens) {
+        for (Token token : locations) {
             terminals.add(new Terminal(token));
         }
 
@@ -130,8 +130,9 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         dependencyGraph.getRelationships().add(createRelationship());
 
         repositoryUtil.getDependencyGraphRepository().save(dependencyGraph);
-    }
+    }*/
 
+    @SuppressWarnings({"unused"})
     private Relationship createRelationship() {
         Relationship relationship = new Relationship();
 
@@ -149,7 +150,7 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         return relationship;
     }
 
-    @Test(dependsOnMethods = "createDependencyGraph")
+    /*@Test(dependsOnMethods = "createDependencyGraph")
     public void checkDependencyGraph() {
         List<DependencyGraph> list = repositoryUtil.getDependencyGraphRepository().findByChapterNumberAndVerseNumber(
                 DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER);
@@ -160,9 +161,9 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         assertNotNull(terminals);
         assertEquals(!terminals.isEmpty(), true);
         terminals.forEach(terminal -> System.out.println("token = " + terminal.getToken()));
-    }
+    }*/
 
-    @Test(dependsOnMethods = "checkDependencyGraph")
+    @Test(dependsOnMethods = "populateToken3")
     public void createChapter2() {
         int chapterNumber = 2;
         log(format("Creating chapter %s", chapterNumber), true);
@@ -195,11 +196,72 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
     }
 
     @Test(dependsOnMethods = "loadLocation")
-    public void testQuery(){
+    public void testQuery() {
         BasicQuery basicQuery = new BasicQuery("{\"displayName\" : \"1:2:1\"}");
         Token token = repositoryUtil.getMongoTemplate().findOne(basicQuery, Token.class);
         assertNotNull(token);
         log(format("Token found: %s", token));
+    }
+
+    @Test(dependsOnMethods = "testQuery")
+    public void createTerminalNode4() {
+        Token token = repositoryUtil.getTokenRepository().findByChapterNumberAndVerseNumberAndTokenNumber
+                (DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, 4);
+        assertNotNull(token);
+        TerminalNode terminalNode = new TerminalNode(token);
+        terminalNode = repositoryUtil.getTerminalNodeRepository().save(terminalNode);
+        assertNotNull(terminalNode);
+        log(format("Created Terminal Node: %s", terminalNode.getDisplayName()));
+    }
+
+    @Test(dependsOnMethods = "createTerminalNode4")
+    public void createTerminalNode3() {
+        Token token = repositoryUtil.getTokenRepository().findByChapterNumberAndVerseNumberAndTokenNumber
+                (DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, 3);
+        assertNotNull(token);
+        TerminalNode terminalNode = new TerminalNode(token);
+        terminalNode = repositoryUtil.getTerminalNodeRepository().save(terminalNode);
+        assertNotNull(terminalNode);
+        log(format("Created Terminal Node: %s", terminalNode.getDisplayName()));
+    }
+
+    @Test(dependsOnMethods = "createTerminalNode3")
+    public void createPartOfSpeechNodes() {
+        TerminalNodeRepository terminalNodeRepository = repositoryUtil.getTerminalNodeRepository();
+        TerminalNode terminalNode = terminalNodeRepository.findByDisplayName("1:2:4:TERMINAL");
+        assertNotNull(terminalNode);
+        List<Location> locations = terminalNode.getToken().getLocations();
+        reverse(locations);
+        for (Location location : locations) {
+            PartOfSpeechNode partOfSpeechNode = new PartOfSpeechNode(location);
+            terminalNode.getPartOfSpeechNodes().add(partOfSpeechNode);
+        }
+        terminalNode = terminalNodeRepository.save(terminalNode);
+        assertEquals(terminalNode.getPartOfSpeechNodes().size(), locations.size());
+    }
+
+    @Test(dependsOnMethods = "createPartOfSpeechNodes")
+    public void createTerminalNode3V1() {
+        Token token = repositoryUtil.getTokenRepository().findByChapterNumberAndVerseNumberAndTokenNumber
+                (DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, 3);
+        assertNotNull(token);
+        TerminalNode terminalNode = new TerminalNode(token);
+        terminalNode.setVersion(1);
+        terminalNode = repositoryUtil.getTerminalNodeRepository().save(terminalNode);
+        assertNotNull(terminalNode);
+        log(format("Created Terminal Node: %s", terminalNode.getDisplayName()));
+    }
+
+    @Test(dependsOnMethods = "createTerminalNode3V1")
+    public void countTerminalNodes() {
+        Token token = repositoryUtil.getTokenRepository().findByChapterNumberAndVerseNumberAndTokenNumber
+                (DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, 3);
+        assertNotNull(token);
+        TerminalNodeRepository terminalNodeRepository = repositoryUtil.getTerminalNodeRepository();
+        Long count = terminalNodeRepository.countByChapterNumberAndVerseNumberAndTokenNumber(
+                token.getChapterNumber(), token.getVerseNumber(), token.getTokenNumber());
+        assertEquals(count.intValue(), 2);
+        log(format("Total number of terminal nodes found: %s", count));
     }
 
 }

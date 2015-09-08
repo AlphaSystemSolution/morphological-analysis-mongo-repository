@@ -1,14 +1,7 @@
 package com.alphasystem.morphologicalanalysis.repository.test;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
-import com.alphasystem.morphologicalanalysis.graph.model.Fragment;
-import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
-import com.alphasystem.morphologicalanalysis.graph.model.Terminal;
-import com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
-import com.alphasystem.morphologicalanalysis.graph.repository.FragmentRepository;
-import com.alphasystem.morphologicalanalysis.graph.repository.RelationshipRepository;
-import com.alphasystem.morphologicalanalysis.graph.repository.TerminalRepository;
 import com.alphasystem.morphologicalanalysis.spring.support.GraphConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
@@ -20,10 +13,6 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import java.util.List;
-
-import static com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType.EMPTY;
-import static com.alphasystem.morphologicalanalysis.graph.model.support.TerminalType.HIDDEN;
 import static java.lang.String.format;
 
 /**
@@ -51,7 +40,7 @@ public class DeleteData extends AbstractTestNGSpringContextTests {
             return;
         }
 
-        TerminalRepository terminalRepository = repositoryUtil.getTerminalRepository();
+        /*TerminalRepository terminalRepository = repositoryUtil.getTerminalRepository();
         List<Terminal> terminals = dependencyGraph.getTerminals();
         for (Terminal terminal : terminals) {
             if (terminal == null) {
@@ -80,7 +69,7 @@ public class DeleteData extends AbstractTestNGSpringContextTests {
                 continue;
             }
             fragmentRepository.delete(fragment);
-        }
+        }*/
 
         dependencyGraphRepository.delete(dependencyGraph);
     }

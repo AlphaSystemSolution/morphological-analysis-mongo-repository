@@ -4,10 +4,7 @@
 package com.alphasystem.morphologicalanalysis.util;
 
 import com.alphasystem.arabic.model.ArabicWord;
-import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
-import com.alphasystem.morphologicalanalysis.graph.repository.FragmentRepository;
-import com.alphasystem.morphologicalanalysis.graph.repository.RelationshipRepository;
-import com.alphasystem.morphologicalanalysis.graph.repository.TerminalRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -45,6 +42,13 @@ public class MorphologicalAnalysisRepositoryUtil {
     private RelationshipRepository relationshipRepository;
     private DependencyGraphRepository dependencyGraphRepository;
     private TerminalRepository terminalRepository;
+    private TerminalNodeRepository terminalNodeRepository;
+    private EmptyNodeRepository emptyNodeRepository;
+    private HiddenNodeRepository hiddenNodeRepository;
+    private ReferenceNodeRepository referenceNodeRepository;
+    private PartOfSpeechNodeRepository partOfSpeechNodeRepository;
+    private PhraseNodeRepository phraseNodeRepository;
+    private RelationshipNodeRepository relationshipNodeRepository;
     private TanzilTool tanzilTool;
     private Query findAllChaptersQuery;
     private boolean verbose;
@@ -187,6 +191,69 @@ public class MorphologicalAnalysisRepositoryUtil {
     @Autowired
     public void setTerminalRepository(TerminalRepository terminalRepository) {
         this.terminalRepository = terminalRepository;
+    }
+
+    public TerminalNodeRepository getTerminalNodeRepository() {
+        return terminalNodeRepository;
+    }
+
+    @Autowired
+    public void setTerminalNodeRepository(TerminalNodeRepository terminalNodeRepository) {
+        this.terminalNodeRepository = terminalNodeRepository;
+    }
+
+    public EmptyNodeRepository getEmptyNodeRepository() {
+        return emptyNodeRepository;
+    }
+
+    @Autowired
+    public void setEmptyNodeRepository(EmptyNodeRepository emptyNodeRepository) {
+        this.emptyNodeRepository = emptyNodeRepository;
+    }
+
+    public HiddenNodeRepository getHiddenNodeRepository() {
+        return hiddenNodeRepository;
+    }
+
+    @Autowired
+    public void setHiddenNodeRepository(HiddenNodeRepository hiddenNodeRepository) {
+        this.hiddenNodeRepository = hiddenNodeRepository;
+    }
+
+    public ReferenceNodeRepository getReferenceNodeRepository() {
+        return referenceNodeRepository;
+    }
+
+    @Autowired
+    public void setReferenceNodeRepository(ReferenceNodeRepository referenceNodeRepository) {
+        this.referenceNodeRepository = referenceNodeRepository;
+    }
+
+    public PartOfSpeechNodeRepository getPartOfSpeechNodeRepository() {
+        return partOfSpeechNodeRepository;
+    }
+
+    @Autowired
+    public void setPartOfSpeechNodeRepository(PartOfSpeechNodeRepository partOfSpeechNodeRepository) {
+        this.partOfSpeechNodeRepository = partOfSpeechNodeRepository;
+    }
+
+    public PhraseNodeRepository getPhraseNodeRepository() {
+        return phraseNodeRepository;
+    }
+
+    @Autowired
+    public void setPhraseNodeRepository(PhraseNodeRepository phraseNodeRepository) {
+        this.phraseNodeRepository = phraseNodeRepository;
+    }
+
+    public RelationshipNodeRepository getRelationshipNodeRepository() {
+        return relationshipNodeRepository;
+    }
+
+    @Autowired
+    public void setRelationshipNodeRepository(RelationshipNodeRepository relationshipNodeRepository) {
+        this.relationshipNodeRepository = relationshipNodeRepository;
     }
 
     public boolean isVerbose() {
