@@ -1,7 +1,6 @@
 package com.alphasystem.morphologicalanalysis.repository.test;
 
 import com.alphasystem.morphologicalanalysis.graph.model.PartOfSpeechNode;
-import com.alphasystem.morphologicalanalysis.graph.model.Relationship;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.repository.TerminalNodeRepository;
 import com.alphasystem.morphologicalanalysis.spring.support.GraphConfig;
@@ -30,7 +29,6 @@ import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.Nou
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NumberType.PLURAL;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NumberType.SINGULAR;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.DEFINITE_ARTICLE;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.RelationshipType.MUDAF_ILAIH;
 import static java.lang.String.format;
 import static java.util.Collections.reverse;
 import static org.testng.Assert.assertEquals;
@@ -107,62 +105,6 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         repositoryUtil.getLocationRepository().save(location);
     }
 
-    // @Test(dependsOnMethods = "populateToken3")
-    /*public void createDependencyGraph() {
-        DependencyGraphRepository repository = repositoryUtil.getDependencyGraphRepository();
-        Long count = repository.countByChapterNumberAndVerseNumber(DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER);
-        log(format("Count for chapter number %s and verse number %s is : %s",
-                DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, count), true);
-        int segmentNumber = (int) (count + 1);
-        List<Token> locations = repositoryUtil.getTokenRepository().findByChapterNumberAndVerseNumber(
-                DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER);
-        Token firstToken = locations.get(0);
-        Token lastToken = locations.get(locations.size() - 1);
-        DependencyGraph dependencyGraph = new DependencyGraph(DEFAULT_CHAPTER_NUMBER,
-                DEFAULT_VERSE_NUMBER, firstToken.getTokenNumber(), lastToken.getTokenNumber());
-
-        List<Terminal> terminals = new ArrayList<>();
-        for (Token token : locations) {
-            terminals.add(new Terminal(token));
-        }
-
-        dependencyGraph.setTerminals(terminals);
-        dependencyGraph.getRelationships().add(createRelationship());
-
-        repositoryUtil.getDependencyGraphRepository().save(dependencyGraph);
-    }*/
-
-    @SuppressWarnings({"unused"})
-    private Relationship createRelationship() {
-        Relationship relationship = new Relationship();
-
-        LocationRepository repository = repositoryUtil.getLocationRepository();
-        Location location = repository.findByChapterNumberAndVerseNumberAndTokenNumberAndLocationNumber
-                (DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, 4, 2);
-        assertNotNull(location);
-        relationship.setDependent(location);
-
-        location = repository.findByChapterNumberAndVerseNumberAndTokenNumberAndLocationNumber
-                (DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, 3, 1);
-        assertNotNull(location);
-        relationship.setOwner(location);
-        relationship.setRelationship(MUDAF_ILAIH);
-        return relationship;
-    }
-
-    /*@Test(dependsOnMethods = "createDependencyGraph")
-    public void checkDependencyGraph() {
-        List<DependencyGraph> list = repositoryUtil.getDependencyGraphRepository().findByChapterNumberAndVerseNumber(
-                DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER);
-        assertNotNull(list);
-        assertEquals(list.size(), 1);
-        DependencyGraph dg = list.get(0);
-        List<Terminal> terminals = dg.getTerminals();
-        assertNotNull(terminals);
-        assertEquals(!terminals.isEmpty(), true);
-        terminals.forEach(terminal -> System.out.println("token = " + terminal.getToken()));
-    }*/
-
     @Test(dependsOnMethods = "populateToken3")
     public void createChapter2() {
         int chapterNumber = 2;
@@ -211,7 +153,7 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         TerminalNode terminalNode = new TerminalNode(token);
         terminalNode = repositoryUtil.getTerminalNodeRepository().save(terminalNode);
         assertNotNull(terminalNode);
-        log(format("Created Terminal Node: %s", terminalNode.getDisplayName()));
+        log(format("Created TerminalNode: %s", terminalNode.getDisplayName()));
     }
 
     @Test(dependsOnMethods = "createTerminalNode4")
@@ -222,7 +164,7 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         TerminalNode terminalNode = new TerminalNode(token);
         terminalNode = repositoryUtil.getTerminalNodeRepository().save(terminalNode);
         assertNotNull(terminalNode);
-        log(format("Created Terminal Node: %s", terminalNode.getDisplayName()));
+        log(format("Created TerminalNode: %s", terminalNode.getDisplayName()));
     }
 
     @Test(dependsOnMethods = "createTerminalNode3")
@@ -249,7 +191,7 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         terminalNode.setVersion(1);
         terminalNode = repositoryUtil.getTerminalNodeRepository().save(terminalNode);
         assertNotNull(terminalNode);
-        log(format("Created Terminal Node: %s", terminalNode.getDisplayName()));
+        log(format("Created TerminalNode: %s", terminalNode.getDisplayName()));
     }
 
     @Test(dependsOnMethods = "createTerminalNode3V1")

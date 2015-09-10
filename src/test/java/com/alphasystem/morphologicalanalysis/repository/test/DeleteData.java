@@ -1,6 +1,7 @@
 package com.alphasystem.morphologicalanalysis.repository.test;
 
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
+import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
 import com.alphasystem.morphologicalanalysis.spring.support.GraphConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
@@ -12,6 +13,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+
+import java.util.List;
 
 import static java.lang.String.format;
 
@@ -36,41 +39,17 @@ public class DeleteData extends AbstractTestNGSpringContextTests {
 
         DependencyGraph dependencyGraph = dependencyGraphRepository.findByDisplayName(displayName);
         if (dependencyGraph == null) {
-            System.out.println(format("No DependencyGraph found with ID {%s}", displayName));
+            System.out.println(format("No DependencyGraph found with Display Name {%s}", displayName));
             return;
         }
 
-        /*TerminalRepository terminalRepository = repositoryUtil.getTerminalRepository();
-        List<Terminal> terminals = dependencyGraph.getTerminals();
-        for (Terminal terminal : terminals) {
-            if (terminal == null) {
-                continue;
-            }
-            TerminalType terminalType = terminal.getTerminalType();
-            if (terminalType.equals(EMPTY) || terminalType.equals(HIDDEN)) {
-                continue;
-            }
-            terminalRepository.delete(terminal);
-        }
-
-        RelationshipRepository relationshipRepository = repositoryUtil.getRelationshipRepository();
-        List<Relationship> relationships = dependencyGraph.getRelationships();
-        for (Relationship relationship : relationships) {
-            if(relationship == null){
-                continue;
-            }
-            relationshipRepository.delete(relationship);
-        }
-
-        FragmentRepository fragmentRepository = repositoryUtil.getFragmentRepository();
-        List<Fragment> fragments = dependencyGraph.getFragments();
-        for (Fragment fragment : fragments) {
-            if(fragment == null){
-                continue;
-            }
-            fragmentRepository.delete(fragment);
-        }*/
+        List<GraphNode> nodes = dependencyGraph.getNodes();
+        nodes.forEach(graphNode -> repositoryUtil.delete(graphNode));
 
         dependencyGraphRepository.delete(dependencyGraph);
+    }
+
+    @Test
+    public void updateData() {
     }
 }

@@ -12,10 +12,9 @@ public interface DependencyGraphRepository extends BaseRepository<DependencyGrap
 
     /**
      * @param chapterNumber
-     * @param verseNumber
      * @return
      */
-    List<DependencyGraph> findByChapterNumberAndVerseNumber(Integer chapterNumber, Integer verseNumber);
+    List<DependencyGraph> findByChapterNumber(Integer chapterNumber);
 
     /**
      *

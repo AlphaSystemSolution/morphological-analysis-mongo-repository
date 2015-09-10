@@ -6,8 +6,8 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import com.alphasystem.persistence.mongo.repository.DocumentEventListener;
-import com.mongodb.DBObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.mapping.event.AfterConvertEvent;
 import org.springframework.stereotype.Component;
 
 import static com.alphasystem.arabic.model.ArabicWord.getSubWord;
@@ -24,9 +24,10 @@ public class LocationEventListener extends DocumentEventListener<Location> {
     private MorphologicalAnalysisRepositoryUtil repositoryUtil;
 
     @Override
-    public void onAfterConvert(DBObject dbo, Location source) {
-        super.onAfterConvert(dbo, source);
+    public void onAfterConvert(AfterConvertEvent<Location> event) {
+        super.onAfterConvert(event);
 
+        Location source = event.getSource();
         TokenRepository tokenRepository = repositoryUtil.getTokenRepository();
         Token token = tokenRepository.findByChapterNumberAndVerseNumberAndTokenNumber(source.getChapterNumber(),
                 source.getVerseNumber(), source.getTokenNumber());
@@ -41,4 +42,5 @@ public class LocationEventListener extends DocumentEventListener<Location> {
         ArabicWord locationWord = getSubWord(token.getTokenWord(), startIndex, endIndex);
         source.setLocationWord(locationWord);
     }
+
 }

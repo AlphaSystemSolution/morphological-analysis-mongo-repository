@@ -10,4 +10,13 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface GraphNodeRepository<N extends GraphNode> extends BaseRepository<N> {
 
+    /**
+     * @param chapterNumber
+     * @param verseNumber
+     * @param tokenNumber
+     * @return
+     */
+    Long countByChapterNumberAndVerseNumberAndTokenNumber(Integer chapterNumber, Integer verseNumber,
+                                                          Integer tokenNumber);
+
 }

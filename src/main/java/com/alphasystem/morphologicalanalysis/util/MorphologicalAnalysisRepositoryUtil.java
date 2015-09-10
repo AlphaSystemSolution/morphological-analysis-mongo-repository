@@ -4,6 +4,9 @@
 package com.alphasystem.morphologicalanalysis.util;
 
 import com.alphasystem.arabic.model.ArabicWord;
+import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
+import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
+import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
@@ -38,10 +41,7 @@ public class MorphologicalAnalysisRepositoryUtil {
     private VerseRepository verseRepository;
     private TokenRepository tokenRepository;
     private LocationRepository locationRepository;
-    private FragmentRepository fragmentRepository;
-    private RelationshipRepository relationshipRepository;
     private DependencyGraphRepository dependencyGraphRepository;
-    private TerminalRepository terminalRepository;
     private TerminalNodeRepository terminalNodeRepository;
     private EmptyNodeRepository emptyNodeRepository;
     private HiddenNodeRepository hiddenNodeRepository;
@@ -157,24 +157,6 @@ public class MorphologicalAnalysisRepositoryUtil {
         this.verseRepository = verseRepository;
     }
 
-    public RelationshipRepository getRelationshipRepository() {
-        return relationshipRepository;
-    }
-
-    @Autowired
-    public void setRelationshipRepository(RelationshipRepository relationshipRepository) {
-        this.relationshipRepository = relationshipRepository;
-    }
-
-    public FragmentRepository getFragmentRepository() {
-        return fragmentRepository;
-    }
-
-    @Autowired
-    public void setFragmentRepository(FragmentRepository fragmentRepository) {
-        this.fragmentRepository = fragmentRepository;
-    }
-
     public DependencyGraphRepository getDependencyGraphRepository() {
         return dependencyGraphRepository;
     }
@@ -182,15 +164,6 @@ public class MorphologicalAnalysisRepositoryUtil {
     @Autowired
     public void setDependencyGraphRepository(DependencyGraphRepository dependencyGraphRepository) {
         this.dependencyGraphRepository = dependencyGraphRepository;
-    }
-
-    public TerminalRepository getTerminalRepository() {
-        return terminalRepository;
-    }
-
-    @Autowired
-    public void setTerminalRepository(TerminalRepository terminalRepository) {
-        this.terminalRepository = terminalRepository;
     }
 
     public TerminalNodeRepository getTerminalNodeRepository() {
@@ -254,6 +227,56 @@ public class MorphologicalAnalysisRepositoryUtil {
     @Autowired
     public void setRelationshipNodeRepository(RelationshipNodeRepository relationshipNodeRepository) {
         this.relationshipNodeRepository = relationshipNodeRepository;
+    }
+
+    public GraphNodeRepository getRepository(GraphNodeType nodeType) {
+        GraphNodeRepository repository = null;
+        switch (nodeType) {
+            case TERMINAL:
+                repository = getTerminalNodeRepository();
+                break;
+            case PART_OF_SPEECH:
+                repository = getPartOfSpeechNodeRepository();
+                break;
+            case PHRASE:
+                repository = getPhraseNodeRepository();
+                break;
+            case RELATIONSHIP:
+                repository = getRelationshipNodeRepository();
+                break;
+            case REFERENCE:
+                repository = getReferenceNodeRepository();
+                break;
+            case HIDDEN:
+                repository = getHiddenNodeRepository();
+                break;
+            case EMPTY:
+                repository = getEmptyNodeRepository();
+                break;
+            case ROOT:
+                break;
+        }
+        return repository;
+    }
+
+    public void delete(GraphNode graphNode) {
+        if (graphNode == null) {
+            return;
+        }
+        GraphNodeType graphNodeType = graphNode.getGraphNodeType();
+        switch (graphNodeType) {
+            case TERMINAL:
+            case EMPTY:
+            case REFERENCE:
+            case HIDDEN:
+                TerminalNode tn = (TerminalNode) graphNode;
+                tn.getPartOfSpeechNodes().forEach(partOfSpeechNode -> {
+                    getPartOfSpeechNodeRepository().delete(partOfSpeechNode.getId());
+                });
+                break;
+        }
+        GraphNodeRepository repository = getRepository(graphNodeType);
+        repository.delete(graphNode.getId());
     }
 
     public boolean isVerbose() {

@@ -8,14 +8,4 @@ import org.springframework.data.repository.NoRepositoryBean;
  */
 @NoRepositoryBean
 public interface AbstractTerminalNodeRepository<N extends TerminalNode> extends GraphNodeRepository<N> {
-
-    /**
-     *
-     * @param chapterNumber
-     * @param verseNumber
-     * @param tokenNumber
-     * @return
-     */
-    Long countByChapterNumberAndVerseNumberAndTokenNumber(Integer chapterNumber, Integer verseNumber,
-                                                          Integer tokenNumber);
 }
