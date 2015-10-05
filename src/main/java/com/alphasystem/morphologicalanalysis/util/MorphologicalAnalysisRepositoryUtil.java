@@ -43,7 +43,7 @@ public class MorphologicalAnalysisRepositoryUtil {
     private LocationRepository locationRepository;
     private DependencyGraphRepository dependencyGraphRepository;
     private TerminalNodeRepository terminalNodeRepository;
-    private EmptyNodeRepository emptyNodeRepository;
+    private ImpliedNodeRepository impliedNodeRepository;
     private HiddenNodeRepository hiddenNodeRepository;
     private ReferenceNodeRepository referenceNodeRepository;
     private PartOfSpeechNodeRepository partOfSpeechNodeRepository;
@@ -175,13 +175,13 @@ public class MorphologicalAnalysisRepositoryUtil {
         this.terminalNodeRepository = terminalNodeRepository;
     }
 
-    public EmptyNodeRepository getEmptyNodeRepository() {
-        return emptyNodeRepository;
+    public ImpliedNodeRepository getImpliedNodeRepository() {
+        return impliedNodeRepository;
     }
 
     @Autowired
-    public void setEmptyNodeRepository(EmptyNodeRepository emptyNodeRepository) {
-        this.emptyNodeRepository = emptyNodeRepository;
+    public void setImpliedNodeRepository(ImpliedNodeRepository impliedNodeRepository) {
+        this.impliedNodeRepository = impliedNodeRepository;
     }
 
     public HiddenNodeRepository getHiddenNodeRepository() {
@@ -250,8 +250,8 @@ public class MorphologicalAnalysisRepositoryUtil {
             case HIDDEN:
                 repository = getHiddenNodeRepository();
                 break;
-            case EMPTY:
-                repository = getEmptyNodeRepository();
+            case IMPLIED:
+                repository = getImpliedNodeRepository();
                 break;
             case ROOT:
                 break;
@@ -266,7 +266,7 @@ public class MorphologicalAnalysisRepositoryUtil {
         GraphNodeType graphNodeType = graphNode.getGraphNodeType();
         switch (graphNodeType) {
             case TERMINAL:
-            case EMPTY:
+            case IMPLIED:
             case REFERENCE:
             case HIDDEN:
                 TerminalNode tn = (TerminalNode) graphNode;
