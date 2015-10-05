@@ -57,7 +57,7 @@ public class BulkDataCreation extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = {"createChapters"})
-    public void createEmptyTokens() {
+    public void createImpliedTokens() {
         Token token = new Token().withChapterNumber(0).withVerseNumber(1).withTokenNumber(1).withToken("(*)")
                 .withHidden(true);
 
@@ -65,9 +65,11 @@ public class BulkDataCreation extends AbstractTestNGSpringContextTests {
                 .withVerseNumber(token.getVerseNumber()).withTokenNumber(token.getTokenNumber())
                 .withLocationIndex(1).withPartOfSpeech(NOUN).withStartIndex(0)
                 .withEndIndex(token.getTokenWord().getLength());
+        System.out.println(format("creating implied location: %s (POS: %s)", location, location.getPartOfSpeech()));
 
         token.setLocations(singletonList(location));
 
+        System.out.println(format("Creating implied token: %s", token));
         repositoryUtil.getTokenRepository().save(token);
 
         token = new Token().withChapterNumber(0).withVerseNumber(1).withTokenNumber(2).withToken("(*)")
@@ -77,13 +79,15 @@ public class BulkDataCreation extends AbstractTestNGSpringContextTests {
                 .withVerseNumber(token.getVerseNumber()).withTokenNumber(token.getTokenNumber())
                 .withLocationIndex(1).withPartOfSpeech(VERB).withStartIndex(0)
                 .withEndIndex(token.getTokenWord().getLength());
+        System.out.println(format("creating implied location: %s (POS: %s)", location, location.getPartOfSpeech()));
 
         token.setLocations(singletonList(location));
 
+        System.out.println(format("Creating implied token: %s", token));
         repositoryUtil.getTokenRepository().save(token);
     }
 
-    @Test(dependsOnMethods = {"createEmptyTokens"})
+    @Test(dependsOnMethods = {"createImpliedTokens"})
     public void createPronounTokens() {
         List<Token> tokens = new ArrayList<>();
         int tokenNumber = 3;
@@ -113,6 +117,8 @@ public class BulkDataCreation extends AbstractTestNGSpringContextTests {
                 .withVerseNumber(token.getVerseNumber()).withTokenNumber(token.getTokenNumber())
                 .withLocationIndex(1).withPartOfSpeech(PRONOUN).withStartIndex(0)
                 .withEndIndex(token.getTokenWord().getLength());
+        System.out.println(format("creating hidden pronoun location: %s (POS: %s)", location,
+                location.getPartOfSpeech()));
 
         token.setLocations(singletonList(location));
 
