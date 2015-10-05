@@ -45,14 +45,6 @@ public class TerminalNodeAdapter extends LineSupportAdapter<TerminalNode> {
         partOfSpeeches.remove(0, partOfSpeeches.size());
         if (terminalNode != null) {
             setTranslationFont(CanvasUtil.getInstance().createFont(terminalNode.getTranslationFont()));
-//            List<PartOfSpeechNode> partOfSpeechNodes = terminalNode.getPartOfSpeechNodes();
-//            for (int i = partOfSpeechNodes.size() - 1; i >= 0; i--) {
-//                PartOfSpeechNode partOfSpeechNode = partOfSpeechNodes.get(i);
-//                PartOfSpeechNodeAdapter partOfSpeechNodeAdapter = new PartOfSpeechNodeAdapter();
-//                partOfSpeechNodeAdapter.setParent(this);
-//                partOfSpeechNodeAdapter.setSrc(partOfSpeechNode);
-//                partOfSpeeches.add(partOfSpeechNodeAdapter);
-//            }
             terminalNode.getPartOfSpeechNodes().forEach(partOfSpeechNode -> {
                 PartOfSpeechNodeAdapter partOfSpeechNodeAdapter = new PartOfSpeechNodeAdapter();
                 partOfSpeechNodeAdapter.setParent(this);

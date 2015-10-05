@@ -3,9 +3,9 @@ package com.alphasystem.morphologicalanalysis.ui.dependencygraph.model;
 /**
  * @author sali
  */
-public class EmptyNodeAdapter extends TerminalNodeAdapter {
+public class ImpliedNodeAdapter extends TerminalNodeAdapter {
 
-    public EmptyNodeAdapter() {
+    public ImpliedNodeAdapter() {
         super();
     }
 }

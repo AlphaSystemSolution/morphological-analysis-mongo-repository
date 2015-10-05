@@ -48,8 +48,8 @@ public class DependencyGraphAdapter {
                     case HIDDEN:
                         adapter = new HiddenNodeAdapter();
                         break;
-                    case EMPTY:
-                        adapter = new EmptyNodeAdapter();
+                    case IMPLIED:
+                        adapter = new ImpliedNodeAdapter();
                         break;
                     default:
                         break;
@@ -98,7 +98,7 @@ public class DependencyGraphAdapter {
             switch (graphNodeType) {
                 case TERMINAL:
                 case REFERENCE:
-                case EMPTY:
+                case IMPLIED:
                 case HIDDEN:
                     TerminalNodeAdapter tn = (TerminalNodeAdapter) node;
                     for (PartOfSpeechNodeAdapter pn : tn.getPartOfSpeeches()) {
