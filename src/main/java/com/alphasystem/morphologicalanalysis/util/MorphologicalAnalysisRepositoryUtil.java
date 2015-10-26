@@ -271,7 +271,9 @@ public class MorphologicalAnalysisRepositoryUtil {
             case HIDDEN:
                 TerminalNode tn = (TerminalNode) graphNode;
                 tn.getPartOfSpeechNodes().forEach(partOfSpeechNode -> {
-                    getPartOfSpeechNodeRepository().delete(partOfSpeechNode.getId());
+                    if (partOfSpeechNode != null) {
+                        getPartOfSpeechNodeRepository().delete(partOfSpeechNode.getId());
+                    }
                 });
                 break;
         }
