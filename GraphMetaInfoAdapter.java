@@ -70,10 +70,6 @@ public class GraphMetaInfoAdapter {
         this.translationFont.set(translationFont);
     }
 
-    public ObjectProperty<FontMetaInfo> translationFontProperty() {
-        return translationFont;
-    }
-
     public FontMetaInfo getTerminalFont() {
         return terminalFont.get();
     }
@@ -82,20 +78,12 @@ public class GraphMetaInfoAdapter {
         this.terminalFont.set(terminalFont);
     }
 
-    public ObjectProperty<FontMetaInfo> terminalFontProperty() {
-        return terminalFont;
-    }
-
     public FontMetaInfo getPosFont() {
         return posFont.get();
     }
 
     public void setPosFont(FontMetaInfo posFont) {
         this.posFont.set(posFont);
-    }
-
-    public ObjectProperty<FontMetaInfo> posFontProperty() {
-        return posFont;
     }
 
     public final GraphMetaInfo getGraphMetaInfo() {
