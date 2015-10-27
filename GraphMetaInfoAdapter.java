@@ -1,12 +1,18 @@
 package com.alphasystem.morphologicalanalysis.ui.dependencygraph.model;
 
+import com.alphasystem.morphologicalanalysis.graph.model.FontMetaInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.GraphMetaInfo;
+import com.alphasystem.morphologicalanalysis.graph.model.PartOfSpeechNode;
+import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import javafx.beans.property.*;
 
 /**
  * @author sali
  */
 public class GraphMetaInfoAdapter {
+
+    private static final TerminalNode DUMMY_TERMINAL_NODE = new TerminalNode();
+    private static final PartOfSpeechNode DUMMY_POS_NODE = new PartOfSpeechNode();
 
     private final ObjectProperty<GraphMetaInfo> graphMetaInfo = new SimpleObjectProperty<>();
     private final DoubleProperty width = new SimpleDoubleProperty();
@@ -17,6 +23,9 @@ public class GraphMetaInfoAdapter {
     private final BooleanProperty showGridLines = new SimpleBooleanProperty();
     private final BooleanProperty showOutLines = new SimpleBooleanProperty();
     private final BooleanProperty debugMode = new SimpleBooleanProperty();
+    private final ObjectProperty<FontMetaInfo> terminalFont = new SimpleObjectProperty<>();
+    private final ObjectProperty<FontMetaInfo> posFont = new SimpleObjectProperty<>();
+    private final ObjectProperty<FontMetaInfo> translationFont = new SimpleObjectProperty<>();
 
     public GraphMetaInfoAdapter(GraphMetaInfo src) {
         graphMetaInfoProperty().addListener((observable, oldValue, newValue) -> {
@@ -28,19 +37,65 @@ public class GraphMetaInfoAdapter {
             setShowGridLines(newValue == null ? true : newValue.isShowGridLines());
             setShowOutLines(newValue == null ? true : newValue.isShowOutLines());
             setDebugMode(newValue == null ? true : newValue.isDebugMode());
+            setTerminalFont(DUMMY_TERMINAL_NODE.getFont());
+            setTranslationFont(DUMMY_TERMINAL_NODE.getTranslationFont());
+            setPosFont(DUMMY_POS_NODE.getFont());
         });
         setGraphMetaInfo(src);
         widthProperty().addListener((observable, oldValue, newValue) ->
-                getGraphMetaInfo().setWidth((Double) newValue));
+                graphMetaInfoProperty().get().setWidth((Double) newValue));
         heightProperty().addListener((observable, oldValue, newValue) ->
-                getGraphMetaInfo().setHeight((Double) newValue));
+                graphMetaInfoProperty().get().setHeight((Double) newValue));
+        tokenWidthProperty().addListener((observable, oldValue, newValue) -> {
+            graphMetaInfoProperty().get().setTokenWidth((Double) newValue);
+        });
+        tokenHeightProperty().addListener((observable, oldValue, newValue) -> {
+            graphMetaInfoProperty().get().setTokenHeight((Double) newValue);
+        });
         gapBetweenTokensProperty().addListener((observable, oldValue, newValue) ->
-                getGraphMetaInfo().setGapBetweenTokens((Double) newValue));
+                graphMetaInfoProperty().get().setGapBetweenTokens((Double) newValue));
         showGridLinesProperty().addListener((observable, oldValue, newValue) ->
-                getGraphMetaInfo().setShowGridLines(newValue));
+                graphMetaInfoProperty().get().setShowGridLines(newValue));
         showOutLinesProperty().addListener((observable, oldValue, newValue) ->
-                getGraphMetaInfo().setShowOutLines(newValue));
-        debugModeProperty().addListener((observable, oldValue, newValue) -> getGraphMetaInfo().setDebugMode(newValue));
+                graphMetaInfoProperty().get().setShowOutLines(newValue));
+        debugModeProperty().addListener((observable, oldValue, newValue) ->
+                graphMetaInfoProperty().get().setDebugMode(newValue));
+    }
+
+    public FontMetaInfo getTranslationFont() {
+        return translationFont.get();
+    }
+
+    public void setTranslationFont(FontMetaInfo translationFont) {
+        this.translationFont.set(translationFont);
+    }
+
+    public ObjectProperty<FontMetaInfo> translationFontProperty() {
+        return translationFont;
+    }
+
+    public FontMetaInfo getTerminalFont() {
+        return terminalFont.get();
+    }
+
+    public void setTerminalFont(FontMetaInfo terminalFont) {
+        this.terminalFont.set(terminalFont);
+    }
+
+    public ObjectProperty<FontMetaInfo> terminalFontProperty() {
+        return terminalFont;
+    }
+
+    public FontMetaInfo getPosFont() {
+        return posFont.get();
+    }
+
+    public void setPosFont(FontMetaInfo posFont) {
+        this.posFont.set(posFont);
+    }
+
+    public ObjectProperty<FontMetaInfo> posFontProperty() {
+        return posFont;
     }
 
     public final GraphMetaInfo getGraphMetaInfo() {
