@@ -30,4 +30,14 @@ public interface TokenRepository extends BaseRepository<Token> {
 	 */
 	Token findByChapterNumberAndVerseNumberAndTokenNumber(
 			Integer chapterNumber, Integer verseNumber, Integer tokenNumber);
+
+    /**
+     * @param chapterNumber
+     * @param verseNumber
+     * @param firstTokenNumber
+     * @param lastTokenNumber
+     * @return
+     */
+    List<Token> findByChapterNumberAndVerseNumberAndTokenNumberBetween(Integer chapterNumber, Integer verseNumber,
+                                                                       Integer firstTokenNumber, Integer lastTokenNumber);
 }

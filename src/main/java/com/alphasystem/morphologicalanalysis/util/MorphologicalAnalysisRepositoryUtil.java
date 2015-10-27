@@ -259,6 +259,7 @@ public class MorphologicalAnalysisRepositoryUtil {
         return repository;
     }
 
+    @SuppressWarnings({"unchecked"})
     public void delete(GraphNode graphNode) {
         if (graphNode == null) {
             return;
