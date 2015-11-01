@@ -8,10 +8,8 @@ import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
 import com.alphasystem.morphologicalanalysis.spring.support.WordByWordConfig;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.NounProperties;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.KanaAndSisters;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +21,16 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.ConversationType.THIRD_PERSON;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.GenderType.MASCULINE;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.KanaFamily.MEMBER1;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus.GENETIVE;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounType.DEFINITE;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NumberType.PLURAL;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NumberType.SINGULAR;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.DEFINITE_ARTICLE;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbType.IMPERFECT;
 import static java.lang.String.format;
 import static java.util.Collections.reverse;
 import static org.testng.Assert.assertEquals;
@@ -206,4 +208,28 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         log(format("Total number of terminal nodes found: %s", count));
     }
 
+    @Test(dependsOnMethods = "countTerminalNodes")
+    public void saveIncompleteVerbType() {
+        Location location = new Location(0, 1, 1, 1);
+        location.setPartOfSpeech(VERB);
+        VerbProperties vp = (VerbProperties) location.getProperties();
+        vp.setVerbType(IMPERFECT);
+        vp.setConversationType(THIRD_PERSON);
+        vp.setGender(MASCULINE);
+        vp.setNumber(SINGULAR);
+        KanaAndSisters incompleteVerb = new KanaAndSisters();
+        incompleteVerb.setType(MEMBER1);
+        vp.setIncompleteVerb(incompleteVerb);
+
+        repositoryUtil.getLocationRepository().save(location);
+    }
+
+    @Test(dependsOnMethods = "saveIncompleteVerbType")
+    public void retrieveIncompleteVerbType() {
+        Location location = repositoryUtil.getLocationRepository().findByDisplayName("0:1:1:1");
+        assertNotNull(location);
+        assertEquals(location.getPartOfSpeech(), VERB);
+        VerbProperties vp = (VerbProperties) location.getProperties();
+        log(format("Incomplete Verb Type: %s", vp.getIncompleteVerb().getType()));
+    }
 }
