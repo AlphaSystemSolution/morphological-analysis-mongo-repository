@@ -23,6 +23,7 @@ import java.util.List;
 
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.ConversationType.THIRD_PERSON;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.GenderType.MASCULINE;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.IncompleteVerbCategory.KANA_AND_ITS_SISTERS;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.KanaFamily.MEMBER1;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus.GENETIVE;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounType.DEFINITE;
@@ -218,6 +219,7 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         vp.setGender(MASCULINE);
         vp.setNumber(SINGULAR);
         KanaAndSisters incompleteVerb = new KanaAndSisters();
+        incompleteVerb.setCategory(KANA_AND_ITS_SISTERS);
         incompleteVerb.setType(MEMBER1);
         vp.setIncompleteVerb(incompleteVerb);
 
