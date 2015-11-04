@@ -21,6 +21,7 @@ public class PhraseNodeAdapter extends LinkSupportAdapter<PhraseNode> {
     private final ObjectProperty<RelationshipType> relationshipType = new SimpleObjectProperty<>();
     private final ObjectProperty<AlternateStatus> alternateStatus = new SimpleObjectProperty<>();
     private final ObservableList<PartOfSpeechNodeAdapter> fragments = observableArrayList();
+    private final ObservableList<RelationshipType> relationships = observableArrayList();
 
     public PhraseNodeAdapter() {
         super();
@@ -35,6 +36,8 @@ public class PhraseNodeAdapter extends LinkSupportAdapter<PhraseNode> {
         List<PartOfSpeechNode> fragments = phraseNode.getFragments();
         fragments.forEach(partOfSpeechNode -> getFragments().add(
                 (PartOfSpeechNodeAdapter) canvasUtil.createLinkSupportAdapter(partOfSpeechNode)));
+        List<RelationshipType> relationships = phraseNode.getRelationships();
+        relationships.forEach(relationship -> getRelationships().add(relationship));
     }
 
     public final AlternateStatus getAlternateStatus() {
@@ -63,5 +66,9 @@ public class PhraseNodeAdapter extends LinkSupportAdapter<PhraseNode> {
 
     public final ObjectProperty<RelationshipType> relationshipTypeProperty() {
         return relationshipType;
+    }
+
+    public ObservableList<RelationshipType> getRelationships() {
+        return relationships;
     }
 }
