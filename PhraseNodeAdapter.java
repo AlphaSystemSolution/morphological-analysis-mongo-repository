@@ -18,7 +18,6 @@ import static javafx.collections.FXCollections.observableArrayList;
  */
 public class PhraseNodeAdapter extends LinkSupportAdapter<PhraseNode> {
 
-    private final ObjectProperty<RelationshipType> relationshipType = new SimpleObjectProperty<>();
     private final ObjectProperty<AlternateStatus> alternateStatus = new SimpleObjectProperty<>();
     private final ObservableList<PartOfSpeechNodeAdapter> fragments = observableArrayList();
     private final ObservableList<RelationshipType> relationships = observableArrayList();
@@ -30,7 +29,6 @@ public class PhraseNodeAdapter extends LinkSupportAdapter<PhraseNode> {
     @Override
     protected void initValues(PhraseNode phraseNode) {
         super.initValues(phraseNode);
-        setRelationshipType(phraseNode == null ? null : phraseNode.getRelationshipType());
         setAlternateStatus(phraseNode == null ? null : phraseNode.getAlternateStatus());
         CanvasUtil canvasUtil = CanvasUtil.getInstance();
         List<PartOfSpeechNode> fragments = phraseNode.getFragments();
@@ -54,18 +52,6 @@ public class PhraseNodeAdapter extends LinkSupportAdapter<PhraseNode> {
 
     public final ObservableList<PartOfSpeechNodeAdapter> getFragments() {
         return fragments;
-    }
-
-    public final RelationshipType getRelationshipType() {
-        return relationshipType.get();
-    }
-
-    public final void setRelationshipType(RelationshipType relationshipType) {
-        this.relationshipType.set(relationshipType);
-    }
-
-    public final ObjectProperty<RelationshipType> relationshipTypeProperty() {
-        return relationshipType;
     }
 
     public ObservableList<RelationshipType> getRelationships() {
