@@ -15,32 +15,4 @@ public interface DependencyGraphRepository extends BaseRepository<DependencyGrap
      * @return
      */
     List<DependencyGraph> findByChapterNumber(Integer chapterNumber);
-
-    /**
-     *
-     * @param chapterNumber
-     * @param verseNumber
-     * @return
-     */
-    List<DependencyGraph> findByChapterNumberAndVerseNumber(Integer chapterNumber, Integer verseNumber);
-
-    /**
-     *
-     * @param chapterNumber
-     * @param verseNumber
-     * @param firstTokenIndex
-     * @param lastTokenIndex
-     * @return
-     */
-    DependencyGraph findByChapterNumberAndVerseNumberAndFirstTokenIndexAndLastTokenIndex(Integer chapterNumber,
-                                                                                         Integer verseNumber,
-                                                                                         Integer firstTokenIndex,
-                                                                                         Integer lastTokenIndex);
-
-    /**
-     * @param chapterNumber
-     * @param verseNumber
-     * @return
-     */
-    Long countByChapterNumberAndVerseNumber(Integer chapterNumber, Integer verseNumber);
 }

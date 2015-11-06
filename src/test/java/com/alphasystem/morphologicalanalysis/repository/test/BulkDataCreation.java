@@ -90,9 +90,10 @@ public class BulkDataCreation extends AbstractTestNGSpringContextTests {
     @Test(dependsOnMethods = {"createImpliedTokens"})
     public void createPronounTokens() {
         List<Token> tokens = new ArrayList<>();
-        int tokenNumber = 3;
+        int verseNumber = 3;
+        int tokenNumber = 1;
         for (ProNoun proNoun : ProNoun.values()) {
-            tokens.add(createToken(tokenNumber, proNoun));
+            tokens.add(createToken(tokenNumber, verseNumber, proNoun));
             tokenNumber++;
         }
         repositoryUtil.getTokenRepository().save(tokens);
@@ -108,8 +109,8 @@ public class BulkDataCreation extends AbstractTestNGSpringContextTests {
         this.repositoryUtil = repositoryUtil;
     }
 
-    private Token createToken(Integer tokenNumber, ProNoun proNoun) {
-        Token token = new Token().withChapterNumber(0).withVerseNumber(1).withTokenNumber(tokenNumber)
+    private Token createToken(Integer tokenNumber, Integer verseNumber, ProNoun proNoun) {
+        Token token = new Token().withChapterNumber(0).withVerseNumber(verseNumber).withTokenNumber(tokenNumber)
                 .withHidden(true).withToken(format("(%s)", proNoun.getLabel().toUnicode()));
         token.setId(proNoun.name());
 

@@ -1,5 +1,7 @@
 package com.alphasystem.morphologicalanalysis.repository.test;
 
+import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
+import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraphTokenInfo;
 import com.alphasystem.morphologicalanalysis.graph.model.PartOfSpeechNode;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.repository.TerminalNodeRepository;
@@ -233,5 +235,13 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         assertEquals(location.getPartOfSpeech(), VERB);
         VerbProperties vp = (VerbProperties) location.getProperties();
         log(format("Incomplete Verb Type: %s", vp.getIncompleteVerb().getType()));
+    }
+
+    @Test(dependsOnMethods = "retrieveIncompleteVerbType")
+    public void createDependencyGraph() {
+        DependencyGraph dependencyGraph = new DependencyGraph(DEFAULT_CHAPTER_NUMBER);
+        DependencyGraphTokenInfo tokenInfo = new DependencyGraphTokenInfo(DEFAULT_VERSE_NUMBER, 1, 4);
+        dependencyGraph.getTokens().add(tokenInfo);
+        repositoryUtil.getDependencyGraphRepository().save(dependencyGraph);
     }
 }

@@ -39,8 +39,10 @@ public class LocationEventListener extends DocumentEventListener<Location> {
         if (startIndex <= 0 && endIndex <= 0) {
             return;
         }
-        ArabicWord locationWord = getSubWord(token.getTokenWord(), startIndex, endIndex);
-        source.setLocationWord(locationWord);
+        if (token != null) {
+            ArabicWord locationWord = getSubWord(token.getTokenWord(), startIndex, endIndex);
+            source.setLocationWord(locationWord);
+        }
     }
 
 }
