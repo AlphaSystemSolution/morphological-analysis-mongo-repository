@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+import static com.alphasystem.tanzil.QuranScript.QURAN_SIMPLE_ENHANCED;
 import static java.lang.String.format;
 import static java.lang.System.out;
 import static java.util.Collections.sort;
@@ -66,7 +67,7 @@ public class MorphologicalAnalysisRepositoryUtil {
         if (verbose) {
             out.println(format("Start creating chapter {%s}", chapterNumber));
         }
-        com.alphasystem.tanzil.model.Chapter ch = tanzilTool.getChapter(chapterNumber);
+        com.alphasystem.tanzil.model.Chapter ch = tanzilTool.getChapter(chapterNumber, QURAN_SIMPLE_ENHANCED);
         Chapter chapter = new Chapter(chapterNumber, ch.getName());
         List<com.alphasystem.tanzil.model.Verse> verses = ch.getVerses();
         int verseCount = verses.size();
