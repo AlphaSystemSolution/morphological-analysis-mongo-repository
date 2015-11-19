@@ -1,9 +1,7 @@
 package com.alphasystem.morphologicalanalysis.repository.test;
 
-import com.alphasystem.morphologicalanalysis.spring.support.GraphConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
-import com.alphasystem.morphologicalanalysis.spring.support.WordByWordConfig;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
@@ -26,8 +24,7 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 /**
  * @author sali
  */
-@ContextConfiguration(classes = {MongoConfig.class, WordByWordConfig.class, GraphConfig.class,
-        MorphologicalAnalysisSpringConfiguration.class})
+@ContextConfiguration(classes = {MongoConfig.class, MorphologicalAnalysisSpringConfiguration.class})
 public class TokenListGenerator extends AbstractTestNGSpringContextTests {
 
     private MorphologicalAnalysisRepositoryUtil repositoryUtil;

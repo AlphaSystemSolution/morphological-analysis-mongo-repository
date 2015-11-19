@@ -3,10 +3,8 @@ package com.alphasystem.morphologicalanalysis.repository.test;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
-import com.alphasystem.morphologicalanalysis.spring.support.GraphConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
-import com.alphasystem.morphologicalanalysis.spring.support.WordByWordConfig;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -21,8 +19,7 @@ import static java.lang.String.format;
 /**
  * @author sali
  */
-@ContextConfiguration(classes = {MongoConfig.class, WordByWordConfig.class, GraphConfig.class,
-        MorphologicalAnalysisSpringConfiguration.class})
+@ContextConfiguration(classes = {MongoConfig.class, MorphologicalAnalysisSpringConfiguration.class})
 public class DeleteData extends AbstractTestNGSpringContextTests {
 
     private MorphologicalAnalysisRepositoryUtil repositoryUtil;

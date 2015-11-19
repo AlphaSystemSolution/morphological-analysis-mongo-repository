@@ -1,10 +1,8 @@
 package com.alphasystem.morphologicalanalysis.repository.test;
 
 import com.alphasystem.arabic.model.ProNoun;
-import com.alphasystem.morphologicalanalysis.spring.support.GraphConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
-import com.alphasystem.morphologicalanalysis.spring.support.WordByWordConfig;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech;
@@ -26,8 +24,7 @@ import static java.util.Collections.singletonList;
 /**
  * @author sali
  */
-@ContextConfiguration(classes = {MongoConfig.class, WordByWordConfig.class, GraphConfig.class,
-        MorphologicalAnalysisSpringConfiguration.class})
+@ContextConfiguration(classes = {MongoConfig.class, MorphologicalAnalysisSpringConfiguration.class})
 public class SupportDataCreation extends AbstractTestNGSpringContextTests {
 
     private MorphologicalAnalysisRepositoryUtil repositoryUtil;

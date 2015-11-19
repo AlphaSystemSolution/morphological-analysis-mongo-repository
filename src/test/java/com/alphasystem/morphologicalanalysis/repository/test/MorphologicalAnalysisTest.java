@@ -5,10 +5,8 @@ import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.PartOfSpeechNode;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.repository.TerminalNodeRepository;
-import com.alphasystem.morphologicalanalysis.spring.support.GraphConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
-import com.alphasystem.morphologicalanalysis.spring.support.WordByWordConfig;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.KanaAndSisters;
@@ -43,8 +41,7 @@ import static org.testng.Reporter.log;
 /**
  * @author sali
  */
-@ContextConfiguration(classes = {MongoConfig.class, WordByWordConfig.class, GraphConfig.class,
-        MorphologicalAnalysisSpringConfiguration.class})
+@ContextConfiguration(classes = {MongoConfig.class, MorphologicalAnalysisSpringConfiguration.class})
 public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests {
 
     private static final int DEFAULT_CHAPTER_NUMBER = 1;

@@ -52,7 +52,6 @@
 				<configuration>
 					<systemProperties>
 						<mongo.db.name>MORPHOLOGICAL_ANALYSIS_TEST_DB</mongo.db.name>
-						<graph.db.name>MORPHOLOGICAL_ANALYSIS_TEST_DB</graph.db.name>
 						<quranic-text>quran-simple-enhanced</quranic-text>
 					</systemProperties>
 				</configuration>
