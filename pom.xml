@@ -8,16 +8,16 @@
 		<relativePath>../project/jar/pom.xml</relativePath>
 	</parent>
 	<groupId>com.alphasystem.arabic</groupId>
-	<artifactId>morphological-analysis-mongo-repository</artifactId>
+	<artifactId>morphological-analysis-repository</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>com.alphasystem.arabic</groupId>
-			<artifactId>morphological-analysis-mongo-model</artifactId>
+			<artifactId>morphological-analysis-model</artifactId>
 			<version>${ma-model.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.alphasystem.mongo</groupId>
-			<artifactId>mongo-repository-base</artifactId>
+			<artifactId>repository-base</artifactId>
 			<version>${mongo-repository.version}</version>
 		</dependency>
 		<dependency>
