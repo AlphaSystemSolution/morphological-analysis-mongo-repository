@@ -15,7 +15,8 @@ import org.springframework.context.annotation.Configuration;
 		"com.alphasystem.morphologicalanalysis.jquran",
 		"com.alphasystem.morphologicalanalysis.util",
 		"com.alphasystem.morphologicalanalysis.wordbyword.listener",
-		"com.alphasystem.morphologicalanalysis.graph.listener"})
+        "com.alphasystem.morphologicalanalysis.graph.listener",
+        "com.alphasystem.morphologicalanalysis.morphology.listener"})
 public class MorphologicalAnalysisSpringConfiguration {
 
 }

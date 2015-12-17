@@ -17,7 +17,8 @@ import static java.lang.System.getProperty;
  */
 @Configuration
 @EnableMongoRepositories(basePackages = {"com.alphasystem.morphologicalanalysis.wordbyword.repository",
-        "com.alphasystem.morphologicalanalysis.graph.repository"})
+        "com.alphasystem.morphologicalanalysis.graph.repository",
+        "com.alphasystem.morphologicalanalysis.morphology.repository"})
 public class MongoConfig {
 
     public static final String MONGO_DB_NAME_PROPERTY = "mongo.db.name";
