@@ -8,6 +8,8 @@ import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.*;
+import com.alphasystem.morphologicalanalysis.morphology.repository.RootLettersRepository;
+import com.alphasystem.morphologicalanalysis.morphology.repository.RootWordRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -49,6 +51,8 @@ public class MorphologicalAnalysisRepositoryUtil {
     private PartOfSpeechNodeRepository partOfSpeechNodeRepository;
     private PhraseNodeRepository phraseNodeRepository;
     private RelationshipNodeRepository relationshipNodeRepository;
+    private RootLettersRepository rootLettersRepository;
+    private RootWordRepository rootWordRepository;
     private TanzilTool tanzilTool;
     private Query findAllChaptersQuery;
     private boolean verbose;
@@ -227,6 +231,24 @@ public class MorphologicalAnalysisRepositoryUtil {
     @Autowired
     public void setRelationshipNodeRepository(RelationshipNodeRepository relationshipNodeRepository) {
         this.relationshipNodeRepository = relationshipNodeRepository;
+    }
+
+    public RootLettersRepository getRootLettersRepository() {
+        return rootLettersRepository;
+    }
+
+    @Autowired
+    public void setRootLettersRepository(RootLettersRepository rootLettersRepository) {
+        this.rootLettersRepository = rootLettersRepository;
+    }
+
+    public RootWordRepository getRootWordRepository() {
+        return rootWordRepository;
+    }
+
+    @Autowired
+    public void setRootWordRepository(RootWordRepository rootWordRepository) {
+        this.rootWordRepository = rootWordRepository;
     }
 
     public GraphNodeRepository getRepository(GraphNodeType nodeType) {
