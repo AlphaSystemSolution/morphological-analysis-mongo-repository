@@ -5,6 +5,8 @@ import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.PartOfSpeechNode;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.repository.TerminalNodeRepository;
+import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
+import com.alphasystem.morphologicalanalysis.morphology.repository.RootLettersRepository;
 import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
@@ -21,6 +23,7 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
+import static com.alphasystem.arabic.model.ArabicLetterType.*;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.ConversationType.THIRD_PERSON;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.GenderType.MASCULINE;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.IncompleteVerbCategory.KANA_AND_ITS_SISTERS;
@@ -240,5 +243,23 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         VerseTokensPair tokenInfo = new VerseTokensPair(DEFAULT_VERSE_NUMBER, 1, 4);
         dependencyGraph.getTokens().add(tokenInfo);
         repositoryUtil.getDependencyGraphRepository().save(dependencyGraph);
+    }
+
+    @Test(dependsOnMethods = "createDependencyGraph")
+    public void testCreateRootLetters() {
+        RootLetters rootLetters = new RootLetters(NOON, SAD, RA);
+        rootLetters.setFirstRadical(NOON);
+        rootLetters.setSecondRadical(SAD);
+        rootLetters.setThirdRadical(RA);
+        RootLettersRepository rootLettersRepository = repositoryUtil.getRootLettersRepository();
+        rootLettersRepository.save(rootLetters);
+    }
+
+    @Test(dependsOnMethods = "testCreateRootLetters")
+    public void testFindRootLetters() {
+        RootLettersRepository rootLettersRepository = repositoryUtil.getRootLettersRepository();
+        RootLetters rootLetters = rootLettersRepository.findByFirstRadicalAndSecondRadicalAndThirdRadical(NOON, SAD, RA);
+        assertNotNull(rootLetters);
+        log(rootLetters.toString(), true);
     }
 }
