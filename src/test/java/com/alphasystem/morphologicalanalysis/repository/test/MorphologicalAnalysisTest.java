@@ -5,7 +5,9 @@ import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.PartOfSpeechNode;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.repository.TerminalNodeRepository;
+import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
+import com.alphasystem.morphologicalanalysis.morphology.repository.MorphologicalEntryRepository;
 import com.alphasystem.morphologicalanalysis.morphology.repository.RootLettersRepository;
 import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
@@ -24,6 +26,7 @@ import org.testng.annotations.Test;
 import java.util.List;
 
 import static com.alphasystem.arabic.model.ArabicLetterType.*;
+import static com.alphasystem.arabic.model.NamedTemplate.FORM_I_CATEGORY_A_GROUP_U_TEMPLATE;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.ConversationType.THIRD_PERSON;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.GenderType.MASCULINE;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.IncompleteVerbCategory.KANA_AND_ITS_SISTERS;
@@ -261,5 +264,18 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         RootLetters rootLetters = rootLettersRepository.findByFirstRadicalAndSecondRadicalAndThirdRadical(NOON, SAD, RA);
         assertNotNull(rootLetters);
         log(rootLetters.toString(), true);
+    }
+
+    @Test(dependsOnMethods = "testFindRootLetters")
+    public void testCreateMorphologicalEntry() {
+        RootLettersRepository rootLettersRepository = repositoryUtil.getRootLettersRepository();
+        RootLetters rootLetters = rootLettersRepository.findByFirstRadicalAndSecondRadicalAndThirdRadical(NOON, SAD, RA);
+        assertNotNull(rootLetters);
+        MorphologicalEntry morphologicalEntry = new MorphologicalEntry();
+        morphologicalEntry.setRootLetters(rootLetters);
+        morphologicalEntry.setForm(FORM_I_CATEGORY_A_GROUP_U_TEMPLATE);
+        morphologicalEntry.setDictionary("To Help");
+        MorphologicalEntryRepository morphologicalEntryRepository = repositoryUtil.getMorphologicalEntryRepository();
+        morphologicalEntryRepository.save(morphologicalEntry);
     }
 }

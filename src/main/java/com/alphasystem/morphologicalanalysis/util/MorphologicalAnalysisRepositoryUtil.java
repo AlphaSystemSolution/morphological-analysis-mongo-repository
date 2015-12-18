@@ -8,6 +8,7 @@ import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.*;
+import com.alphasystem.morphologicalanalysis.morphology.repository.MorphologicalEntryRepository;
 import com.alphasystem.morphologicalanalysis.morphology.repository.RootLettersRepository;
 import com.alphasystem.morphologicalanalysis.morphology.repository.RootWordRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
@@ -53,6 +54,7 @@ public class MorphologicalAnalysisRepositoryUtil {
     private RelationshipNodeRepository relationshipNodeRepository;
     private RootLettersRepository rootLettersRepository;
     private RootWordRepository rootWordRepository;
+    private MorphologicalEntryRepository morphologicalEntryRepository;
     private TanzilTool tanzilTool;
     private Query findAllChaptersQuery;
     private boolean verbose;
@@ -249,6 +251,15 @@ public class MorphologicalAnalysisRepositoryUtil {
     @Autowired
     public void setRootWordRepository(RootWordRepository rootWordRepository) {
         this.rootWordRepository = rootWordRepository;
+    }
+
+    public MorphologicalEntryRepository getMorphologicalEntryRepository() {
+        return morphologicalEntryRepository;
+    }
+
+    @Autowired
+    public void setMorphologicalEntryRepository(MorphologicalEntryRepository morphologicalEntryRepository) {
+        this.morphologicalEntryRepository = morphologicalEntryRepository;
     }
 
     public GraphNodeRepository getRepository(GraphNodeType nodeType) {
