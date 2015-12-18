@@ -17,7 +17,6 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.support.KanaAndSis
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeClass;
@@ -147,8 +146,7 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
 
     @Test(dependsOnMethods = "loadLocation")
     public void testQuery() {
-        BasicQuery basicQuery = new BasicQuery("{\"displayName\" : \"1:2:1\"}");
-        Token token = repositoryUtil.getMongoTemplate().findOne(basicQuery, Token.class);
+        Token token = repositoryUtil.getTokenRepository().findOne(QToken.token1.displayName.eq("1:2:1"));
         assertNotNull(token);
         log(format("Token found: %s", token));
     }
