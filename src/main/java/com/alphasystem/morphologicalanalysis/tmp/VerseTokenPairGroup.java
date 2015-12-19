@@ -1,4 +1,4 @@
-package com.alphasystem.morphologicalanalysis.ui.dependencygraph.model;
+package com.alphasystem.morphologicalanalysis.tmp;
 
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 
