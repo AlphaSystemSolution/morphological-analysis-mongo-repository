@@ -297,8 +297,6 @@ public class MorphologicalAnalysisRepositoryUtil {
         morphologicalEntry.getLocations().add(location);
         morphologicalEntryRepository.save(morphologicalEntry);
 
-        location.setRootWord(null);
-        location.setFormTemplate(null);
         locationRepository.save(location);
     }
 

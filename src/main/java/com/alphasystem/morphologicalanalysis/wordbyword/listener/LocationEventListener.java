@@ -40,8 +40,13 @@ public class LocationEventListener extends DocumentEventListener<Location> {
             return;
         }
         if (token != null) {
-            ArabicWord locationWord = getSubWord(token.getTokenWord(), startIndex, endIndex);
-            source.setLocationWord(locationWord);
+            try {
+                ArabicWord locationWord = getSubWord(token.getTokenWord(), startIndex, endIndex);
+                source.setLocationWord(locationWord);
+            } catch (Exception e) {
+                String msg = format("Error occurred while getting location word for token {%s} location {%s} @(%s, %s)", token, source, startIndex, endIndex);
+                System.err.println(msg);
+            }
         }
     }
 

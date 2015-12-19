@@ -4,18 +4,13 @@ import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
-import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.repository.MorphologicalEntryRepository;
 import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.QLocation;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.QRootWord;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.support.RootWord;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
-import com.mysema.query.types.expr.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -72,32 +67,6 @@ public class ReadOnlyRepositoryTests extends AbstractTestNGSpringContextTests {
     }
 
     @Test(dependsOnMethods = {"getDependencyGraphs"})
-    public void printLocationsWithRootOrFormPopulated() {
-        QLocation qLocation = QLocation.location;
-        QRootWord qRootWord = qLocation.rootWord;
-        BooleanExpression predicate = qRootWord.firstRadical.isNotNull().or(qRootWord.secondRadical.isNotNull())
-                .or(qRootWord.thirdRadical.isNotNull()).or(qRootWord.fourthRadical.isNotNull());
-        predicate = predicate.or(qLocation.formTemplate.isNotNull());
-        log(format("Query {%s}", predicate), true);
-        LocationRepository locationRepository = repositoryUtil.getLocationRepository();
-        List<Location> locations = (List<Location>) locationRepository.findAll(predicate);
-        if (locations == null || locations.isEmpty()) {
-            log("No Location with root word or form populated exists", true);
-        } else {
-            locations.forEach(location -> {
-                RootWord rootWord = location.getRootWord();
-                String id = rootWord.getId();
-                String displayName = rootWord.toCode();
-                loadMorphologicalEntry(location);
-                log(format("Location: %s, Root: %s (%s), Form: %s", location, id, displayName,
-                        location.getFormTemplate()), true);
-                repositoryUtil.getLocationRepository().save(location);
-            });
-            log(format("Total number of locations: %s", locations.size()), true);
-        }
-    }
-
-    @Test(dependsOnMethods = {"printLocationsWithRootOrFormPopulated"})
     public void printLocationsWithMorphologicalEntriesPopulated() {
         MorphologicalEntryRepository morphologicalEntryRepository = repositoryUtil.getMorphologicalEntryRepository();
         List<MorphologicalEntry> morphologicalEntries = (List<MorphologicalEntry>) morphologicalEntryRepository.findAll();
@@ -108,42 +77,20 @@ public class ReadOnlyRepositoryTests extends AbstractTestNGSpringContextTests {
         }
     }
 
-    //@Test(dependsOnMethods = {"getDependencyGraphs"})
+    @Test(dependsOnMethods = {"printLocationsWithMorphologicalEntriesPopulated"})
     public void printLocationsWithRootNotPopulated() {
-        QLocation qLocation = QLocation.location;
-        QRootWord qRootWord = qLocation.rootWord;
-        BooleanExpression predicate = qRootWord.isNotNull().and(qRootWord.firstRadical.isNull().and(qRootWord.secondRadical.isNull())
-                .and(qRootWord.thirdRadical.isNull()).and(qRootWord.fourthRadical.isNull()));
-        log(format("Query {%s}", predicate), true);
         LocationRepository locationRepository = repositoryUtil.getLocationRepository();
-        List<Location> locations = (List<Location>) locationRepository.findAll(predicate);
+        List<Location> locations = (List<Location>) locationRepository.findAll();
         if (locations == null || locations.isEmpty()) {
             log("No Location with root word null exists", true);
         } else {
             locations.forEach(location -> {
-                RootWord rootWord = location.getRootWord();
-                String id = (rootWord == null) ? null : rootWord.getId();
-                String displayName = (rootWord == null) ? null : rootWord.toCode();
-                log(format("Location: %s, Root: %s (%s)", location, id, displayName), true);
-                // location.setRootWord(null);
+                locationRepository.save(location);
+                log(format("Saved: {%s}", location));
             });
-            // locationRepository.save(locations);
             log(format("Total number of locations: %s", locations.size()), true);
         }
     }
 
-    private void loadMorphologicalEntry(Location location) {
-        MorphologicalEntry morphologicalEntry = new MorphologicalEntry();
-        RootWord rootWord = location.getRootWord();
-        RootLetters rootLetters = null;
-        if (rootWord != null && rootWord.getFirstRadical() != null && rootWord.getSecondRadical()
-                != null && rootWord.getThirdRadical() != null) {
-            rootLetters = new RootLetters(rootWord.getFirstRadical(), rootWord.getSecondRadical(),
-                    rootWord.getThirdRadical());
-        }
-        log(format("Location: {%s}, RL: {%s}, RW: {%s}", location, rootLetters, rootWord.toCode()), true);
-        morphologicalEntry.setRootLetters(rootLetters);
-        morphologicalEntry.setForm(location.getFormTemplate());
-        repositoryUtil.saveMorphologicalEntry(morphologicalEntry, location);
-    }
+
 }
