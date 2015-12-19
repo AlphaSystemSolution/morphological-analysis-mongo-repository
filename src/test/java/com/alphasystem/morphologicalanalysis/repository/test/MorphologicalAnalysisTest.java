@@ -295,4 +295,5 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         MorphologicalEntryRepository morphologicalEntryRepository = repositoryUtil.getMorphologicalEntryRepository();
         morphologicalEntryRepository.save(morphologicalEntry);
     }
+
 }

@@ -4,28 +4,35 @@
 package com.alphasystem.morphologicalanalysis.util;
 
 import com.alphasystem.arabic.model.ArabicWord;
+import com.alphasystem.morphologicalanalysis.common.model.QVerseTokensPair;
+import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
+import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
+import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
+import com.alphasystem.morphologicalanalysis.graph.model.QDependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.*;
 import com.alphasystem.morphologicalanalysis.morphology.repository.MorphologicalEntryRepository;
 import com.alphasystem.morphologicalanalysis.morphology.repository.RootLettersRepository;
 import com.alphasystem.morphologicalanalysis.morphology.repository.RootWordRepository;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.ChapterRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.util.ChapterComparator;
 import com.alphasystem.tanzil.TanzilTool;
+import com.mysema.query.types.expr.BooleanExpression;
+import com.mysema.query.types.path.ListPath;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.alphasystem.tanzil.QuranScript.QURAN_SIMPLE_ENHANCED;
@@ -38,6 +45,8 @@ import static java.util.Collections.sort;
  */
 @Component
 public class MorphologicalAnalysisRepositoryUtil {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MorphologicalAnalysisRepositoryUtil.class);
 
     private MongoTemplate mongoTemplate;
     private ChapterRepository chapterRepository;
@@ -115,6 +124,53 @@ public class MorphologicalAnalysisRepositoryUtil {
                 Chapter.class, Chapter.class.getSimpleName().toLowerCase());
         sort(chapters, new ChapterComparator());
         return chapters;
+    }
+
+    public List<Token> getTokens(VerseTokenPairGroup group) {
+        List<VerseTokensPair> pairs = group.getPairs();
+        if (pairs == null | pairs.isEmpty()) {
+            return new ArrayList<>();
+        }
+        VerseTokensPair pair = pairs.get(0);
+        QToken qToken = QToken.token1;
+        BooleanExpression predicate = qToken.verseNumber.eq(pair.getVerseNumber()).
+                and(qToken.tokenNumber.between(pair.getFirstTokenIndex(), pair.getLastTokenIndex()));
+        for (int i = 1; i < pairs.size(); i++) {
+            pair = pairs.get(i);
+            BooleanExpression predicate1 = qToken.verseNumber.eq(pair.getVerseNumber())
+                    .and(qToken.tokenNumber.between(pair.getFirstTokenIndex(), pair.getLastTokenIndex()));
+            predicate = predicate.or(predicate1);
+        }
+        predicate = qToken.chapterNumber.eq(group.getChapterNumber()).and(predicate);
+        if (group.isIncludeHidden()) {
+            predicate = predicate.and(qToken.hidden.eq(true));
+        }
+        LOGGER.info(format("Query for \"getTokens\" is {%s}", predicate));
+        return (List<Token>) tokenRepository.findAll(predicate);
+    }
+
+    public List<DependencyGraph> getDependencyGraphs(VerseTokenPairGroup group) {
+        List<VerseTokensPair> pairs = group.getPairs();
+        if (pairs == null || pairs.isEmpty()) {
+            return new ArrayList<>();
+        }
+        QDependencyGraph qDependencyGraph = QDependencyGraph.dependencyGraph;
+        int index = 0;
+        VerseTokensPair pair = pairs.get(index);
+        ListPath<VerseTokensPair, QVerseTokensPair> tokens = qDependencyGraph.tokens;
+        BooleanExpression predicate = tokens.get(index).verseNumber.eq(pair.getVerseNumber());
+        for (index = 1; index < pairs.size(); index++) {
+            pair = pairs.get(index);
+            BooleanExpression predicate1 = tokens.get(index).verseNumber.eq(pair.getVerseNumber());
+            predicate = predicate.or(predicate1);
+        }
+        predicate = qDependencyGraph.chapterNumber.eq(group.getChapterNumber()).and(predicate);
+        LOGGER.info(format("Query for \"getDependencyGraphs\" is {%s}", predicate));
+        return (List<DependencyGraph>) dependencyGraphRepository.findAll(predicate);
+    }
+
+    public DependencyGraph getDependencyGraph(String displayName) {
+        return dependencyGraphRepository.findByDisplayName(displayName);
     }
 
     // Getter & Setters
