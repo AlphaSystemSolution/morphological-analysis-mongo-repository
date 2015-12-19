@@ -39,9 +39,9 @@ import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.Par
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbType.IMPERFECT;
 import static java.lang.String.format;
+import static java.lang.System.getProperty;
 import static java.util.Collections.reverse;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.*;
 import static org.testng.Reporter.log;
 
 /**
@@ -58,6 +58,10 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
 
     @BeforeClass
     public void beforeSuite() {
+        log("Checking database", true);
+        String dbName = getProperty(MongoConfig.MONGO_DB_NAME_PROPERTY);
+        log(format("Database in use {%s}", dbName), true);
+        assertTrue("MORPHOLOGICAL_ANALYSIS_TEST_DB".equals(dbName));
         repositoryUtil.getMongoTemplate().getDb().dropDatabase();
     }
 
@@ -289,7 +293,7 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         MorphologicalEntry morphologicalEntry = new MorphologicalEntry();
         morphologicalEntry.setRootLetters(rootLetters);
         morphologicalEntry.setForm(FORM_I_CATEGORY_A_GROUP_U_TEMPLATE);
-        morphologicalEntry.setDictionary("To Help");
+        morphologicalEntry.setTranslation("To Help");
         MorphologicalEntryRepository morphologicalEntryRepository = repositoryUtil.getMorphologicalEntryRepository();
         morphologicalEntryRepository.save(morphologicalEntry);
         log(format("MorphologicalEntry created {%s}", morphologicalEntry.getDisplayName()), true);
@@ -301,6 +305,15 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
                 FORM_I_CATEGORY_A_GROUP_U_TEMPLATE);
         assertNotNull(morphologicalEntry);
         log(format("MorphologicalEntry found {%s}", morphologicalEntry.getDisplayName()), true);
+    }
+
+    @Test(dependsOnMethods = "testFindMorphologicalEntry")
+    public void testFindGroup() {
+        MorphologicalEntryRepository morphologicalEntryRepository = repositoryUtil.getMorphologicalEntryRepository();
+        RootLetters rootLetters = new RootLetters(NOON, SAD, RA);
+        List<MorphologicalEntry> morphologicalEntries = morphologicalEntryRepository.findByGroupTag(rootLetters.getDisplayName());
+        assertTrue(morphologicalEntries != null && !morphologicalEntries.isEmpty());
+        morphologicalEntries.forEach(entry -> log(format("MorphologicalEntry found {%s}", entry.getDisplayName()), true));
     }
 
 }
