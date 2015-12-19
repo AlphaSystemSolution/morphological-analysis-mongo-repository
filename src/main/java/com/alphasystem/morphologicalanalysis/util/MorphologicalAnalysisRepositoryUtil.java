@@ -39,6 +39,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.alphasystem.tanzil.QuranScript.QURAN_SIMPLE_ENHANCED;
 import static java.lang.String.format;
@@ -122,7 +123,7 @@ public class MorphologicalAnalysisRepositoryUtil {
     }
 
     /**
-     * @return
+     * @return all chapters
      */
     public List<Chapter> findAllChapters() {
         List<Chapter> chapters = mongoTemplate.find(findAllChaptersQuery,
@@ -172,6 +173,42 @@ public class MorphologicalAnalysisRepositoryUtil {
         predicate = qDependencyGraph.chapterNumber.eq(group.getChapterNumber()).and(predicate);
         LOGGER.info(format("Query for \"getDependencyGraphs\" is {%s}", predicate));
         return (List<DependencyGraph>) dependencyGraphRepository.findAll(predicate);
+    }
+
+    public void saveDependencyGraph(DependencyGraph dependencyGraph, List<Token> impliedOrHiddenTokens,
+                                    Map<GraphNodeType, List<String>> removalIds) {
+        if (impliedOrHiddenTokens != null && !impliedOrHiddenTokens.isEmpty()) {
+            impliedOrHiddenTokens.forEach(tokenRepository::save);
+        }
+        dependencyGraphRepository.save(dependencyGraph);
+        if (!removalIds.isEmpty()) {
+            removalIds.entrySet().forEach(this::removeNode);
+        }
+    }
+
+    public void deleteDependencyGraph(String id, Map<GraphNodeType, List<String>> removalIds) {
+        if (!removalIds.isEmpty()) {
+            removalIds.entrySet().forEach(this::removeNode);
+        }
+        DependencyGraph dependencyGraph = dependencyGraphRepository.findOne(id);
+        VerseTokenPairGroup group = new VerseTokenPairGroup();
+        group.setIncludeHidden(true);
+        group.setChapterNumber(dependencyGraph.getChapterNumber());
+        group.getPairs().addAll(dependencyGraph.getTokens());
+        List<Token> hiddenTokens = getTokens(group);
+        if (hiddenTokens != null && !hiddenTokens.isEmpty()) {
+            hiddenTokens.forEach(token -> locationRepository.delete(token.getLocations()));
+            tokenRepository.delete(hiddenTokens);
+        }
+        dependencyGraphRepository.delete(id);
+    }
+
+    @SuppressWarnings({"unchecked"})
+    private void removeNode(Map.Entry<GraphNodeType, List<String>> entry) {
+        GraphNodeType key = entry.getKey();
+        List<String> ids = entry.getValue();
+        GraphNodeRepository repository = getRepository(key);
+        ids.forEach(repository::delete);
     }
 
     public DependencyGraph getDependencyGraph(String displayName) {
