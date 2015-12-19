@@ -16,6 +16,7 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.KanaAndSisters;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
+import com.mysema.query.types.expr.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -126,13 +127,31 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         int from = 10;
         int to = 21;
         int len = to - from - 1;
+
         VerseRepository verseRepository = repositoryUtil.getVerseRepository();
         List<Verse> verses = verseRepository.findByChapterNumberAndVerseNumberBetween(chapterNumber, from, to);
         assertNotNull(verses);
         assertEquals(verses.isEmpty(), false);
         assertEquals(verses.size(), len);
         for (Verse verse : verses) {
-            log(format("VERSE: %s", verse.getDisplayName()), true);
+            log(format("Using getRangeOfVerses: VERSE: %s", verse.getDisplayName()), true);
+        }
+    }
+
+    @Test(dependsOnMethods = "createChapter2")
+    public void getRangeOfVerses2() {
+        int chapterNumber = 2;
+        int from = 10;
+        int to = 20;
+
+        QVerse qVerse = QVerse.verse1;
+        BooleanExpression predicate = qVerse.chapterNumber.eq(chapterNumber).and(qVerse.verseNumber.between(from, to));
+        log(format("Query in getRangeOfVerses2: %s", predicate.toString()), true);
+        VerseRepository verseRepository = repositoryUtil.getVerseRepository();
+        Iterable<Verse> verses = verseRepository.findAll(predicate);
+        assertNotNull(verses);
+        for (Verse verse : verses) {
+            log(format("Using getRangeOfVerses2: VERSE: %s", verse.getDisplayName()), true);
         }
     }
 
