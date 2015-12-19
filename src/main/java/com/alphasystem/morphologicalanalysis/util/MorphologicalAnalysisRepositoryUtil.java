@@ -23,7 +23,6 @@ import com.alphasystem.morphologicalanalysis.morphology.model.support.NounOfPlac
 import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
 import com.alphasystem.morphologicalanalysis.morphology.repository.MorphologicalEntryRepository;
 import com.alphasystem.morphologicalanalysis.morphology.repository.RootLettersRepository;
-import com.alphasystem.morphologicalanalysis.morphology.repository.RootWordRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.ChapterRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
@@ -73,7 +72,6 @@ public class MorphologicalAnalysisRepositoryUtil {
     private PhraseNodeRepository phraseNodeRepository;
     private RelationshipNodeRepository relationshipNodeRepository;
     private RootLettersRepository rootLettersRepository;
-    private RootWordRepository rootWordRepository;
     private MorphologicalEntryRepository morphologicalEntryRepository;
     private TanzilTool tanzilTool;
     private Query findAllChaptersQuery;
@@ -429,15 +427,6 @@ public class MorphologicalAnalysisRepositoryUtil {
     @Autowired
     public void setRootLettersRepository(RootLettersRepository rootLettersRepository) {
         this.rootLettersRepository = rootLettersRepository;
-    }
-
-    public RootWordRepository getRootWordRepository() {
-        return rootWordRepository;
-    }
-
-    @Autowired
-    public void setRootWordRepository(RootWordRepository rootWordRepository) {
-        this.rootWordRepository = rootWordRepository;
     }
 
     public MorphologicalEntryRepository getMorphologicalEntryRepository() {
