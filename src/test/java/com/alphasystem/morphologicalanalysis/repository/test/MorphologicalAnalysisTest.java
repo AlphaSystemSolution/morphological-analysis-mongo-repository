@@ -277,16 +277,14 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
 
     @Test(dependsOnMethods = "testCreateRootLetters")
     public void testFindRootLetters() {
-        RootLettersRepository rootLettersRepository = repositoryUtil.getRootLettersRepository();
-        RootLetters rootLetters = rootLettersRepository.findByFirstRadicalAndSecondRadicalAndThirdRadical(NOON, SAD, RA);
+        RootLetters rootLetters = repositoryUtil.getRootLetters(NOON, SAD, RA, null);
         assertNotNull(rootLetters);
-        log(rootLetters.toString(), true);
+        log(format("RootLetter found {%s}", rootLetters.toString()), true);
     }
 
     @Test(dependsOnMethods = "testFindRootLetters")
     public void testCreateMorphologicalEntry() {
-        RootLettersRepository rootLettersRepository = repositoryUtil.getRootLettersRepository();
-        RootLetters rootLetters = rootLettersRepository.findByFirstRadicalAndSecondRadicalAndThirdRadical(NOON, SAD, RA);
+        RootLetters rootLetters = repositoryUtil.getRootLetters(NOON, SAD, RA);
         assertNotNull(rootLetters);
         MorphologicalEntry morphologicalEntry = new MorphologicalEntry();
         morphologicalEntry.setRootLetters(rootLetters);
@@ -294,6 +292,15 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         morphologicalEntry.setDictionary("To Help");
         MorphologicalEntryRepository morphologicalEntryRepository = repositoryUtil.getMorphologicalEntryRepository();
         morphologicalEntryRepository.save(morphologicalEntry);
+        log(format("MorphologicalEntry created {%s}", morphologicalEntry.getDisplayName()), true);
+    }
+
+    @Test(dependsOnMethods = "testCreateMorphologicalEntry")
+    public void testFindMorphologicalEntry() {
+        MorphologicalEntry morphologicalEntry = repositoryUtil.findMorphologicalEntry(new RootLetters(NOON, SAD, RA),
+                FORM_I_CATEGORY_A_GROUP_U_TEMPLATE);
+        assertNotNull(morphologicalEntry);
+        log(format("MorphologicalEntry found {%s}", morphologicalEntry.getDisplayName()), true);
     }
 
 }

@@ -3,7 +3,9 @@
  */
 package com.alphasystem.morphologicalanalysis.util;
 
+import com.alphasystem.arabic.model.ArabicLetterType;
 import com.alphasystem.arabic.model.ArabicWord;
+import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.morphologicalanalysis.common.model.QVerseTokensPair;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
@@ -13,6 +15,9 @@ import com.alphasystem.morphologicalanalysis.graph.model.QDependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.*;
+import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
+import com.alphasystem.morphologicalanalysis.morphology.model.QRootLetters;
+import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.repository.MorphologicalEntryRepository;
 import com.alphasystem.morphologicalanalysis.morphology.repository.RootLettersRepository;
 import com.alphasystem.morphologicalanalysis.morphology.repository.RootWordRepository;
@@ -171,6 +176,31 @@ public class MorphologicalAnalysisRepositoryUtil {
 
     public DependencyGraph getDependencyGraph(String displayName) {
         return dependencyGraphRepository.findByDisplayName(displayName);
+    }
+
+    public RootLetters getRootLetters(RootLetters src) {
+        return getRootLetters(src.getFirstRadical(), src.getSecondRadical(), src.getThirdRadical(),
+                src.getFourthRadical());
+    }
+
+    public RootLetters getRootLetters(ArabicLetterType firstRadical, ArabicLetterType secondRadical,
+                                      ArabicLetterType thirdRadical) {
+        return getRootLetters(firstRadical, secondRadical, thirdRadical, null);
+    }
+
+    public RootLetters getRootLetters(ArabicLetterType firstRadical, ArabicLetterType secondRadical,
+                                      ArabicLetterType thirdRadical, ArabicLetterType fourthRadical) {
+        QRootLetters qRootLetters = QRootLetters.rootLetters;
+        BooleanExpression predicate = qRootLetters.firstRadical.eq(firstRadical).and(qRootLetters.secondRadical
+                .eq(secondRadical)).and(qRootLetters.thirdRadical.eq(thirdRadical));
+        if (fourthRadical != null) {
+            predicate = predicate.and(qRootLetters.fourthRadical.eq(fourthRadical));
+        }
+        return rootLettersRepository.findOne(predicate);
+    }
+
+    public MorphologicalEntry findMorphologicalEntry(RootLetters src, NamedTemplate form) {
+        return morphologicalEntryRepository.findByDisplayName(format("%s:%s", form, src.getDisplayName()));
     }
 
     // Getter & Setters
