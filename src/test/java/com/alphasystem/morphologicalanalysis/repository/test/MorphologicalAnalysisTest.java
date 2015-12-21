@@ -91,6 +91,7 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
 
         location = new Location(DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, token.getTokenNumber(), 2)
                 .withStartIndex(2).withEndIndex(length);
+        location.setMorphologicalEntry(new MorphologicalEntry());
         NounProperties properties = (NounProperties) location.getProperties();
         properties.setNounType(DEFINITE);
         properties.setGender(MASCULINE);
