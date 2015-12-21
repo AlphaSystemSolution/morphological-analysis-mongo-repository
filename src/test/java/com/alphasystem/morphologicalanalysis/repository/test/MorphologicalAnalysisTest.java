@@ -119,6 +119,17 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
     }
 
     @Test(dependsOnMethods = "populateToken3")
+    public void getTokenByDisplayName() {
+        Token token = new Token(DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, 3, "");
+        token.initDisplayName();
+        String displayName = token.getDisplayName();
+        token = repositoryUtil.getTokenRepository().findByDisplayName(displayName);
+        assertNotNull(token);
+        assertEquals(token.getDisplayName(), displayName);
+        log(format("Token Display Name: %s", token.getDisplayName()), true);
+    }
+
+    @Test(dependsOnMethods = "populateToken3")
     public void createChapter2() {
         int chapterNumber = 2;
         log(format("Creating chapter %s", chapterNumber), true);

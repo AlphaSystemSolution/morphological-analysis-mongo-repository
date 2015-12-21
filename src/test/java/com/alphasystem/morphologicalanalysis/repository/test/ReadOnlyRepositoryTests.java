@@ -42,6 +42,17 @@ public class ReadOnlyRepositoryTests extends AbstractTestNGSpringContextTests {
     }
 
     @Test
+    public void getTokenByDisplayName() {
+        Token token = new Token(1, 1, 1, "");
+        token.initDisplayName();
+        String displayName = token.getDisplayName();
+        token = repositoryUtil.getTokenRepository().findByDisplayName(displayName);
+        assertNotNull(token);
+        log(format("Token Display Name: %s", token.getDisplayName()), true);
+        assertEquals(token.getDisplayName(), displayName);
+    }
+
+    @Test(dependsOnMethods = "getTokenByDisplayName")
     public void getTokens() {
         VerseTokenPairGroup group = new VerseTokenPairGroup();
         group.setChapterNumber(2);
