@@ -245,8 +245,7 @@ public class MorphologicalAnalysisRepositoryUtil {
     }
 
     public MorphologicalEntry findMorphologicalEntry(RootLetters src, NamedTemplate form) {
-        MorphologicalEntry tmp = new MorphologicalEntry(src, form);
-        return findMorphologicalEntry(tmp);
+        return findMorphologicalEntry(new MorphologicalEntry(src, form));
     }
 
     public void saveMorphologicalEntry(MorphologicalEntry src, Location location) {
