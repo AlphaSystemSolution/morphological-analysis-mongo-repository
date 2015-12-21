@@ -1,6 +1,7 @@
 package com.alphasystem.morphologicalanalysis.wordbyword.listener;
 
 import com.alphasystem.arabic.model.ArabicWord;
+import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
@@ -8,11 +9,10 @@ import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenReposito
 import com.alphasystem.persistence.mongo.repository.DocumentEventListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.event.AfterConvertEvent;
+import org.springframework.data.mongodb.core.mapping.event.BeforeConvertEvent;
 import org.springframework.stereotype.Component;
 
 import static com.alphasystem.arabic.model.ArabicWord.getSubWord;
-import static java.lang.String.format;
-import static java.lang.System.err;
 
 /**
  * @author sali
@@ -32,7 +32,7 @@ public class LocationEventListener extends DocumentEventListener<Location> {
         Token token = tokenRepository.findByChapterNumberAndVerseNumberAndTokenNumber(source.getChapterNumber(),
                 source.getVerseNumber(), source.getTokenNumber());
         if (token == null) {
-            err.println(format("Token is null for location {%s}", source));
+            logger.error("Token is null for location {}", source);
         }
         Integer startIndex = source.getStartIndex();
         Integer endIndex = source.getEndIndex();
@@ -44,10 +44,20 @@ public class LocationEventListener extends DocumentEventListener<Location> {
                 ArabicWord locationWord = getSubWord(token.getTokenWord(), startIndex, endIndex);
                 source.setLocationWord(locationWord);
             } catch (Exception e) {
-                String msg = format("Error occurred while getting location word for token {%s} location {%s} @(%s, %s)", token, source, startIndex, endIndex);
-                System.err.println(msg);
+                logger.error("Error occurred while getting location word for token {} location {} @({}, {})",
+                        token, source, startIndex, endIndex);
             }
         }
     }
 
+    @Override
+    public void onBeforeConvert(BeforeConvertEvent<Location> event) {
+        super.onBeforeConvert(event);
+        Location source = event.getSource();
+        MorphologicalEntry morphologicalEntry = source.getMorphologicalEntry();
+        if (morphologicalEntry != null && morphologicalEntry.isEmpty()) {
+            logger.warn("Trying to save location \"{}\" with empty morphologicalEntry \"{}\"", source, morphologicalEntry);
+            source.setMorphologicalEntry(null);
+        }
+    }
 }
