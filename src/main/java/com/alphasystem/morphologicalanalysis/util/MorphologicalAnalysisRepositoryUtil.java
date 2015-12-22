@@ -132,7 +132,7 @@ public class MorphologicalAnalysisRepositoryUtil {
 
     public List<Token> getTokens(VerseTokenPairGroup group) {
         List<VerseTokensPair> pairs = group.getPairs();
-        if (pairs == null | pairs.isEmpty()) {
+        if (pairs == null || pairs.isEmpty()) {
             return new ArrayList<>();
         }
         VerseTokensPair pair = pairs.get(0);
