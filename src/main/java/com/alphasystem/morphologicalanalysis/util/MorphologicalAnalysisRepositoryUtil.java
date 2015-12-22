@@ -15,12 +15,9 @@ import com.alphasystem.morphologicalanalysis.graph.model.QDependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.*;
-import com.alphasystem.morphologicalanalysis.morphology.model.ConjugationConfiguration;
 import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
 import com.alphasystem.morphologicalanalysis.morphology.model.QRootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
-import com.alphasystem.morphologicalanalysis.morphology.model.support.NounOfPlaceAndTime;
-import com.alphasystem.morphologicalanalysis.morphology.model.support.VerbalNoun;
 import com.alphasystem.morphologicalanalysis.morphology.repository.MorphologicalEntryRepository;
 import com.alphasystem.morphologicalanalysis.morphology.repository.RootLettersRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
@@ -42,13 +39,11 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static com.alphasystem.tanzil.QuranScript.QURAN_SIMPLE_ENHANCED;
 import static java.lang.String.format;
 import static java.lang.System.out;
 import static java.util.Collections.sort;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * @author sali
@@ -246,55 +241,6 @@ public class MorphologicalAnalysisRepositoryUtil {
 
     public MorphologicalEntry findMorphologicalEntry(RootLetters src, NamedTemplate form) {
         return findMorphologicalEntry(new MorphologicalEntry(src, form));
-    }
-
-    public void saveMorphologicalEntry(MorphologicalEntry src, Location location) {
-        if (location == null) {
-            LOGGER.error("Location cannot be null");
-            return;
-        }
-        if (src == null) {
-            LOGGER.error("MorphologicalEntry cannot be null");
-            return;
-        }
-        // we are not allowing to save MorphologicalEntry with no RootLetters and Form
-        if (src.getRootLetters() == null || src.getRootLetters().isEmpty() || src.getForm() == null) {
-            LOGGER.error("RootLetters or Form in MorphologicalEntry cannot be null or empty");
-            return;
-        }
-        LOGGER.debug("Saving MorphologicalEntry {} in location {}", src, location);
-
-        // re-init display name just in case
-        src.initDisplayName();
-
-        // first find out whether source MorphologicalEntry exists or not, if yes then use that one
-        MorphologicalEntry morphologicalEntry = findMorphologicalEntry(src);
-        if (morphologicalEntry == null) {
-            morphologicalEntry = src;
-        } else {
-            LOGGER.debug("MorphologicalEntry {} already exists in location {}", morphologicalEntry, location);
-            ConjugationConfiguration configuration = src.getConfiguration();
-            if (configuration != null) {
-                morphologicalEntry.setConfiguration(configuration);
-            }
-            Set<VerbalNoun> verbalNouns = src.getVerbalNouns();
-            if (verbalNouns != null || !verbalNouns.isEmpty()) {
-                morphologicalEntry.setVerbalNouns(verbalNouns);
-            }
-            Set<NounOfPlaceAndTime> nounOfPlaceAndTimes = src.getNounOfPlaceAndTimes();
-            if (nounOfPlaceAndTimes != null || !nounOfPlaceAndTimes.isEmpty()) {
-                morphologicalEntry.setNounOfPlaceAndTimes(nounOfPlaceAndTimes);
-            }
-            String translation = src.getTranslation();
-            if (isNotBlank(translation)) {
-                morphologicalEntry.setTranslation(translation);
-            }
-        }
-        location.setMorphologicalEntry(morphologicalEntry);
-        morphologicalEntry.getLocations().add(location);
-        morphologicalEntryRepository.save(morphologicalEntry);
-
-        locationRepository.save(location);
     }
 
     // Getter & Setters
