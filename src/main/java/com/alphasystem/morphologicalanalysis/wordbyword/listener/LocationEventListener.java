@@ -55,9 +55,13 @@ public class LocationEventListener extends DocumentEventListener<Location> {
         super.onBeforeConvert(event);
         Location source = event.getSource();
         MorphologicalEntry morphologicalEntry = source.getMorphologicalEntry();
-        if (morphologicalEntry != null && morphologicalEntry.isEmpty()) {
-            logger.warn("Trying to save location \"{}\" with empty morphologicalEntry \"{}\"", source, morphologicalEntry);
-            source.setMorphologicalEntry(null);
+        if (morphologicalEntry != null) {
+            if (morphologicalEntry.isEmpty()) {
+                logger.warn("Trying to save location \"{}\" with empty morphologicalEntry \"{}\"", source, morphologicalEntry);
+                source.setMorphologicalEntry(null);
+            } else {
+                morphologicalEntry.getLocations().add(source);
+            }
         }
     }
 }
