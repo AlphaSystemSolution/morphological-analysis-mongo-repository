@@ -4,7 +4,6 @@ import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -24,7 +23,6 @@ public class MorphologicalAnalysisBasicTest extends AbstractTestNGSpringContextT
 
     @Autowired
     private MorphologicalAnalysisRepositoryUtil repositoryUtil;
-    private TokenRepository tokenRepository;
 
     @BeforeClass
     public void beforeSuite() {
@@ -32,22 +30,6 @@ public class MorphologicalAnalysisBasicTest extends AbstractTestNGSpringContextT
         String dbName = getProperty(MongoConfig.MONGO_DB_NAME_PROPERTY);
         log(format("Database in use {%s}", dbName), true);
         assertTrue("MORPHOLOGICAL_ANALYSIS_TEST_DB".equals(dbName));
-        tokenRepository = repositoryUtil.getTokenRepository();
-        assertNotNull(tokenRepository);
-    }
-
-    @Test
-    public void getPreviousTokenPositiveCase() {
-        Integer chapterNumber = 1;
-        Integer verseNumber = 5;
-        Integer tokenNumber = 3;
-        Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
-        log(format("Getting previous token for token {%s}", dummy), true);
-
-        Token token = repositoryUtil.getPreviousToken(dummy);
-        log(format("Previous token found {%s}", token), true);
-        assertNotNull(token);
-        assertEquals((Object) token.getTokenNumber(), tokenNumber - 1);
     }
 
     @Test
@@ -56,20 +38,34 @@ public class MorphologicalAnalysisBasicTest extends AbstractTestNGSpringContextT
         Integer verseNumber = 1;
         Integer tokenNumber = 1;
         Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
-        log(format("Getting previous token for token {%s}", dummy));
+        log(format("Getting previous token for token {%s}", dummy), true);
 
         Token token = repositoryUtil.getPreviousToken(dummy);
-        log(format("No previous token found for {%s}", token), true);
+        log(format("No previous token found for {%s}", dummy), true);
         assertNull(token);
     }
 
-    @Test
+    @Test(dependsOnMethods = {"getPreviousTokenLowerBoundary"})
+    public void getPreviousTokenPositiveCase() {
+        Integer chapterNumber = 1;
+        Integer verseNumber = 5;
+        Integer tokenNumber = 3;
+        Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
+        log(format("Getting previous token for token {%s}", dummy), true);
+
+        Token token = repositoryUtil.getPreviousToken(dummy);
+        log(format("Previous token for {%s} is {%s}", dummy, token), true);
+        assertNotNull(token);
+        assertEquals((Object) token.getTokenNumber(), tokenNumber - 1);
+    }
+
+    @Test(dependsOnMethods = {"getPreviousTokenPositiveCase"})
     public void getPreviousTokenFirstTokenFirstVerseOfChapter() {
         Integer chapterNumber = 2;
         Integer verseNumber = 1;
         Integer tokenNumber = 1;
         Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
-        log(format("Getting previous token for token {%s}", dummy));
+        log(format("Getting previous token for token {%s}", dummy), true);
 
         Token token = repositoryUtil.getPreviousToken(dummy);
         assertNotNull(token);
@@ -77,13 +73,13 @@ public class MorphologicalAnalysisBasicTest extends AbstractTestNGSpringContextT
         assertEquals(token.getDisplayName(), "1:7:9");
     }
 
-    @Test
+    @Test(dependsOnMethods = {"getPreviousTokenFirstTokenFirstVerseOfChapter"})
     public void getPreviousTokenFirstTokenOfMiddleVerseOfChapter() {
         Integer chapterNumber = 1;
         Integer verseNumber = 5;
         Integer tokenNumber = 1;
         Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
-        log(format("Getting previous token for token {%s}", dummy));
+        log(format("Getting previous token for token {%s}", dummy), true);
 
         Token token = repositoryUtil.getPreviousToken(dummy);
         assertNotNull(token);
@@ -91,7 +87,20 @@ public class MorphologicalAnalysisBasicTest extends AbstractTestNGSpringContextT
         assertEquals(token.getDisplayName(), "1:4:3");
     }
 
-    @Test
+    @Test(dependsOnMethods = {"getPreviousTokenFirstTokenOfMiddleVerseOfChapter"})
+    public void getNextTokenUpperBoundary() {
+        Integer chapterNumber = 114;
+        Integer verseNumber = 6;
+        Integer tokenNumber = 3;
+        Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
+        log(format("Getting next token for token {%s}", dummy), true);
+
+        Token token = repositoryUtil.getNextToken(dummy);
+        log(format("No next token found for {%s}", dummy), true);
+        assertNull(token);
+    }
+
+    @Test(dependsOnMethods = {"getNextTokenUpperBoundary"})
     public void getNextTokenPositiveCase() {
         Integer chapterNumber = 1;
         Integer verseNumber = 5;
@@ -100,31 +109,18 @@ public class MorphologicalAnalysisBasicTest extends AbstractTestNGSpringContextT
         log(format("Getting next token for token {%s}", dummy), true);
 
         Token token = repositoryUtil.getNextToken(dummy);
-        log(format("Next token found {%s}", token), true);
+        log(format("Next token for {%s} is {%s}", dummy, token), true);
         assertNotNull(token);
         assertEquals((Object) token.getTokenNumber(), tokenNumber + 1);
     }
 
-    @Test
-    public void getNextTokenUpperBoundary() {
-        Integer chapterNumber = 114;
-        Integer verseNumber = 6;
-        Integer tokenNumber = 3;
-        Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
-        log(format("Getting next token for token {%s}", dummy));
-
-        Token token = repositoryUtil.getNextToken(dummy);
-        log(format("No next token found for {%s}", token), true);
-        assertNull(token);
-    }
-
-    @Test
+    @Test(dependsOnMethods = {"getNextTokenPositiveCase"})
     public void getNextTokenLastTokenLastVerseOfChapter() {
         Integer chapterNumber = 1;
         Integer verseNumber = 7;
         Integer tokenNumber = 9;
         Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
-        log(format("Getting next token for token {%s}", dummy));
+        log(format("Getting next token for token {%s}", dummy), true);
 
         Token token = repositoryUtil.getNextToken(dummy);
         assertNotNull(token);
@@ -132,13 +128,13 @@ public class MorphologicalAnalysisBasicTest extends AbstractTestNGSpringContextT
         assertEquals(token.getDisplayName(), "2:1:1");
     }
 
-    @Test
+    @Test(dependsOnMethods = {"getNextTokenLastTokenLastVerseOfChapter"})
     public void getNextTokenLastTokenOfMiddleVerseOfChapter() {
         Integer chapterNumber = 1;
         Integer verseNumber = 5;
         Integer tokenNumber = 4;
         Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
-        log(format("Getting next token for token {%s}", dummy));
+        log(format("Getting next token for token {%s}", dummy), true);
 
         Token token = repositoryUtil.getNextToken(dummy);
         assertNotNull(token);

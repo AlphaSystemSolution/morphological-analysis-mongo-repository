@@ -110,36 +110,37 @@ public class MorphologicalAnalysisRepositoryUtil {
         LOGGER.info("Finding token {}", dummy.getDisplayName());
         Token token = tokenRepository.findByDisplayName(dummy.getDisplayName());
         if (token == null) {
-            if (!next && vn == 0) {
-                // handle case 1
-                return getToken(cn - 1, -1, -1, next, tokenRepository, repositoryUtil);
-            }
-            if (next && vn > 0) {
-                // handle case 3
-                return getToken(cn + 1, 1, 1, next, tokenRepository, repositoryUtil);
-            }
-            if (!next && tn == 0) {
-                // the reference token should have been the first token of verse, now there are two possible cases:
-                // case 1: the reference token might have been the first token of the first verse of the chapter,
-                // in this case we need to go to the last token of last verse of previous chapter
-                // case 2: the reference token might have been the first token of any verse other then first verse,
-                // in this case we need to go to the last token of the previous verse while staying in the same chapter
-                // we are going to handle case 2 now
-                // but we don't know the how many tokens in the previous verse, we are going to pass -1 as the token
-                // number
-                return getToken(cn, vn - 1, -1, next, tokenRepository, repositoryUtil);
-            }
-            if (next && tn > 0) {
-                // we have situation where token number is greater then 0 and we still haven't found our token
-                // that our reference token was the last token of the verse, now again we have two possible cases:
-                // case 3: the reference token might have been the last token of the last verse of the chapter,
-                // in this case we need to go to the first token of first verse of next chapter
-                // case 4: the reference token might have been the last token of any verse other then first verse,
-                // in this case we need to go to the first token of the next verse while staying in the same chapter
-                // we are going to handle case 4 now
-                // but we don't know the how many tokens in the nect verse, we are going to pass -1 as the token
-                // number
-                return getToken(cn, vn + 1, 1, next, tokenRepository, repositoryUtil);
+            if (next) {
+                if (tn > 1) {
+                    // we have situation where token number is greater then 0 and we still haven't found our token
+                    // that our reference token was the last token of the verse, now again we have two possible cases:
+                    // case 3: the reference token might have been the last token of the last verse of the chapter,
+                    // in this case we need to go to the first token of first verse of next chapter
+                    // case 4: the reference token might have been the last token of any verse other then first verse,
+                    // in this case we need to go to the first token of the next verse while staying in the same chapter
+                    // we are going to handle case 4 now
+                    // but we don't know the how many tokens in the nect verse, we are going to pass -1 as the token
+                    // number
+                    return getToken(cn, vn + 1, 1, next, tokenRepository, repositoryUtil);
+                } else if (vn > 1) {
+                    // handle case 3
+                    return getToken(cn + 1, 1, 1, next, tokenRepository, repositoryUtil);
+                }
+            } else {
+                if (vn == 0) {
+                    // handle case 1
+                    return getToken(cn - 1, -1, -1, next, tokenRepository, repositoryUtil);
+                } else if (tn == 0) {
+                    // the reference token should have been the first token of verse, now there are two possible cases:
+                    // case 1: the reference token might have been the first token of the first verse of the chapter,
+                    // in this case we need to go to the last token of last verse of previous chapter
+                    // case 2: the reference token might have been the first token of any verse other then first verse,
+                    // in this case we need to go to the last token of the previous verse while staying in the same chapter
+                    // we are going to handle case 2 now
+                    // but we don't know the how many tokens in the previous verse, we are going to pass -1 as the token
+                    // number
+                    return getToken(cn, vn - 1, -1, next, tokenRepository, repositoryUtil);
+                }
             }
         }
         return token;
@@ -208,76 +209,13 @@ public class MorphologicalAnalysisRepositoryUtil {
     }
 
     public Token getNextToken(Token token) {
-        Integer chapterNumber = token.getChapterNumber();
-        Integer verseNumber = token.getVerseNumber();
-        Integer tokenNumber = token.getTokenNumber();
-        LOGGER.info("Getting next with data ChapterNumber \"{}\", Verse Number \"{}\", Token Number \"{}\"",
-                chapterNumber, verseNumber, tokenNumber);
-        if (chapterNumber > 114 || chapterNumber < 1 || verseNumber < 1 || tokenNumber < 1) {
-            return null;
-        }
-        int newTokenNumber = tokenNumber + 1;
-        Token tmp = new Token(chapterNumber, verseNumber, newTokenNumber, "");
-        Token nextToken = tokenRepository.findByDisplayName(tmp.getDisplayName());
-        if (nextToken == null) {
-            // this token should have been the last token of this verse, so move to next verse
-            int newVerseNumber = verseNumber + 1;
-            tmp = new Token(chapterNumber, newVerseNumber, 1, "");
-            nextToken = tokenRepository.findByDisplayName(tmp.getDisplayName());
-            if (nextToken == null) {
-                // this verse should have been the last verse of the chapter, so move to next chapter
-                int newChapterNumber = chapterNumber + 1;
-                if (newChapterNumber > 114) {
-                    // this chapter should have been the last chapter, can't do anything now
-                    return null;
-                }
-                tmp = new Token(newChapterNumber, 1, 1, "");
-                nextToken = tokenRepository.findByDisplayName(tmp.getDisplayName());
-            }
-        }
-        LOGGER.info("The next token for {%s} is {%s}", token, nextToken);
-        return nextToken;
+        return getToken(token.getChapterNumber(), token.getVerseNumber(), token.getTokenNumber() + 1, true,
+                tokenRepository, this);
     }
 
     public Token getPreviousToken(Token token) {
-        Integer chapterNumber = token.getChapterNumber();
-        Integer verseNumber = token.getVerseNumber();
-        Integer tokenNumber = token.getTokenNumber();
-        LOGGER.info("Getting previous with data ChapterNumber \"{}\", Verse Number \"{}\", Token Number \"{}\"",
-                chapterNumber, verseNumber, tokenNumber);
-        if (chapterNumber > 114 || chapterNumber < 1 || verseNumber < 1 || tokenNumber < 1) {
-            return null;
-        }
-        int newChapterNumber = chapterNumber;
-        int newVerseNumber = verseNumber;
-        int newTokenNumber = tokenNumber - 1;
-        if (newTokenNumber <= 0) {
-            // this token should have been the first token of the verse, so go back to previous verse
-            newVerseNumber = verseNumber - 1;
-            if (newVerseNumber <= 0) {
-
-                // this verse should have been the first verse of the chapter, so go back to previous chapter
-                newChapterNumber = chapterNumber - 1;
-                if (newChapterNumber <= 0) {
-                    // this chapter should have been the first chapter, can't do anything now
-                    return null;
-                } // end of "newChapterNumber <= 0"
-
-                // we need to find out the last verse of this chapter
-                newVerseNumber = getVerseCount(newChapterNumber);
-            } // end of "newVerseNumber <= 0"
-
-            // we need to find out the last token
-            newTokenNumber = getTokenCount(newChapterNumber, newVerseNumber);
-        } // end of "newTokenNumber <= 0"
-
-        Token tmp = new Token(newChapterNumber, newVerseNumber, newTokenNumber, "");
-        Token nextToken = tokenRepository.findByDisplayName(tmp.getDisplayName());
-        if (nextToken == null) {
-            LOGGER.warn("No token found {}:{}:{}", newChapterNumber, newVerseNumber, newTokenNumber);
-        }
-        LOGGER.info("The previous token for {} is {}", token, nextToken);
-        return nextToken;
+        return getToken(token.getChapterNumber(), token.getVerseNumber(), token.getTokenNumber() - 1, false,
+                tokenRepository, this);
     }
 
     public List<Token> getTokens(VerseTokenPairGroup group) {
