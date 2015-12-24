@@ -79,7 +79,6 @@ public class MorphologicalAnalysisRepositoryUtil {
                 .include("verseCount").include("chapterName");
     }
 
-    // TODO: figure out how to fix this
     private static Token getToken(Integer chapterNumber, Integer verseNumber, Integer tokenNumber, boolean next,
                                   TokenRepository tokenRepository, MorphologicalAnalysisRepositoryUtil repositoryUtil) {
         LOGGER.info("Getting request to find token {}:{}:{}", chapterNumber, verseNumber, tokenNumber);
@@ -88,47 +87,44 @@ public class MorphologicalAnalysisRepositoryUtil {
             LOGGER.warn("No token found {}:{}:{}", chapterNumber, verseNumber, tokenNumber);
             return null;
         }
-        Integer cn = chapterNumber;
-        Integer vn = verseNumber;
-        Integer tn = tokenNumber;
-        if (vn == -1) {
+        if (verseNumber == -1) {
             // verse number "-1" indicates that this could be the last verse of this chapter and we don't know how
             // many verses are in this chapter, let's find out now
-            vn = repositoryUtil.getVerseCount(cn);
+            verseNumber = repositoryUtil.getVerseCount(chapterNumber);
         }
-        if (tn == -1) {
+        if (tokenNumber == -1) {
             // token number "-1" indicates that this could be the last token of this verse and we don't know how
             // many tokens are in this verse, let's find out now
-            tn = repositoryUtil.getTokenCount(cn, vn);
+            tokenNumber = repositoryUtil.getTokenCount(chapterNumber, verseNumber);
         }
         // at this stage if both vn and tn are null, stop now
-        if (vn == -1 && tn == -1) {
-            LOGGER.warn("No token found {}:{}:{}", cn, vn, tn);
+        if (verseNumber == -1 && tokenNumber == -1) {
+            LOGGER.warn("No token found {}:{}:{}", chapterNumber, verseNumber, tokenNumber);
             return null;
         }
-        Token dummy = new Token(cn, vn, tn, "");
+        Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
         LOGGER.info("Finding token {}", dummy.getDisplayName());
         Token token = tokenRepository.findByDisplayName(dummy.getDisplayName());
         if (token == null) {
             if (next) {
-                if (tn > 1) {
-                    // we have situation where token number is greater then 0 and we still haven't found our token
-                    // that our reference token was the last token of the verse, now again we have two possible cases:
+                if (tokenNumber > 1) {
+                    // we have situation where token number is greater then 0 and we still haven't found our token.
+                    // The reference token should have been the last token of the verse, we have two possible cases:
                     // case 1: the reference token might have been the last token of the last verse of the chapter,
                     // in this case we need to go to the first token of first verse of next chapter
-                    // case 2: the reference token might have been the last token of any verse other then first verse,
+                    // case 2: the reference token might have been the last token of any verse other then last verse,
                     // in this case we need to go to the first token of the next verse while staying in the same chapter
                     // we are going to handle case 2 now
-                    return getToken(cn, vn + 1, 1, next, tokenRepository, repositoryUtil);
-                } else if (vn > 1) {
+                    return getToken(chapterNumber, verseNumber + 1, 1, next, tokenRepository, repositoryUtil);
+                } else if (verseNumber > 1) {
                     // handle case 1
-                    return getToken(cn + 1, 1, 1, next, tokenRepository, repositoryUtil);
+                    return getToken(chapterNumber + 1, 1, 1, next, tokenRepository, repositoryUtil);
                 }
             } else {
-                if (vn == 0) {
-                    // handle case 1
-                    return getToken(cn - 1, -1, -1, next, tokenRepository, repositoryUtil);
-                } else if (tn == 0) {
+                if (verseNumber == 0) {
+                    // handle case 3
+                    return getToken(chapterNumber - 1, -1, -1, next, tokenRepository, repositoryUtil);
+                } else if (tokenNumber == 0) {
                     // the reference token should have been the first token of verse, now there are two possible cases:
                     // case 3: the reference token might have been the first token of the first verse of the chapter,
                     // in this case we need to go to the last token of last verse of previous chapter
@@ -137,7 +133,7 @@ public class MorphologicalAnalysisRepositoryUtil {
                     // we are going to handle case 4 now
                     // but we don't know the how many tokens in the previous verse, we are going to pass -1 as the token
                     // number
-                    return getToken(cn, vn - 1, -1, next, tokenRepository, repositoryUtil);
+                    return getToken(chapterNumber, verseNumber - 1, -1, next, tokenRepository, repositoryUtil);
                 }
             }
         }
