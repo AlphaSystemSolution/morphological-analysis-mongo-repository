@@ -114,16 +114,16 @@ public class MorphologicalAnalysisRepositoryUtil {
                 if (tn > 1) {
                     // we have situation where token number is greater then 0 and we still haven't found our token
                     // that our reference token was the last token of the verse, now again we have two possible cases:
-                    // case 3: the reference token might have been the last token of the last verse of the chapter,
+                    // case 1: the reference token might have been the last token of the last verse of the chapter,
                     // in this case we need to go to the first token of first verse of next chapter
-                    // case 4: the reference token might have been the last token of any verse other then first verse,
+                    // case 2: the reference token might have been the last token of any verse other then first verse,
                     // in this case we need to go to the first token of the next verse while staying in the same chapter
-                    // we are going to handle case 4 now
+                    // we are going to handle case 2 now
                     // but we don't know the how many tokens in the nect verse, we are going to pass -1 as the token
                     // number
                     return getToken(cn, vn + 1, 1, next, tokenRepository, repositoryUtil);
                 } else if (vn > 1) {
-                    // handle case 3
+                    // handle case 1
                     return getToken(cn + 1, 1, 1, next, tokenRepository, repositoryUtil);
                 }
             } else {
@@ -132,11 +132,11 @@ public class MorphologicalAnalysisRepositoryUtil {
                     return getToken(cn - 1, -1, -1, next, tokenRepository, repositoryUtil);
                 } else if (tn == 0) {
                     // the reference token should have been the first token of verse, now there are two possible cases:
-                    // case 1: the reference token might have been the first token of the first verse of the chapter,
+                    // case 3: the reference token might have been the first token of the first verse of the chapter,
                     // in this case we need to go to the last token of last verse of previous chapter
-                    // case 2: the reference token might have been the first token of any verse other then first verse,
+                    // case 4: the reference token might have been the first token of any verse other then first verse,
                     // in this case we need to go to the last token of the previous verse while staying in the same chapter
-                    // we are going to handle case 2 now
+                    // we are going to handle case 4 now
                     // but we don't know the how many tokens in the previous verse, we are going to pass -1 as the token
                     // number
                     return getToken(cn, vn - 1, -1, next, tokenRepository, repositoryUtil);
