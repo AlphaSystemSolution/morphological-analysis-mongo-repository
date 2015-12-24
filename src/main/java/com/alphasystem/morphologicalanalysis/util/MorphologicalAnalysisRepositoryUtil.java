@@ -97,7 +97,7 @@ public class MorphologicalAnalysisRepositoryUtil {
             // many tokens are in this verse, let's find out now
             tokenNumber = repositoryUtil.getTokenCount(chapterNumber, verseNumber);
         }
-        // at this stage if both vn and tn are null, stop now
+        // at this stage if both verseNumber and tokenNumber are null, stop now
         if (verseNumber == -1 && tokenNumber == -1) {
             LOGGER.warn("No token found {}:{}:{}", chapterNumber, verseNumber, tokenNumber);
             return null;
@@ -115,15 +115,15 @@ public class MorphologicalAnalysisRepositoryUtil {
                     // case 2: the reference token might have been the last token of any verse other then last verse,
                     // in this case we need to go to the first token of the next verse while staying in the same chapter
                     // we are going to handle case 2 now
-                    return getToken(chapterNumber, verseNumber + 1, 1, next, tokenRepository, repositoryUtil);
+                    return getToken(chapterNumber, verseNumber + 1, 1, true, tokenRepository, repositoryUtil);
                 } else if (verseNumber > 1) {
                     // handle case 1
-                    return getToken(chapterNumber + 1, 1, 1, next, tokenRepository, repositoryUtil);
+                    return getToken(chapterNumber + 1, 1, 1, true, tokenRepository, repositoryUtil);
                 }
             } else {
                 if (verseNumber == 0) {
                     // handle case 3
-                    return getToken(chapterNumber - 1, -1, -1, next, tokenRepository, repositoryUtil);
+                    return getToken(chapterNumber - 1, -1, -1, false, tokenRepository, repositoryUtil);
                 } else if (tokenNumber == 0) {
                     // the reference token should have been the first token of verse, now there are two possible cases:
                     // case 3: the reference token might have been the first token of the first verse of the chapter,
@@ -133,7 +133,7 @@ public class MorphologicalAnalysisRepositoryUtil {
                     // we are going to handle case 4 now
                     // but we don't know the how many tokens in the previous verse, we are going to pass -1 as the token
                     // number
-                    return getToken(chapterNumber, verseNumber - 1, -1, next, tokenRepository, repositoryUtil);
+                    return getToken(chapterNumber, verseNumber - 1, -1, false, tokenRepository, repositoryUtil);
                 }
             }
         }
