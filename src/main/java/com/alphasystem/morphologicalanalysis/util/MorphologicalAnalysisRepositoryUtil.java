@@ -101,7 +101,7 @@ public class MorphologicalAnalysisRepositoryUtil {
             // many tokens are in this verse, let's find out now
             tn = repositoryUtil.getTokenCount(cn, vn);
         }
-        // at this stage if either of vn or tn is null, stop now
+        // at this stage if both vn and tn are null, stop now
         if (vn == -1 && tn == -1) {
             LOGGER.warn("No token found {}:{}:{}", cn, vn, tn);
             return null;
