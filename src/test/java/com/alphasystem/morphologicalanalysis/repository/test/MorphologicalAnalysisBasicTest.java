@@ -1,24 +1,16 @@
 package com.alphasystem.morphologicalanalysis.repository.test;
 
-import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
 import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.NounProperties;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
+import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.GenderType.MASCULINE;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus.GENETIVE;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounType.DEFINITE;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NumberType.PLURAL;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.DEFINITE_ARTICLE;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static org.testng.Assert.*;
@@ -30,11 +22,9 @@ import static org.testng.Reporter.log;
 @ContextConfiguration(classes = {MongoConfig.class, MorphologicalAnalysisSpringConfiguration.class})
 public class MorphologicalAnalysisBasicTest extends AbstractTestNGSpringContextTests {
 
-    private static final int DEFAULT_CHAPTER_NUMBER = 1;
-    private static final int DEFAULT_VERSE_NUMBER = 2;
-
     @Autowired
     private MorphologicalAnalysisRepositoryUtil repositoryUtil;
+    private TokenRepository tokenRepository;
 
     @BeforeClass
     public void beforeSuite() {
@@ -42,43 +32,118 @@ public class MorphologicalAnalysisBasicTest extends AbstractTestNGSpringContextT
         String dbName = getProperty(MongoConfig.MONGO_DB_NAME_PROPERTY);
         log(format("Database in use {%s}", dbName), true);
         assertTrue("MORPHOLOGICAL_ANALYSIS_TEST_DB".equals(dbName));
-        repositoryUtil.getMongoTemplate().getDb().dropDatabase();
+        tokenRepository = repositoryUtil.getTokenRepository();
+        assertNotNull(tokenRepository);
     }
 
     @Test
-    public void createChapter() {
-        log(format("Creating chapter: %s", DEFAULT_CHAPTER_NUMBER), true);
-        repositoryUtil.createChapter(DEFAULT_CHAPTER_NUMBER);
-        log(format("Chapter %s created", DEFAULT_CHAPTER_NUMBER), true);
+    public void getPreviousTokenPositiveCase() {
+        Integer chapterNumber = 1;
+        Integer verseNumber = 5;
+        Integer tokenNumber = 3;
+        Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
+        log(format("Getting previous token for token {%s}", dummy), true);
 
-        Verse verse = repositoryUtil.getVerseRepository().
-                findByChapterNumberAndVerseNumber(DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER);
-        assertEquals(verse.getTokenCount(), new Integer(4));
-    }
-
-    @Test(dependsOnMethods = "createChapter")
-    public void populateToken4() {
-        Token token = repositoryUtil.getTokenRepository().findByChapterNumberAndVerseNumberAndTokenNumber
-                (DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, 4);
+        Token token = repositoryUtil.getPreviousToken(dummy);
+        log(format("Previous token found {%s}", token), true);
         assertNotNull(token);
-        int length = token.getTokenWord().getLength();
-        log(format("Token word length: %s", length), true);
-        Location location = token.getLocations().get(0);
-        location.setPartOfSpeech(DEFINITE_ARTICLE);
-        location.setStartIndex(0);
-        location.setEndIndex(2);
-        repositoryUtil.getLocationRepository().save(location);
-
-        location = new Location(DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, token.getTokenNumber(), 2)
-                .withStartIndex(2).withEndIndex(length);
-        location.setMorphologicalEntry(new MorphologicalEntry());
-        NounProperties properties = (NounProperties) location.getProperties();
-        properties.setNounType(DEFINITE);
-        properties.setGender(MASCULINE);
-        properties.setNumber(PLURAL);
-        properties.setStatus(GENETIVE);
-        repositoryUtil.getLocationRepository().save(location);
-        token.getLocations().add(location);
-        repositoryUtil.getTokenRepository().save(token);
+        assertEquals((Object) token.getTokenNumber(), tokenNumber - 1);
     }
+
+    @Test
+    public void getPreviousTokenLowerBoundary() {
+        Integer chapterNumber = 1;
+        Integer verseNumber = 1;
+        Integer tokenNumber = 1;
+        Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
+        log(format("Getting previous token for token {%s}", dummy));
+
+        Token token = repositoryUtil.getPreviousToken(dummy);
+        log(format("No previous token found for {%s}", token), true);
+        assertNull(token);
+    }
+
+    @Test
+    public void getPreviousTokenFirstTokenFirstVerseOfChapter() {
+        Integer chapterNumber = 2;
+        Integer verseNumber = 1;
+        Integer tokenNumber = 1;
+        Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
+        log(format("Getting previous token for token {%s}", dummy));
+
+        Token token = repositoryUtil.getPreviousToken(dummy);
+        assertNotNull(token);
+        log(format("Previous token for {%s} is {%s}", dummy, token), true);
+        assertEquals(token.getDisplayName(), "1:7:9");
+    }
+
+    @Test
+    public void getPreviousTokenFirstTokenOfMiddleVerseOfChapter() {
+        Integer chapterNumber = 1;
+        Integer verseNumber = 5;
+        Integer tokenNumber = 1;
+        Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
+        log(format("Getting previous token for token {%s}", dummy));
+
+        Token token = repositoryUtil.getPreviousToken(dummy);
+        assertNotNull(token);
+        log(format("Previous token for {%s} is {%s}", dummy, token), true);
+        assertEquals(token.getDisplayName(), "1:4:3");
+    }
+
+    @Test
+    public void getNextTokenPositiveCase() {
+        Integer chapterNumber = 1;
+        Integer verseNumber = 5;
+        Integer tokenNumber = 3;
+        Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
+        log(format("Getting next token for token {%s}", dummy), true);
+
+        Token token = repositoryUtil.getNextToken(dummy);
+        log(format("Next token found {%s}", token), true);
+        assertNotNull(token);
+        assertEquals((Object) token.getTokenNumber(), tokenNumber + 1);
+    }
+
+    @Test
+    public void getNextTokenUpperBoundary() {
+        Integer chapterNumber = 114;
+        Integer verseNumber = 6;
+        Integer tokenNumber = 3;
+        Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
+        log(format("Getting next token for token {%s}", dummy));
+
+        Token token = repositoryUtil.getNextToken(dummy);
+        log(format("No next token found for {%s}", token), true);
+        assertNull(token);
+    }
+
+    @Test
+    public void getNextTokenLastTokenLastVerseOfChapter() {
+        Integer chapterNumber = 1;
+        Integer verseNumber = 7;
+        Integer tokenNumber = 9;
+        Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
+        log(format("Getting next token for token {%s}", dummy));
+
+        Token token = repositoryUtil.getNextToken(dummy);
+        assertNotNull(token);
+        log(format("Next token for {%s} is {%s}", dummy, token), true);
+        assertEquals(token.getDisplayName(), "2:1:1");
+    }
+
+    @Test
+    public void getNextTokenLastTokenOfMiddleVerseOfChapter() {
+        Integer chapterNumber = 1;
+        Integer verseNumber = 5;
+        Integer tokenNumber = 4;
+        Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
+        log(format("Getting next token for token {%s}", dummy));
+
+        Token token = repositoryUtil.getNextToken(dummy);
+        assertNotNull(token);
+        log(format("Previous token for {%s} is {%s}", dummy, token), true);
+        assertEquals(token.getDisplayName(), "1:6:1");
+    }
+
 }

@@ -40,4 +40,23 @@ public class MongoConfig {
     public MongoTemplate mongoTemplate() throws Exception {
         return new MongoTemplate(mongoDbFactory());
     }
+
+    /*@Bean
+    public Morphia morphia(){
+        Morphia morphia = new Morphia();
+        morphia.mapPackage("com.alphasystem.persistence.model");
+        morphia.mapPackage("com.alphasystem.morphologicalanalysis.wordbyword.model");
+        morphia.mapPackage("com.alphasystem.morphologicalanalysis.morphology.model");
+        morphia.mapPackage("com.alphasystem.morphologicalanalysis.graph.model");
+        return morphia;
+    }*/
+
+    /*@Bean
+    public Datastore datastore() throws Exception{
+        Datastore datastore = morphia().createDatastore(mongoClient(),
+                getProperty(MONGO_DB_NAME_PROPERTY, "__DEFAULT__"));
+        datastore.ensureCaps();
+        datastore.ensureIndexes();
+        return datastore;
+    }*/
 }

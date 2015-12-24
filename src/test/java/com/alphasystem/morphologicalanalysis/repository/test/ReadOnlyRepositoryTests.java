@@ -11,6 +11,7 @@ import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositor
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
+import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -65,7 +66,7 @@ public class ReadOnlyRepositoryTests extends AbstractTestNGSpringContextTests {
         tokens.forEach(token -> log(format("Token: {%s}", token), true));
     }
 
-    @Test(dependsOnMethods = {"getTokens"})
+    //@Test(dependsOnMethods = {"getTokens"})
     public void getDependencyGraphs() {
         VerseTokenPairGroup group = new VerseTokenPairGroup();
         group.setChapterNumber(18);
@@ -77,7 +78,7 @@ public class ReadOnlyRepositoryTests extends AbstractTestNGSpringContextTests {
         dependencyGraphs.forEach(dependencyGraph -> log(format("Dependency Graph: {%s}", dependencyGraph), true));
     }
 
-    @Test(dependsOnMethods = {"getDependencyGraphs"})
+    //@Test(dependsOnMethods = {"getTokens"})
     public void printLocationsWithMorphologicalEntriesPopulated() {
         MorphologicalEntryRepository morphologicalEntryRepository = repositoryUtil.getMorphologicalEntryRepository();
         List<MorphologicalEntry> morphologicalEntries = (List<MorphologicalEntry>) morphologicalEntryRepository.findAll();
@@ -88,7 +89,7 @@ public class ReadOnlyRepositoryTests extends AbstractTestNGSpringContextTests {
         }
     }
 
-    @Test(dependsOnMethods = {"printLocationsWithMorphologicalEntriesPopulated"})
+    // @Test(dependsOnMethods = {"printLocationsWithMorphologicalEntriesPopulated"})
     public void printLocationsWithRootNotPopulated() {
         LocationRepository locationRepository = repositoryUtil.getLocationRepository();
         List<Location> locations = (List<Location>) locationRepository.findAll();
@@ -103,5 +104,17 @@ public class ReadOnlyRepositoryTests extends AbstractTestNGSpringContextTests {
         }
     }
 
+    @Test(dependsOnMethods = "getTokens")
+    public void testNextToken() {
+        // boundary case
+        TokenRepository tokenRepository = repositoryUtil.getTokenRepository();
+        String displayName = "114:6:3";
+        log(format("Boundary Case, getNextToken: {%s}", displayName), true);
+        Token token = tokenRepository.findByDisplayName(displayName);
+        assertNotNull(token);
+        Token nextToken = repositoryUtil.getNextToken(token);
+        assertNull(nextToken);
+        log(format("No next token found", displayName), true);
+    }
 
 }

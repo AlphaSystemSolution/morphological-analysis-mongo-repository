@@ -3,7 +3,6 @@
 <suite name="Suite">
     <test name="Test" preserve-order="true">
         <classes>
-            <!--<class name="com.alphasystem.morphologicalanalysis.repository.test.ReadOnlyRepositoryTests"/>-->
             <class name="com.alphasystem.morphologicalanalysis.repository.test.MorphologicalAnalysisBasicTest"/>
         </classes>
     </test>
