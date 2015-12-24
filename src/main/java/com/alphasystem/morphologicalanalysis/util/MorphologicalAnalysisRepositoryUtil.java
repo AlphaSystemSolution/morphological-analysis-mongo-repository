@@ -119,8 +119,6 @@ public class MorphologicalAnalysisRepositoryUtil {
                     // case 2: the reference token might have been the last token of any verse other then first verse,
                     // in this case we need to go to the first token of the next verse while staying in the same chapter
                     // we are going to handle case 2 now
-                    // but we don't know the how many tokens in the nect verse, we are going to pass -1 as the token
-                    // number
                     return getToken(cn, vn + 1, 1, next, tokenRepository, repositoryUtil);
                 } else if (vn > 1) {
                     // handle case 1
