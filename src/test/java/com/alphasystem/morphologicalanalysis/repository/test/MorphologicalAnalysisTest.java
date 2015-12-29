@@ -305,7 +305,7 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         MorphologicalEntry morphologicalEntry = new MorphologicalEntry();
         morphologicalEntry.setRootLetters(rootLetters);
         morphologicalEntry.setForm(FORM_I_CATEGORY_A_GROUP_U_TEMPLATE);
-        morphologicalEntry.setTranslation("To Help");
+        morphologicalEntry.setShortTranslation("To Help");
         MorphologicalEntryRepository morphologicalEntryRepository = repositoryUtil.getMorphologicalEntryRepository();
         morphologicalEntryRepository.save(morphologicalEntry);
         log(format("MorphologicalEntry created {%s}", morphologicalEntry.getDisplayName()), true);
