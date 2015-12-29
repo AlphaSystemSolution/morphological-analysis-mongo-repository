@@ -61,7 +61,7 @@ public class MorphologicalAnalysisBasicTest extends AbstractTestNGSpringContextT
 
     @Test(dependsOnMethods = {"getPreviousTokenPositiveCase"})
     public void getPreviousTokenFirstTokenFirstVerseOfChapter() {
-        Integer chapterNumber = 2;
+        Integer chapterNumber = 18;
         Integer verseNumber = 1;
         Integer tokenNumber = 1;
         Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
@@ -70,7 +70,11 @@ public class MorphologicalAnalysisBasicTest extends AbstractTestNGSpringContextT
         Token token = repositoryUtil.getPreviousToken(dummy);
         assertNotNull(token);
         log(format("Previous token for {%s} is {%s}", dummy, token), true);
-        assertEquals(token.getDisplayName(), "1:7:9");
+        int previousChapterNumber = chapterNumber - 1;
+        int lastVerseNumber = repositoryUtil.getVerseCount(previousChapterNumber);
+        int lastTokenNumber = repositoryUtil.getTokenCount(previousChapterNumber, lastVerseNumber);
+        dummy = new Token(previousChapterNumber, lastVerseNumber, lastTokenNumber, "");
+        assertEquals(token.getDisplayName(), dummy.getDisplayName());
     }
 
     @Test(dependsOnMethods = {"getPreviousTokenFirstTokenFirstVerseOfChapter"})
