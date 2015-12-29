@@ -203,13 +203,25 @@ public class MorphologicalAnalysisRepositoryUtil {
     }
 
     public Token getNextToken(Token token) {
-        return getToken(token.getChapterNumber(), token.getVerseNumber(), token.getTokenNumber() + 1, true,
+        LOGGER.info("Getting next token for {}", token);
+        if(token == null){
+            return null;
+        }
+        Token result = getToken(token.getChapterNumber(), token.getVerseNumber(), token.getTokenNumber() + 1, true,
                 tokenRepository, this);
+        LOGGER.info("Next token for {} is {}", token, result);
+        return result;
     }
 
     public Token getPreviousToken(Token token) {
-        return getToken(token.getChapterNumber(), token.getVerseNumber(), token.getTokenNumber() - 1, false,
+        LOGGER.info("Getting previous token for {}", token);
+        if(token == null){
+            return null;
+        }
+        Token result = getToken(token.getChapterNumber(), token.getVerseNumber(), token.getTokenNumber() - 1, false,
                 tokenRepository, this);
+        LOGGER.info("Previous token for {} is {}", token, result);
+        return result;
     }
 
     public List<Token> getTokens(VerseTokenPairGroup group) {
