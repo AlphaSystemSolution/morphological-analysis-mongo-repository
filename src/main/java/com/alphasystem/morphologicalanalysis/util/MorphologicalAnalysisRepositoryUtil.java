@@ -81,7 +81,7 @@ public class MorphologicalAnalysisRepositoryUtil {
 
     private static Token getToken(Integer chapterNumber, Integer verseNumber, Integer tokenNumber, boolean next,
                                   TokenRepository tokenRepository, MorphologicalAnalysisRepositoryUtil repositoryUtil) {
-        LOGGER.info("Getting request to find token {}:{}:{}", chapterNumber, verseNumber, tokenNumber);
+        LOGGER.debug("Getting request to find token {}:{}:{}", chapterNumber, verseNumber, tokenNumber);
         if (chapterNumber <= 0 || chapterNumber > 114) {
             // no next/previous token
             LOGGER.warn("No token found {}:{}:{}", chapterNumber, verseNumber, tokenNumber);
@@ -103,7 +103,7 @@ public class MorphologicalAnalysisRepositoryUtil {
             return null;
         }
         Token dummy = new Token(chapterNumber, verseNumber, tokenNumber, "");
-        LOGGER.info("Finding token {}", dummy.getDisplayName());
+        LOGGER.debug("Finding token {}", dummy.getDisplayName());
         Token token = tokenRepository.findByDisplayName(dummy.getDisplayName());
         if (token == null) {
             if (next) {
@@ -203,24 +203,24 @@ public class MorphologicalAnalysisRepositoryUtil {
     }
 
     public Token getNextToken(Token token) {
-        LOGGER.info("Getting next token for {}", token);
+        LOGGER.debug("Getting next token for {}", token);
         if(token == null){
             return null;
         }
         Token result = getToken(token.getChapterNumber(), token.getVerseNumber(), token.getTokenNumber() + 1, true,
                 tokenRepository, this);
-        LOGGER.info("Next token for {} is {}", token, result);
+        LOGGER.debug("Next token for {} is {}", token, result);
         return result;
     }
 
     public Token getPreviousToken(Token token) {
-        LOGGER.info("Getting previous token for {}", token);
+        LOGGER.debug("Getting previous token for {}", token);
         if(token == null){
             return null;
         }
         Token result = getToken(token.getChapterNumber(), token.getVerseNumber(), token.getTokenNumber() - 1, false,
                 tokenRepository, this);
-        LOGGER.info("Previous token for {} is {}", token, result);
+        LOGGER.debug("Previous token for {} is {}", token, result);
         return result;
     }
 
