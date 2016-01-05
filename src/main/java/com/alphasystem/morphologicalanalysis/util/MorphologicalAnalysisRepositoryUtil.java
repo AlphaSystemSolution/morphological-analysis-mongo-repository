@@ -15,9 +15,11 @@ import com.alphasystem.morphologicalanalysis.graph.model.QDependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.*;
+import com.alphasystem.morphologicalanalysis.morphology.model.DictionaryNotes;
 import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
 import com.alphasystem.morphologicalanalysis.morphology.model.QRootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
+import com.alphasystem.morphologicalanalysis.morphology.repository.DictionaryNotesRepository;
 import com.alphasystem.morphologicalanalysis.morphology.repository.MorphologicalEntryRepository;
 import com.alphasystem.morphologicalanalysis.morphology.repository.RootLettersRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
@@ -68,6 +70,7 @@ public class MorphologicalAnalysisRepositoryUtil {
     private RelationshipNodeRepository relationshipNodeRepository;
     private RootLettersRepository rootLettersRepository;
     private MorphologicalEntryRepository morphologicalEntryRepository;
+    private DictionaryNotesRepository dictionaryNotesRepository;
     private TanzilTool tanzilTool;
     private Query findAllChaptersQuery;
     private boolean verbose;
@@ -204,7 +207,7 @@ public class MorphologicalAnalysisRepositoryUtil {
 
     public Token getNextToken(Token token) {
         LOGGER.debug("Getting next token for {}", token);
-        if(token == null){
+        if (token == null) {
             return null;
         }
         Token result = getToken(token.getChapterNumber(), token.getVerseNumber(), token.getTokenNumber() + 1, true,
@@ -215,7 +218,7 @@ public class MorphologicalAnalysisRepositoryUtil {
 
     public Token getPreviousToken(Token token) {
         LOGGER.debug("Getting previous token for {}", token);
-        if(token == null){
+        if (token == null) {
             return null;
         }
         Token result = getToken(token.getChapterNumber(), token.getVerseNumber(), token.getTokenNumber() - 1, false,
@@ -335,6 +338,11 @@ public class MorphologicalAnalysisRepositoryUtil {
 
     public MorphologicalEntry findMorphologicalEntry(RootLetters src, NamedTemplate form) {
         return findMorphologicalEntry(new MorphologicalEntry(src, form));
+    }
+
+    public DictionaryNotes findDictionaryNotes(DictionaryNotes src) {
+        src.initDisplayName();
+        return dictionaryNotesRepository.findByDisplayName(src.getDisplayName());
     }
 
     // Getter & Setters
@@ -471,6 +479,15 @@ public class MorphologicalAnalysisRepositoryUtil {
     @Autowired
     public void setMorphologicalEntryRepository(MorphologicalEntryRepository morphologicalEntryRepository) {
         this.morphologicalEntryRepository = morphologicalEntryRepository;
+    }
+
+    public DictionaryNotesRepository getDictionaryNotesRepository() {
+        return dictionaryNotesRepository;
+    }
+
+    @Autowired
+    public void setDictionaryNotesRepository(DictionaryNotesRepository dictionaryNotesRepository) {
+        this.dictionaryNotesRepository = dictionaryNotesRepository;
     }
 
     public GraphNodeRepository getRepository(GraphNodeType nodeType) {
