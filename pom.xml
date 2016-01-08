@@ -55,7 +55,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemProperties>
-                        <mongo.db.name>MORPHOLOGICAL_ANALYSIS_TEST_DB</mongo.db.name>
+                        <mongo.db.name>MORPHOLOGICAL_ANALYSIS_DB</mongo.db.name>
                         <quranic-text>quran-simple-enhanced</quranic-text>
                     </systemProperties>
                 </configuration>
