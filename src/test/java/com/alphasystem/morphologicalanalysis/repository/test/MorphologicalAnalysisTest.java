@@ -8,7 +8,6 @@ import com.alphasystem.morphologicalanalysis.graph.repository.TerminalNodeReposi
 import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.repository.MorphologicalEntryRepository;
-import com.alphasystem.morphologicalanalysis.morphology.repository.RootLettersRepository;
 import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
@@ -282,26 +281,8 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
     }
 
     @Test(dependsOnMethods = "createDependencyGraph")
-    public void testCreateRootLetters() {
-        RootLetters rootLetters = new RootLetters(NOON, SAD, RA);
-        rootLetters.setFirstRadical(NOON);
-        rootLetters.setSecondRadical(SAD);
-        rootLetters.setThirdRadical(RA);
-        RootLettersRepository rootLettersRepository = repositoryUtil.getRootLettersRepository();
-        rootLettersRepository.save(rootLetters);
-    }
-
-    @Test(dependsOnMethods = "testCreateRootLetters")
-    public void testFindRootLetters() {
-        RootLetters rootLetters = repositoryUtil.getRootLetters(NOON, SAD, RA, null);
-        assertNotNull(rootLetters);
-        log(format("RootLetter found {%s}", rootLetters.toString()), true);
-    }
-
-    @Test(dependsOnMethods = "testFindRootLetters")
     public void testCreateMorphologicalEntry() {
-        RootLetters rootLetters = repositoryUtil.getRootLetters(NOON, SAD, RA);
-        assertNotNull(rootLetters);
+        RootLetters rootLetters = new RootLetters(NOON, SAD, RA);
         MorphologicalEntry morphologicalEntry = new MorphologicalEntry();
         morphologicalEntry.setRootLetters(rootLetters);
         morphologicalEntry.setForm(FORM_I_CATEGORY_A_GROUP_U_TEMPLATE);

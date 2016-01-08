@@ -8,11 +8,15 @@ import com.alphasystem.morphologicalanalysis.morphology.repository.Morphological
 import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
 import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.repository.ChapterRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeSuite;
@@ -115,6 +119,24 @@ public class ReadOnlyRepositoryTests extends AbstractTestNGSpringContextTests {
         Token nextToken = repositoryUtil.getNextToken(token);
         assertNull(nextToken);
         log(format("No next token found", displayName), true);
+    }
+
+    @Test
+    public void testPage() {
+        ChapterRepository chapterRepository = repositoryUtil.getChapterRepository();
+        int pageSize = 10;
+        Page<Chapter> page = chapterRepository.findAll(new PageRequest(0, pageSize));
+        while (page.hasContent() || page.hasNext()) {
+            log(format("Total Number Of Pages: %s, Current Page: %s, Total Number OfElements: %s", page.getTotalPages(),
+                    page.getNumber(), page.getTotalElements()), true);
+            List<Chapter> content = page.getContent();
+            log("------------------------------------------------------------", true);
+            content.forEach(chapter -> log(chapter.getDisplayName(), true));
+            log("------------------------------------------------------------", true);
+            log("", true);
+            page = chapterRepository.findAll(new PageRequest(page.getNumber() + 1, pageSize));
+        }
+
     }
 
 }

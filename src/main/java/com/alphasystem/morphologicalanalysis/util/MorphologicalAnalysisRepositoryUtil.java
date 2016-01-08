@@ -3,7 +3,6 @@
  */
 package com.alphasystem.morphologicalanalysis.util;
 
-import com.alphasystem.arabic.model.ArabicLetterType;
 import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.morphologicalanalysis.common.model.QVerseTokensPair;
@@ -17,11 +16,9 @@ import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.*;
 import com.alphasystem.morphologicalanalysis.morphology.model.DictionaryNotes;
 import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
-import com.alphasystem.morphologicalanalysis.morphology.model.QRootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.repository.DictionaryNotesRepository;
 import com.alphasystem.morphologicalanalysis.morphology.repository.MorphologicalEntryRepository;
-import com.alphasystem.morphologicalanalysis.morphology.repository.RootLettersRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.ChapterRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
@@ -68,7 +65,6 @@ public class MorphologicalAnalysisRepositoryUtil {
     private PartOfSpeechNodeRepository partOfSpeechNodeRepository;
     private PhraseNodeRepository phraseNodeRepository;
     private RelationshipNodeRepository relationshipNodeRepository;
-    private RootLettersRepository rootLettersRepository;
     private MorphologicalEntryRepository morphologicalEntryRepository;
     private DictionaryNotesRepository dictionaryNotesRepository;
     private TanzilTool tanzilTool;
@@ -310,27 +306,6 @@ public class MorphologicalAnalysisRepositoryUtil {
         return dependencyGraphRepository.findByDisplayName(displayName);
     }
 
-    public RootLetters getRootLetters(RootLetters src) {
-        return getRootLetters(src.getFirstRadical(), src.getSecondRadical(), src.getThirdRadical(),
-                src.getFourthRadical());
-    }
-
-    public RootLetters getRootLetters(ArabicLetterType firstRadical, ArabicLetterType secondRadical,
-                                      ArabicLetterType thirdRadical) {
-        return getRootLetters(firstRadical, secondRadical, thirdRadical, null);
-    }
-
-    public RootLetters getRootLetters(ArabicLetterType firstRadical, ArabicLetterType secondRadical,
-                                      ArabicLetterType thirdRadical, ArabicLetterType fourthRadical) {
-        QRootLetters qRootLetters = QRootLetters.rootLetters;
-        BooleanExpression predicate = qRootLetters.firstRadical.eq(firstRadical).and(qRootLetters.secondRadical
-                .eq(secondRadical)).and(qRootLetters.thirdRadical.eq(thirdRadical));
-        if (fourthRadical != null) {
-            predicate = predicate.and(qRootLetters.fourthRadical.eq(fourthRadical));
-        }
-        return rootLettersRepository.findOne(predicate);
-    }
-
     public MorphologicalEntry findMorphologicalEntry(MorphologicalEntry src) {
         src.initDisplayName();
         return morphologicalEntryRepository.findByDisplayName(src.getDisplayName());
@@ -461,15 +436,6 @@ public class MorphologicalAnalysisRepositoryUtil {
     @Autowired
     public void setRelationshipNodeRepository(RelationshipNodeRepository relationshipNodeRepository) {
         this.relationshipNodeRepository = relationshipNodeRepository;
-    }
-
-    public RootLettersRepository getRootLettersRepository() {
-        return rootLettersRepository;
-    }
-
-    @Autowired
-    public void setRootLettersRepository(RootLettersRepository rootLettersRepository) {
-        this.rootLettersRepository = rootLettersRepository;
     }
 
     public MorphologicalEntryRepository getMorphologicalEntryRepository() {
