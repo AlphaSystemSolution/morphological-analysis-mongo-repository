@@ -14,7 +14,6 @@ import com.alphasystem.morphologicalanalysis.graph.model.QDependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.*;
-import com.alphasystem.morphologicalanalysis.morphology.model.DictionaryNotes;
 import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.repository.DictionaryNotesRepository;
@@ -313,11 +312,6 @@ public class MorphologicalAnalysisRepositoryUtil {
 
     public MorphologicalEntry findMorphologicalEntry(RootLetters src, NamedTemplate form) {
         return findMorphologicalEntry(new MorphologicalEntry(src, form));
-    }
-
-    public DictionaryNotes findDictionaryNotes(DictionaryNotes src) {
-        src.initDisplayName();
-        return dictionaryNotesRepository.findByDisplayName(src.getDisplayName());
     }
 
     // Getter & Setters

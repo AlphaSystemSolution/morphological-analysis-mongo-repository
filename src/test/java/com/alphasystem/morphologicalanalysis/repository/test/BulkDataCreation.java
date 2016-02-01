@@ -21,6 +21,7 @@ import static java.lang.System.out;
 @ContextConfiguration(classes = {MongoConfig.class, MorphologicalAnalysisSpringConfiguration.class})
 public class BulkDataCreation extends AbstractTestNGSpringContextTests {
 
+    @Autowired
     private MorphologicalAnalysisRepositoryUtil repositoryUtil;
 
     /**
@@ -31,7 +32,7 @@ public class BulkDataCreation extends AbstractTestNGSpringContextTests {
         long startTime = currentTimeMillis();
         for (int chapterNumber = 1; chapterNumber <= 114; chapterNumber++) {
             long chapterStartTime = currentTimeMillis();
-            getRepositoryUtil().createChapter(chapterNumber);
+            repositoryUtil.createChapter(chapterNumber);
             long chapterEndTime = currentTimeMillis();
             out.printf("Time consume to save chapter {%s} is {%s}",
                     chapterNumber, getTimeConsumed(chapterEndTime
@@ -42,16 +43,6 @@ public class BulkDataCreation extends AbstractTestNGSpringContextTests {
         out.printf("Total time consume is {%s}", getTimeConsumed(endTime
                 - startTime));
         out.println();
-    }
-
-    public MorphologicalAnalysisRepositoryUtil getRepositoryUtil() {
-        return repositoryUtil;
-    }
-
-    @Autowired
-    public void setRepositoryUtil(
-            MorphologicalAnalysisRepositoryUtil repositoryUtil) {
-        this.repositoryUtil = repositoryUtil;
     }
 
 }

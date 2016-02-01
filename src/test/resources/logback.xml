@@ -24,7 +24,7 @@
         <appender-ref ref="STDOUT"/>
     </root>
 
-    <logger name="com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil" level="DEBUG"/>
+    <logger name="com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositoryUtil" level="INFO"/>
     <logger name="com.alphasystem.persistence.mongo.spring.support.CascadingMongoEventListener" level="INFO"/>
     <logger name="org.springframework.data.mongodb.core" level="INFO"/>
     <logger name="org.springframework.beans.factory.support" level="INFO"/>

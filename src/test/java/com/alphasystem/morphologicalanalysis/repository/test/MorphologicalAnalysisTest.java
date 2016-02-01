@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.repository.test;
 
+import com.alphasystem.arabic.model.ArabicLetterType;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.PartOfSpeechNode;
@@ -7,6 +8,7 @@ import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.repository.TerminalNodeRepository;
 import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
+import com.alphasystem.morphologicalanalysis.morphology.repository.DictionaryNotesRepository;
 import com.alphasystem.morphologicalanalysis.morphology.repository.MorphologicalEntryRepository;
 import com.alphasystem.morphologicalanalysis.spring.support.MongoConfig;
 import com.alphasystem.morphologicalanalysis.spring.support.MorphologicalAnalysisSpringConfiguration;
@@ -22,6 +24,8 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 import static com.alphasystem.arabic.model.ArabicLetterType.*;
@@ -61,21 +65,10 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         String dbName = getProperty(MongoConfig.MONGO_DB_NAME_PROPERTY);
         log(format("Database in use {%s}", dbName), true);
         assertTrue("MORPHOLOGICAL_ANALYSIS_TEST_DB".equals(dbName));
-        repositoryUtil.getMongoTemplate().getDb().dropDatabase();
+        // repositoryUtil.getMongoTemplate().getDb().dropDatabase();
     }
 
     @Test
-    public void createChapter() {
-        log(format("Creating chapter: %s", DEFAULT_CHAPTER_NUMBER), true);
-        repositoryUtil.createChapter(DEFAULT_CHAPTER_NUMBER);
-        log(format("Chapter %s created", DEFAULT_CHAPTER_NUMBER), true);
-
-        Verse verse = repositoryUtil.getVerseRepository().
-                findByChapterNumberAndVerseNumber(DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER);
-        assertEquals(verse.getTokenCount(), new Integer(4));
-    }
-
-    @Test(dependsOnMethods = "createChapter")
     public void populateToken4() {
         Token token = repositoryUtil.getTokenRepository().findByChapterNumberAndVerseNumberAndTokenNumber
                 (DEFAULT_CHAPTER_NUMBER, DEFAULT_VERSE_NUMBER, 4);
@@ -128,15 +121,7 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         log(format("Token Display Name: %s", token.getDisplayName()), true);
     }
 
-    @Test(dependsOnMethods = "populateToken3")
-    public void createChapter2() {
-        int chapterNumber = 2;
-        log(format("Creating chapter %s", chapterNumber), true);
-        repositoryUtil.createChapter(chapterNumber);
-        log(format("Created chapter %s", chapterNumber), true);
-    }
-
-    @Test(dependsOnMethods = "createChapter2")
+    @Test(dependsOnMethods = "getTokenByDisplayName")
     public void getRangeOfVerses() {
         int chapterNumber = 2;
         int from = 10;
@@ -153,7 +138,7 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         }
     }
 
-    @Test(dependsOnMethods = "createChapter2")
+    @Test(dependsOnMethods = "getRangeOfVerses")
     public void getRangeOfVerses2() {
         int chapterNumber = 2;
         int from = 10;
@@ -307,6 +292,29 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         List<MorphologicalEntry> morphologicalEntries = morphologicalEntryRepository.findByGroupTag(rootLetters.getDisplayName());
         assertTrue(morphologicalEntries != null && !morphologicalEntries.isEmpty());
         morphologicalEntries.forEach(entry -> log(format("MorphologicalEntry found {%s}", entry.getDisplayName()), true));
+    }
+
+    @Test(dependsOnMethods = "testFindGroup")
+    public void storeNotes() {
+        final DictionaryNotesRepository dictionaryNotesRepository = repositoryUtil.getDictionaryNotesRepository();
+        RootLetters rootLetters = new RootLetters(ArabicLetterType.SEEN, ArabicLetterType.LAM, ArabicLetterType.MEEM);
+        try {
+            dictionaryNotesRepository.store(rootLetters);
+        } catch (IOException e) {
+            fail(e.getMessage(), e);
+        }
+    }
+
+    @Test(dependsOnMethods = "storeNotes")
+    public void retrieveNotes() {
+        final DictionaryNotesRepository dictionaryNotesRepository = repositoryUtil.getDictionaryNotesRepository();
+        RootLetters rootLetters = new RootLetters(ArabicLetterType.SEEN, ArabicLetterType.LAM, ArabicLetterType.MEEM);
+        try {
+            final Path path = dictionaryNotesRepository.retrieve(rootLetters);
+            log(format("Path retrieved: %s", path.toString()), true);
+        } catch (IOException e) {
+            fail(e.getMessage(), e);
+        }
     }
 
 }
