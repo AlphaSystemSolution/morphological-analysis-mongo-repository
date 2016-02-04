@@ -45,7 +45,7 @@ import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.Par
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbType.IMPERFECT;
 import static com.alphasystem.util.AppUtil.USER_HOME_DIR;
-import static com.alphasystem.util.AppUtil.fastCopy;
+import static com.alphasystem.util.nio.NIOFileUtils.fastCopy;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.nio.file.Files.newInputStream;
