@@ -6,6 +6,7 @@ import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.PartOfSpeechNode;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.repository.TerminalNodeRepository;
+import com.alphasystem.morphologicalanalysis.morphology.model.DictionaryNotes;
 import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.repository.DictionaryNotesRepository;
@@ -24,8 +25,10 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import static com.alphasystem.arabic.model.ArabicLetterType.*;
@@ -41,8 +44,15 @@ import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.Num
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.DEFINITE_ARTICLE;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.PartOfSpeech.VERB;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.VerbType.IMPERFECT;
+import static com.alphasystem.util.AppUtil.USER_HOME_DIR;
+import static com.alphasystem.util.AppUtil.fastCopy;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
+import static java.nio.file.Files.newInputStream;
+import static java.nio.file.Files.newOutputStream;
+import static java.nio.file.Paths.get;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.WRITE;
 import static java.util.Collections.reverse;
 import static org.testng.Assert.*;
 import static org.testng.Reporter.log;
@@ -55,6 +65,8 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
 
     private static final int DEFAULT_CHAPTER_NUMBER = 1;
     private static final int DEFAULT_VERSE_NUMBER = 2;
+    private static final File DEFAULT_FOLDER = new File(".wordbyword", "dictionary");
+    private static final File DEFAULT_NOTES_STORAGE = new File(USER_HOME_DIR, DEFAULT_FOLDER.getPath());
 
     @Autowired
     private MorphologicalAnalysisRepositoryUtil repositoryUtil;
@@ -298,9 +310,13 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
     public void storeNotes() {
         final DictionaryNotesRepository dictionaryNotesRepository = repositoryUtil.getDictionaryNotesRepository();
         RootLetters rootLetters = new RootLetters(ArabicLetterType.SEEN, ArabicLetterType.LAM, ArabicLetterType.MEEM);
-        try {
-            dictionaryNotesRepository.store(rootLetters);
-        } catch (IOException e) {
+        DictionaryNotes dictionaryNotes = new DictionaryNotes(rootLetters);
+
+        try (InputStream inputStream = newInputStream(get(DEFAULT_NOTES_STORAGE.getPath(), dictionaryNotes.getFileName()))) {
+            dictionaryNotes.setInputStream(inputStream);
+            final DictionaryNotes dn = dictionaryNotesRepository.store(dictionaryNotes);
+            log(format("DictionaryNotes created with id: %s", dn.getId()), true);
+        } catch (Exception e) {
             fail(e.getMessage(), e);
         }
     }
@@ -309,9 +325,15 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
     public void retrieveNotes() {
         final DictionaryNotesRepository dictionaryNotesRepository = repositoryUtil.getDictionaryNotesRepository();
         RootLetters rootLetters = new RootLetters(ArabicLetterType.SEEN, ArabicLetterType.LAM, ArabicLetterType.MEEM);
-        try {
-            final Path path = dictionaryNotesRepository.retrieve(rootLetters);
-            log(format("Path retrieved: %s", path.toString()), true);
+
+        final DictionaryNotes dictionaryNotes = dictionaryNotesRepository.retrieve(rootLetters);
+        log(format("Dictionary notes retrieved:- ID: %s, FILE NAME: %s", dictionaryNotes.getId(), dictionaryNotes.getFileName()), true);
+
+        assertNotNull(dictionaryNotes.getInputStream());
+        String path = format("test_%s", dictionaryNotes.getFileName());
+        try (InputStream inputStream = dictionaryNotes.getInputStream();
+             OutputStream outputStream = newOutputStream(get(DEFAULT_NOTES_STORAGE.getPath(), path), WRITE, CREATE)) {
+            fastCopy(inputStream, outputStream);
         } catch (IOException e) {
             fail(e.getMessage(), e);
         }
