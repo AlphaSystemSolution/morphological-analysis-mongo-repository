@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.alphasystem.morphologicalanalysis.util;
 
 import com.alphasystem.arabic.model.ArabicWord;
@@ -250,6 +247,7 @@ public class MorphologicalAnalysisRepositoryUtil {
         if (pairs == null || pairs.isEmpty()) {
             return new ArrayList<>();
         }
+        LOGGER.info(format("Group to find DependencyGraph is {%s}", group));
         QDependencyGraph qDependencyGraph = QDependencyGraph.dependencyGraph;
         int index = 0;
         VerseTokensPair pair = pairs.get(index);
