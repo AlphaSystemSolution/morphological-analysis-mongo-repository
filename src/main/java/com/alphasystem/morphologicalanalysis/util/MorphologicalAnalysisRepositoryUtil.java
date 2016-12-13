@@ -22,6 +22,7 @@ import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenReposito
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.util.ChapterComparator;
 import com.alphasystem.tanzil.TanzilTool;
+import com.alphasystem.tanzil.model.Document;
 import com.mysema.query.types.expr.BooleanExpression;
 import com.mysema.query.types.path.ListPath;
 import org.slf4j.Logger;
@@ -141,7 +142,8 @@ public class MorphologicalAnalysisRepositoryUtil {
         if (verbose) {
             out.println(format("Start creating chapter {%s}", chapterNumber));
         }
-        com.alphasystem.tanzil.model.Chapter ch = tanzilTool.getChapter(chapterNumber, QURAN_SIMPLE_ENHANCED);
+        final Document document = tanzilTool.getChapter(chapterNumber, QURAN_SIMPLE_ENHANCED);
+        com.alphasystem.tanzil.model.Chapter ch = document.getChapters().get(0);
         Chapter chapter = new Chapter(chapterNumber, ch.getName());
         List<com.alphasystem.tanzil.model.Verse> verses = ch.getVerses();
         int verseCount = verses.size();
@@ -269,7 +271,7 @@ public class MorphologicalAnalysisRepositoryUtil {
             impliedOrHiddenTokens.forEach(tokenRepository::save);
         }
         dependencyGraphRepository.save(dependencyGraph);
-        if (!removalIds.isEmpty()) {
+        if (removalIds != null && !removalIds.isEmpty()) {
             removalIds.entrySet().forEach(this::removeNode);
         }
     }
