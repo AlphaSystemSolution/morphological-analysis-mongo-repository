@@ -450,29 +450,30 @@ public class MorphologicalAnalysisRepositoryUtil {
         this.dictionaryNotesRepository = dictionaryNotesRepository;
     }
 
-    public GraphNodeRepository getRepository(GraphNodeType nodeType) {
-        GraphNodeRepository repository = null;
+    @SuppressWarnings("unchecked")
+    public <N extends GraphNode, R extends GraphNodeRepository<N>> R getRepository(GraphNodeType nodeType) {
+        R repository = null;
         switch (nodeType) {
             case TERMINAL:
-                repository = getTerminalNodeRepository();
+                repository = (R) getTerminalNodeRepository();
                 break;
             case PART_OF_SPEECH:
-                repository = getPartOfSpeechNodeRepository();
+                repository = (R) getPartOfSpeechNodeRepository();
                 break;
             case PHRASE:
-                repository = getPhraseNodeRepository();
+                repository = (R) getPhraseNodeRepository();
                 break;
             case RELATIONSHIP:
-                repository = getRelationshipNodeRepository();
+                repository = (R) getRelationshipNodeRepository();
                 break;
             case REFERENCE:
-                repository = getReferenceNodeRepository();
+                repository = (R) getReferenceNodeRepository();
                 break;
             case HIDDEN:
-                repository = getHiddenNodeRepository();
+                repository = (R) getHiddenNodeRepository();
                 break;
             case IMPLIED:
-                repository = getImpliedNodeRepository();
+                repository = (R) getImpliedNodeRepository();
                 break;
             case ROOT:
                 break;
