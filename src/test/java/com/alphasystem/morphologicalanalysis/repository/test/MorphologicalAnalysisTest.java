@@ -18,7 +18,7 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.support.KanaAndSisters;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
-import com.mysema.query.types.expr.BooleanExpression;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;

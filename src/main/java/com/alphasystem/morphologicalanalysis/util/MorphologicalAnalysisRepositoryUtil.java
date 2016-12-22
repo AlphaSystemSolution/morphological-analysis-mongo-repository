@@ -2,12 +2,10 @@ package com.alphasystem.morphologicalanalysis.util;
 
 import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.arabic.model.NamedTemplate;
-import com.alphasystem.morphologicalanalysis.common.model.QVerseTokensPair;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
-import com.alphasystem.morphologicalanalysis.graph.model.QDependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
 import com.alphasystem.morphologicalanalysis.graph.repository.*;
@@ -23,12 +21,13 @@ import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseReposito
 import com.alphasystem.morphologicalanalysis.wordbyword.util.ChapterComparator;
 import com.alphasystem.tanzil.TanzilTool;
 import com.alphasystem.tanzil.model.Document;
-import com.mysema.query.types.expr.BooleanExpression;
-import com.mysema.query.types.path.ListPath;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
@@ -249,20 +248,24 @@ public class MorphologicalAnalysisRepositoryUtil {
         if (pairs == null || pairs.isEmpty()) {
             return new ArrayList<>();
         }
+
         LOGGER.info(format("Group to find DependencyGraph is {%s}", group));
-        QDependencyGraph qDependencyGraph = QDependencyGraph.dependencyGraph;
         int index = 0;
         VerseTokensPair pair = pairs.get(index);
-        ListPath<VerseTokensPair, QVerseTokensPair> tokens = qDependencyGraph.tokens;
-        BooleanExpression predicate = tokens.get(index).verseNumber.eq(pair.getVerseNumber());
+        Criteria[] verseNumberCriterion = new Criteria[pairs.size()];
+        verseNumberCriterion[index] = Criteria.where("verseNumber").is(pair.getVerseNumber());
         for (index = 1; index < pairs.size(); index++) {
             pair = pairs.get(index);
-            BooleanExpression predicate1 = tokens.get(index).verseNumber.eq(pair.getVerseNumber());
-            predicate = predicate.or(predicate1);
+            verseNumberCriterion[index] = Criteria.where("verseNumber").is(pair.getVerseNumber());
         }
-        predicate = qDependencyGraph.chapterNumber.eq(group.getChapterNumber()).and(predicate);
-        LOGGER.info(format("Query for \"getDependencyGraphs\" is {%s}", predicate));
-        return (List<DependencyGraph>) dependencyGraphRepository.findAll(predicate);
+        Criteria tokensCriteria = Criteria.where("tokens").elemMatch(new Criteria().orOperator(verseNumberCriterion));
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("chapterNumber").is(group.getChapterNumber())).addCriteria(tokensCriteria)
+                .with(new Sort("tokens.verseNumber"));
+
+        LOGGER.info(format("Query for \"getDependencyGraphs\" is {%s}", query));
+        return mongoTemplate.find(query, DependencyGraph.class);
     }
 
     public void saveDependencyGraph(DependencyGraph dependencyGraph, List<Token> impliedOrHiddenTokens,

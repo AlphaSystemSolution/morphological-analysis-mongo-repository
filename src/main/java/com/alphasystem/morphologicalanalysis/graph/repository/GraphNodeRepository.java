@@ -4,6 +4,8 @@ import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
 import com.alphasystem.persistence.mongo.repository.BaseRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
+import java.util.List;
+
 /**
  * @author sali
  */
@@ -19,4 +21,6 @@ public interface GraphNodeRepository<N extends GraphNode> extends BaseRepository
     Long countByChapterNumberAndVerseNumberAndTokenNumber(Integer chapterNumber, Integer verseNumber,
                                                           Integer tokenNumber);
 
+    List<N> findByChapterNumberAndVerseNumberAndTokenNumber(Integer chapterNumber, Integer verseNumber,
+                                                              Integer tokenNumber);
 }
