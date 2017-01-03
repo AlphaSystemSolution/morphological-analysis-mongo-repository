@@ -336,10 +336,6 @@ public class MorphologicalAnalysisRepositoryUtil {
         this.locationRepository = locationRepository;
     }
 
-    public MongoTemplate getMongoTemplate() {
-        return mongoTemplate;
-    }
-
     @Autowired
     public void setMongoTemplate(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
@@ -381,7 +377,7 @@ public class MorphologicalAnalysisRepositoryUtil {
         this.terminalNodeRepository = terminalNodeRepository;
     }
 
-    public ImpliedNodeRepository getImpliedNodeRepository() {
+    private ImpliedNodeRepository getImpliedNodeRepository() {
         return impliedNodeRepository;
     }
 
@@ -390,7 +386,7 @@ public class MorphologicalAnalysisRepositoryUtil {
         this.impliedNodeRepository = impliedNodeRepository;
     }
 
-    public HiddenNodeRepository getHiddenNodeRepository() {
+    private HiddenNodeRepository getHiddenNodeRepository() {
         return hiddenNodeRepository;
     }
 
@@ -399,7 +395,7 @@ public class MorphologicalAnalysisRepositoryUtil {
         this.hiddenNodeRepository = hiddenNodeRepository;
     }
 
-    public ReferenceNodeRepository getReferenceNodeRepository() {
+    private ReferenceNodeRepository getReferenceNodeRepository() {
         return referenceNodeRepository;
     }
 
@@ -417,7 +413,7 @@ public class MorphologicalAnalysisRepositoryUtil {
         this.partOfSpeechNodeRepository = partOfSpeechNodeRepository;
     }
 
-    public PhraseNodeRepository getPhraseNodeRepository() {
+    private PhraseNodeRepository getPhraseNodeRepository() {
         return phraseNodeRepository;
     }
 
@@ -426,7 +422,7 @@ public class MorphologicalAnalysisRepositoryUtil {
         this.phraseNodeRepository = phraseNodeRepository;
     }
 
-    public RelationshipNodeRepository getRelationshipNodeRepository() {
+    private RelationshipNodeRepository getRelationshipNodeRepository() {
         return relationshipNodeRepository;
     }
 
@@ -505,10 +501,6 @@ public class MorphologicalAnalysisRepositoryUtil {
         }
         GraphNodeRepository repository = getRepository(graphNodeType);
         repository.delete(graphNode.getId());
-    }
-
-    public boolean isVerbose() {
-        return verbose;
     }
 
     public void setVerbose(boolean verbose) {
