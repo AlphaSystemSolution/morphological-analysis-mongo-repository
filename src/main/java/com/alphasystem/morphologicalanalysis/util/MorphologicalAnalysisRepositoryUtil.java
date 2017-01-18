@@ -243,6 +243,21 @@ public class MorphologicalAnalysisRepositoryUtil {
         return (List<Token>) tokenRepository.findAll(predicate);
     }
 
+    public ArabicWord getLocationWord(Location location){
+        if(location == null || location.isTransient()){
+            return null;
+        }
+        ArabicWord locationWord = null;
+
+        Token token = tokenRepository.findByChapterNumberAndVerseNumberAndTokenNumber(location.getChapterNumber(),
+                location.getVerseNumber(), location.getTokenNumber());
+        if(token != null){
+            locationWord = ArabicWord.getSubWord(token.getTokenWord(), location.getStartIndex(), location.getEndIndex());
+        }
+
+        return locationWord;
+    }
+
     public List<DependencyGraph> getDependencyGraphs(VerseTokenPairGroup group) {
         List<VerseTokensPair> pairs = group.getPairs();
         if (pairs == null || pairs.isEmpty()) {
