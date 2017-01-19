@@ -1,5 +1,6 @@
 package com.alphasystem.morphologicalanalysis.repository.test;
 
+import com.alphasystem.arabic.model.ArabicWord;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
@@ -14,6 +15,7 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.ChapterRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +28,10 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Reporter.log;
 
 /**
@@ -71,6 +76,7 @@ public class ReadOnlyRepositoryTests extends AbstractTestNGSpringContextTests {
     }
 
     //@Test(dependsOnMethods = {"getTokens"})
+    @SuppressWarnings("unused")
     public void getDependencyGraphs() {
         VerseTokenPairGroup group = new VerseTokenPairGroup();
         group.setChapterNumber(18);
@@ -83,6 +89,7 @@ public class ReadOnlyRepositoryTests extends AbstractTestNGSpringContextTests {
     }
 
     //@Test(dependsOnMethods = {"getTokens"})
+    @SuppressWarnings("unused")
     public void printLocationsWithMorphologicalEntriesPopulated() {
         MorphologicalEntryRepository morphologicalEntryRepository = repositoryUtil.getMorphologicalEntryRepository();
         List<MorphologicalEntry> morphologicalEntries = (List<MorphologicalEntry>) morphologicalEntryRepository.findAll();
@@ -94,6 +101,7 @@ public class ReadOnlyRepositoryTests extends AbstractTestNGSpringContextTests {
     }
 
     // @Test(dependsOnMethods = {"printLocationsWithMorphologicalEntriesPopulated"})
+    @SuppressWarnings("unused")
     public void printLocationsWithRootNotPopulated() {
         LocationRepository locationRepository = repositoryUtil.getLocationRepository();
         List<Location> locations = (List<Location>) locationRepository.findAll();
@@ -118,7 +126,7 @@ public class ReadOnlyRepositoryTests extends AbstractTestNGSpringContextTests {
         assertNotNull(token);
         Token nextToken = repositoryUtil.getNextToken(token);
         assertNull(nextToken);
-        log(format("No next token found", displayName), true);
+        log(format("No next token found %s", displayName), true);
     }
 
     @Test
@@ -137,6 +145,71 @@ public class ReadOnlyRepositoryTests extends AbstractTestNGSpringContextTests {
             page = chapterRepository.findAll(new PageRequest(page.getNumber() + 1, pageSize));
         }
 
+    }
+
+    @SuppressWarnings("unused")
+    private void populateTextInLocations() {
+        final LocationRepository locationRepository = repositoryUtil.getLocationRepository();
+        int pageSize = 50;
+        int pageNumber = 0;
+        Page<Location> page = locationRepository.findAll(new PageRequest(pageNumber, pageSize));
+        final int totalPages = page.getTotalPages();
+        while (pageNumber <= totalPages) {
+            final int currentPageNumber = page.getNumber();
+            log(format("Total Number Of Pages: %s, Current Page: %s, Total Number Of Elements: %s", totalPages,
+                    currentPageNumber, page.getTotalElements()), true);
+            if (page.hasContent()) {
+                final List<Location> locations = page.getContent();
+                locations.forEach(location -> {
+                    final String text = location.getText();
+                    if (!location.isTransient() && StringUtils.isBlank(text)) {
+                        final ArabicWord locationWord = repositoryUtil.getLocationWord(location);
+                        System.out.println(format("Empty text for location \"%s\", Text would be \"%s\"", location, locationWord.toUnicode()));
+                        location.setText(locationWord.toUnicode());
+                        locationRepository.save(location);
+                    }
+                });
+            }
+            pageNumber = currentPageNumber + 1;
+            page = locationRepository.findAll(new PageRequest(pageNumber, pageSize));
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private void removeMorphologicalEntries() {
+        final LocationRepository locationRepository = repositoryUtil.getLocationRepository();
+        final MorphologicalEntryRepository morphologicalEntryRepository = repositoryUtil.getMorphologicalEntryRepository();
+        int pageSize = 50;
+        int pageNumber = 0;
+        Page<Location> page = locationRepository.findAll(new PageRequest(pageNumber, pageSize));
+        final int totalPages = page.getTotalPages();
+        while (pageNumber <= totalPages) {
+            final int currentPageNumber = page.getNumber();
+            log(format("Total Number Of Pages: %s, Current Page: %s, Total Number Of Elements: %s", totalPages,
+                    currentPageNumber, page.getTotalElements()), true);
+            if (page.hasContent()) {
+                final List<Location> locations = page.getContent();
+                locations.forEach(location -> {
+                    final MorphologicalEntry morphologicalEntry = location.getMorphologicalEntry();
+                    if (morphologicalEntry != null) {
+                        System.out.println(format("Removing MorphologicalEntry \"%s-%s from location \"%s-%s\"",
+                                morphologicalEntry.getDisplayName(), morphologicalEntry.getId(), location.getDisplayName(), location.getId()));
+                        location.setMorphologicalEntry(null);
+                        locationRepository.save(location);
+                    }
+                });
+            }
+            pageNumber = currentPageNumber + 1;
+            page = locationRepository.findAll(new PageRequest(pageNumber, pageSize));
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private void mergeTokens() {
+        final int chapterNumber = 49;
+        final int verseNumber = 2;
+        final int[] tokenNumbers = {1, 2};
+        repositoryUtil.mergeTokens(chapterNumber, verseNumber, tokenNumbers);
     }
 
 }
