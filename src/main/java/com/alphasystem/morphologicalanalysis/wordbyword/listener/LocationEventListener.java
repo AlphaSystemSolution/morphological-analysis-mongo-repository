@@ -42,6 +42,22 @@ public class LocationEventListener extends DocumentEventListener<Location> {
     public void onBeforeConvert(BeforeConvertEvent<Location> event) {
         super.onBeforeConvert(event);
         Location source = event.getSource();
+        String text = source.getText();
+        if (StringUtils.isBlank(text)) {
+            ArabicWord locationWord = null;
+            String errorMessage = null;
+            try {
+                locationWord = repositoryUtil.getLocationWord(source);
+            } catch (Exception e) {
+                errorMessage = e.getMessage();
+            }
+            if (locationWord == null) {
+                logger.warn("Error retrieving location text for location \"{}\", error message was \"{}\"", source.getDisplayName(), errorMessage);
+            } else {
+                logger.info("Setting text for location", locationWord.toUnicode());
+                source.setText(locationWord.toUnicode());
+            }
+        }
         MorphologicalEntry morphologicalEntry = source.getMorphologicalEntry();
         if (morphologicalEntry != null) {
             if (morphologicalEntry.isEmpty()) {
