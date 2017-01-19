@@ -8,12 +8,26 @@ import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
 import com.alphasystem.morphologicalanalysis.graph.model.GraphNode;
 import com.alphasystem.morphologicalanalysis.graph.model.TerminalNode;
 import com.alphasystem.morphologicalanalysis.graph.model.support.GraphNodeType;
-import com.alphasystem.morphologicalanalysis.graph.repository.*;
+import com.alphasystem.morphologicalanalysis.graph.repository.DependencyGraphRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.GraphNodeRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.HiddenNodeRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.ImpliedNodeRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.PartOfSpeechNodeRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.PhraseNodeRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.ReferenceNodeRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.RelationshipNodeRepository;
+import com.alphasystem.morphologicalanalysis.graph.repository.TerminalNodeRepository;
 import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
 import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.repository.DictionaryNotesRepository;
 import com.alphasystem.morphologicalanalysis.morphology.repository.MorphologicalEntryRepository;
-import com.alphasystem.morphologicalanalysis.wordbyword.model.*;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.QChapter;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.QToken;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.QVerse;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.ChapterRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
@@ -22,6 +36,7 @@ import com.alphasystem.morphologicalanalysis.wordbyword.util.ChapterComparator;
 import com.alphasystem.tanzil.TanzilTool;
 import com.alphasystem.tanzil.model.Document;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +47,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -185,6 +201,86 @@ public class MorphologicalAnalysisRepositoryUtil {
         return chapters;
     }
 
+    public void mergeTokens(int chapterNumber, int verseNumber, int... tokenNumbers) {
+        if (ArrayUtils.isEmpty(tokenNumbers) || tokenNumbers.length <= 1) {
+            return;
+        }
+        LOGGER.info("Merging tokens \"{}\" in chapter \"{}\" and verse \"{}\".", ArrayUtils.toString(tokenNumbers),
+                chapterNumber, verseNumber);
+        final List<Token> tokens = tokenRepository.findByChapterNumberAndVerseNumber(chapterNumber, verseNumber);
+        if (tokens == null || tokens.isEmpty()) {
+            return;
+        }
+        LOGGER.info("Total number of tokens: \"{}\".", tokens.size());
+        removeCurrent(tokens);
+        createNewTokens(chapterNumber, verseNumber, tokens, tokenNumbers);
+    }
+
+    private void removeCurrent(final List<Token> tokens){
+        tokens.forEach(token -> {
+            LOGGER.info("Current token: \"{}:{}\" with token text \"{}\"", token, token.getId(), token.getTokenWord().toBuckWalter());
+            final List<Location> locations = token.getLocations();
+            locations.forEach(location -> {
+                LOGGER.info("    Current location: \"{}:{}\"", location, location.getId());
+                MorphologicalEntry morphologicalEntry = location.getMorphologicalEntry();
+                if (morphologicalEntry != null) {
+                    LOGGER.info("        MorphologicalEntry \"{}\" is not null for location \"{}:{}\".", morphologicalEntry, location, location.getId());
+                    final MorphologicalEntry entry = morphologicalEntryRepository.findOne(morphologicalEntry.getId());
+                    final Iterator<Location> iterator = entry.getLocations().iterator();
+                    while (iterator.hasNext()){
+                        final Location location1 = iterator.next();
+                        if(location1.equals(location)) {
+                            LOGGER.info("        Removing location \"{}\" from morphological entry \"{}\"", location1.getId(), morphologicalEntry.getId());
+                            iterator.remove();
+                        }
+                    }
+                    morphologicalEntryRepository.save(entry);
+                    location.setMorphologicalEntry(null);
+                }
+
+                // delete location
+                locationRepository.delete(location);
+            }); // end of location forEach
+            // delete token
+            tokenRepository.delete(token);
+        }); // end of token forEach
+    }
+
+    private void createNewTokens(int chapterNumber, int verseNumber, List<Token> tokens, int... tokenNumbers) {
+        List<Token> newTokens = new ArrayList<>();
+        int firstTokenNumber = tokenNumbers[0];
+        int tokenNumber = 1;
+        int index = 0;
+        while (index < tokens.size()) {
+            Token token = tokens.get(index);
+            String tokenText = token.getToken();
+            if (firstTokenNumber == token.getTokenNumber()) {
+                for (int i = 1; i < tokenNumbers.length; i++) {
+                    index++;
+                    if (index != i) {
+                        throw new RuntimeException(format("index does not match, expected: %s, actual: %s", index, i));
+                    }
+                    token = tokens.get(index);
+                    tokenText += " " + token.getToken();
+                }
+            }
+            Token newToken = new Token(chapterNumber, verseNumber, tokenNumber, tokenText);
+            Location newLocation = new Location(chapterNumber, verseNumber, tokenNumber, 1);
+            newToken.addLocation(newLocation);
+            newTokens.add(newToken);
+            locationRepository.save(newLocation);
+            tokenRepository.save(newToken);
+            LOGGER.info("NEW \"{}:{}:{}\", \"{}:{}\"", newToken, newToken.getId(), newToken.getTokenWord().toBuckWalter(), newLocation, newLocation.getId());
+            tokenNumber++;
+            index++;
+        }
+
+        final Verse verse = verseRepository.findByChapterNumberAndVerseNumber(chapterNumber, verseNumber);
+        verse.setTokens(newTokens);
+        verse.setTokenCount(newTokens.size());
+        verseRepository.save(verse);
+    }
+
     public int getTokenCount(Integer chapterNumber, Integer verseNumber) {
         QVerse qVerse = QVerse.verse1;
         BooleanExpression predicate = qVerse.chapterNumber.eq(chapterNumber).and(qVerse.verseNumber.eq(verseNumber));
@@ -243,15 +339,15 @@ public class MorphologicalAnalysisRepositoryUtil {
         return (List<Token>) tokenRepository.findAll(predicate);
     }
 
-    public ArabicWord getLocationWord(Location location){
-        if(location == null || location.isTransient()){
+    public ArabicWord getLocationWord(Location location) {
+        if (location == null || location.isTransient()) {
             return null;
         }
         ArabicWord locationWord = null;
 
         Token token = tokenRepository.findByChapterNumberAndVerseNumberAndTokenNumber(location.getChapterNumber(),
                 location.getVerseNumber(), location.getTokenNumber());
-        if(token != null){
+        if (token != null) {
             locationWord = ArabicWord.getSubWord(token.getTokenWord(), location.getStartIndex(), location.getEndIndex());
         }
 
