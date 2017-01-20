@@ -164,31 +164,43 @@ public class MorphologicalAnalysisRepositoryUtil {
         int verseCount = verses.size();
         chapter.setVerseCount(verseCount);
         for (int verseNumber = 1; verseNumber <= verseCount; verseNumber++) {
-            com.alphasystem.tanzil.model.Verse vs = verses.get(verseNumber - 1);
-            if (verbose) {
-                out.println(format("Start creating verse {%s}", verseNumber));
-            }
-            Verse verse = new Verse(chapterNumber, verseNumber);
-            int tokenNumber = 1;
-            List<ArabicWord> tokens = vs.getTokens();
-            for (ArabicWord aw : tokens) {
-                Token token = new Token(chapterNumber, verseNumber, tokenNumber, aw.toUnicode());
-                // we will create one location for each token
-                Location location = new Location(chapterNumber, verseNumber, tokenNumber, 1);
-                token.addLocation(location);
-                verse.addToken(token);
-                tokenNumber++;
-            } // end of token loop
-            verse.setTokenCount(verse.getTokens().size());
-            if (verbose) {
-                out.println(format("Finished creating verse {%s}", verseNumber));
-            }
-            chapter.addVerse(verse);
+            chapter.addVerse(createVerse(chapterNumber, null, verses.get(verseNumber - 1)));
         } // end of verse loop
         chapterRepository.save(chapter);
         if (verbose) {
             out.println(format("Finished creating chapter {%s}", chapterNumber));
         }
+    }
+
+    public Verse createVerse(int chapterNumber, Verse verse, com.alphasystem.tanzil.model.Verse vs) {
+        int verseNumber = vs.getVerseNumber();
+        if (verbose) {
+            LOGGER.info("Start creating verse {}", verseNumber);
+        }
+        if (verse == null) {
+            verse = new Verse(chapterNumber, verseNumber);
+        }
+        verse.setTokenCount(0);
+        verse.setTokens(null);
+
+        int tokenNumber = 1;
+        List<ArabicWord> tokens = vs.getTokens();
+        for (ArabicWord aw : tokens) {
+            Token token = new Token(chapterNumber, verseNumber, tokenNumber, aw.toUnicode());
+            if (verbose) {
+                LOGGER.info("Token \"{}\" created with text \"{}\".", token, token.getTokenWord().toUnicode());
+            }
+            // we will create one location for each token
+            Location location = new Location(chapterNumber, verseNumber, tokenNumber, 1);
+            token.addLocation(location);
+            verse.addToken(token);
+            tokenNumber++;
+        } // end of token loop
+        verse.setTokenCount(verse.getTokens().size());
+        if (verbose) {
+            LOGGER.info("Finished creating verse {}", verseNumber);
+        }
+        return verse;
     }
 
     /**
@@ -216,7 +228,7 @@ public class MorphologicalAnalysisRepositoryUtil {
         createNewTokens(chapterNumber, verseNumber, tokens, tokenNumbers);
     }
 
-    private void removeCurrent(final List<Token> tokens){
+    private void removeCurrent(final List<Token> tokens) {
         tokens.forEach(token -> {
             LOGGER.info("Current token: \"{}:{}\" with token text \"{}\"", token, token.getId(), token.getTokenWord().toBuckWalter());
             final List<Location> locations = token.getLocations();
@@ -227,9 +239,9 @@ public class MorphologicalAnalysisRepositoryUtil {
                     LOGGER.info("        MorphologicalEntry \"{}\" is not null for location \"{}:{}\".", morphologicalEntry, location, location.getId());
                     final MorphologicalEntry entry = morphologicalEntryRepository.findOne(morphologicalEntry.getId());
                     final Iterator<Location> iterator = entry.getLocations().iterator();
-                    while (iterator.hasNext()){
+                    while (iterator.hasNext()) {
                         final Location location1 = iterator.next();
-                        if(location1.equals(location)) {
+                        if (location1.equals(location)) {
                             LOGGER.info("        Removing location \"{}\" from morphological entry \"{}\"", location1.getId(), morphologicalEntry.getId());
                             iterator.remove();
                         }
@@ -257,9 +269,6 @@ public class MorphologicalAnalysisRepositoryUtil {
             if (firstTokenNumber == token.getTokenNumber()) {
                 for (int i = 1; i < tokenNumbers.length; i++) {
                     index++;
-                    if (index != i) {
-                        throw new RuntimeException(format("index does not match, expected: %s, actual: %s", index, i));
-                    }
                     token = tokens.get(index);
                     tokenText += " " + token.getToken();
                 }

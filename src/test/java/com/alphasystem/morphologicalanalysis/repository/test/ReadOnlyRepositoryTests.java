@@ -12,9 +12,14 @@ import com.alphasystem.morphologicalanalysis.util.MorphologicalAnalysisRepositor
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.ChapterRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
+import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
+import com.alphasystem.tanzil.QuranScript;
+import com.alphasystem.tanzil.TanzilTool;
+import com.alphasystem.tanzil.model.Document;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -210,6 +215,29 @@ public class ReadOnlyRepositoryTests extends AbstractTestNGSpringContextTests {
         final int verseNumber = 2;
         final int[] tokenNumbers = {1, 2};
         repositoryUtil.mergeTokens(chapterNumber, verseNumber, tokenNumbers);
+    }
+
+    @SuppressWarnings("unused")
+    private void createTokens() {
+        repositoryUtil.setVerbose(true);
+        final TanzilTool tanzilTool = TanzilTool.getInstance();
+        final int chapterNumber = 49;
+        final Document document = tanzilTool.getVerseRange(chapterNumber, 1, 2, QuranScript.QURAN_SIMPLE_ENHANCED);
+        final List<com.alphasystem.tanzil.model.Chapter> chapters = document.getChapters();
+        final com.alphasystem.tanzil.model.Chapter chapter = chapters.get(0);
+
+        final VerseRepository verseRepository = repositoryUtil.getVerseRepository();
+        Verse verse = verseRepository.findByChapterNumberAndVerseNumber(chapterNumber, 1);
+        System.out.println(verse.getVerseNumber() + ":" + verse.getTokenCount());
+        verse = repositoryUtil.createVerse(chapterNumber, verse, chapter.getVerses().get(0));
+        System.out.println(verse.getVerseNumber() + ":" + verse.getTokenCount());
+        verseRepository.save(verse);
+
+        verse = verseRepository.findByChapterNumberAndVerseNumber(chapterNumber, 2);
+        System.out.println(verse.getVerseNumber() + ":" + verse.getTokenCount());
+        verse = repositoryUtil.createVerse(chapterNumber, verse, chapter.getVerses().get(1));
+        System.out.println(verse.getVerseNumber() + ":" + verse.getTokenCount());
+        verseRepository.save(verse);
     }
 
 }
