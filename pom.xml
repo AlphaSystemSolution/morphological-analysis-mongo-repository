@@ -5,10 +5,10 @@
         <groupId>com.alphasystem.project</groupId>
         <artifactId>jar</artifactId>
         <version>3.0.0-SNAPSHOT</version>
-        <relativePath>../project/jar/pom.xml</relativePath>
     </parent>
     <groupId>com.alphasystem.arabic</groupId>
     <artifactId>morphological-analysis-repository</artifactId>
+    <version>4.0.0-SNAPSHOT</version>
     <dependencies>
         <dependency>
             <groupId>com.alphasystem.arabic</groupId>
@@ -63,9 +63,10 @@
         </plugins>
     </build>
     <properties>
-        <mongo-repository.version>${project.version}</mongo-repository.version>
+        <base.version>3.0.0-SNAPSHOT</base.version>
+        <mongo-repository.version>${base.version}</mongo-repository.version>
         <ma-model.version>${project.version}</ma-model.version>
-        <tanzil-adapter.version>${project.version}</tanzil-adapter.version>
+        <tanzil-adapter.version>${base.version}</tanzil-adapter.version>
         <maven.test.skip>true</maven.test.skip>
     </properties>
 </project>
