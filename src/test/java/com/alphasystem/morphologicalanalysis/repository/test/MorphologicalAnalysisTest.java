@@ -37,7 +37,7 @@ import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.Con
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.GenderType.MASCULINE;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.IncompleteVerbCategory.KANA_AND_ITS_SISTERS;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.KanaFamily.MEMBER1;
-import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus.GENETIVE;
+import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounStatus.GENITIVE;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NounType.DEFINITE;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NumberType.PLURAL;
 import static com.alphasystem.morphologicalanalysis.wordbyword.model.support.NumberType.SINGULAR;
@@ -100,7 +100,7 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         properties.setNounType(DEFINITE);
         properties.setGender(MASCULINE);
         properties.setNumber(PLURAL);
-        properties.setStatus(GENETIVE);
+        properties.setStatus(GENITIVE);
         repositoryUtil.getLocationRepository().save(location);
         token.getLocations().add(location);
         repositoryUtil.getTokenRepository().save(token);
@@ -118,7 +118,7 @@ public class MorphologicalAnalysisTest extends AbstractTestNGSpringContextTests 
         properties.setNounType(DEFINITE);
         properties.setGender(MASCULINE);
         properties.setNumber(SINGULAR);
-        properties.setStatus(GENETIVE);
+        properties.setStatus(GENITIVE);
         repositoryUtil.getLocationRepository().save(location);
     }
 

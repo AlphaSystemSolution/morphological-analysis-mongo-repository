@@ -33,8 +33,6 @@ import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepos
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.VerseRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.util.ChapterComparator;
-import com.alphasystem.tanzil.TanzilTool;
-import com.alphasystem.tanzil.model.Document;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
@@ -51,9 +49,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static com.alphasystem.tanzil.QuranScript.QURAN_SIMPLE_ENHANCED;
 import static java.lang.String.format;
-import static java.lang.System.out;
 import static java.util.Collections.sort;
 
 /**
@@ -79,12 +75,9 @@ public class MorphologicalAnalysisRepositoryUtil {
     private RelationshipNodeRepository relationshipNodeRepository;
     private MorphologicalEntryRepository morphologicalEntryRepository;
     private DictionaryNotesRepository dictionaryNotesRepository;
-    private TanzilTool tanzilTool;
     private Query findAllChaptersQuery;
-    private boolean verbose;
 
     public MorphologicalAnalysisRepositoryUtil() {
-        tanzilTool = TanzilTool.getInstance();
         findAllChaptersQuery = new Query();
         findAllChaptersQuery.fields().include("chapterNumber")
                 .include("verseCount").include("chapterName");
@@ -152,56 +145,6 @@ public class MorphologicalAnalysisRepositoryUtil {
     }
 
     // Business methods
-
-    public void createChapter(int chapterNumber) {
-        if (verbose) {
-            out.println(format("Start creating chapter {%s}", chapterNumber));
-        }
-        final Document document = tanzilTool.getChapter(chapterNumber, QURAN_SIMPLE_ENHANCED);
-        com.alphasystem.tanzil.model.Chapter ch = document.getChapters().get(0);
-        Chapter chapter = new Chapter(chapterNumber, ch.getName());
-        List<com.alphasystem.tanzil.model.Verse> verses = ch.getVerses();
-        int verseCount = verses.size();
-        chapter.setVerseCount(verseCount);
-        for (int verseNumber = 1; verseNumber <= verseCount; verseNumber++) {
-            chapter.addVerse(createVerse(chapterNumber, null, verses.get(verseNumber - 1)));
-        } // end of verse loop
-        chapterRepository.save(chapter);
-        if (verbose) {
-            out.println(format("Finished creating chapter {%s}", chapterNumber));
-        }
-    }
-
-    public Verse createVerse(int chapterNumber, Verse verse, com.alphasystem.tanzil.model.Verse vs) {
-        int verseNumber = vs.getVerseNumber();
-        if (verbose) {
-            LOGGER.info("Start creating verse {}", verseNumber);
-        }
-        if (verse == null) {
-            verse = new Verse(chapterNumber, verseNumber);
-        }
-        verse.setTokenCount(0);
-        verse.setTokens(null);
-
-        int tokenNumber = 1;
-        List<ArabicWord> tokens = vs.getTokens();
-        for (ArabicWord aw : tokens) {
-            Token token = new Token(chapterNumber, verseNumber, tokenNumber, aw.toUnicode());
-            if (verbose) {
-                LOGGER.info("Token \"{}\" created with text \"{}\".", token, token.getTokenWord().toUnicode());
-            }
-            // we will create one location for each token
-            Location location = new Location(chapterNumber, verseNumber, tokenNumber, 1);
-            token.addLocation(location);
-            verse.addToken(token);
-            tokenNumber++;
-        } // end of token loop
-        verse.setTokenCount(verse.getTokens().size());
-        if (verbose) {
-            LOGGER.info("Finished creating verse {}", verseNumber);
-        }
-        return verse;
-    }
 
     /**
      * @return all chapters
@@ -623,7 +566,4 @@ public class MorphologicalAnalysisRepositoryUtil {
         repository.delete(graphNode.getId());
     }
 
-    public void setVerbose(boolean verbose) {
-        this.verbose = verbose;
-    }
 }

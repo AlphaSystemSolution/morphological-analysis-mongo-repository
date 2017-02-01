@@ -52,7 +52,7 @@ public class LocationEventListener extends DocumentEventListener<Location> {
                 errorMessage = e.getMessage();
             }
             if (locationWord == null) {
-                logger.warn("Error retrieving location text for location \"{}\", error message was \"{}\"", source.getDisplayName(), errorMessage);
+                logger.debug("Error retrieving location text for location \"{}\", error message was \"{}\"", source.getDisplayName(), errorMessage);
             } else {
                 logger.info("Setting text for location", locationWord.toUnicode());
                 source.setText(locationWord.toUnicode());
@@ -61,7 +61,7 @@ public class LocationEventListener extends DocumentEventListener<Location> {
         MorphologicalEntry morphologicalEntry = source.getMorphologicalEntry();
         if (morphologicalEntry != null) {
             if (morphologicalEntry.isEmpty()) {
-                logger.warn("Trying to save location \"{}\" with empty morphologicalEntry \"{}\"", source, morphologicalEntry);
+                logger.debug("Trying to save location \"{}\" with empty morphologicalEntry \"{}\"", source, morphologicalEntry);
                 source.setMorphologicalEntry(null);
             } else {
                 morphologicalEntry.getLocations().add(source);

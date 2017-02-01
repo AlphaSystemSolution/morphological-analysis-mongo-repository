@@ -84,7 +84,7 @@ public class SupportDataCreation extends AbstractTestNGSpringContextTests {
         createToken(id, verseNumber, tokenNumber, NOUN, properties);
 
         tokenNumber = 3;
-        properties = new NounProperties().withNounStatus(GENETIVE);
+        properties = new NounProperties().withNounStatus(GENITIVE);
         id = format("%s_%s", NOUN, properties.getStatus());
         createToken(id, verseNumber, tokenNumber, NOUN, properties);
     }

@@ -1,6 +1,9 @@
 package com.alphasystem.morphologicalanalysis.spring.support;
 
+import com.alphasystem.morphologicalanalysis.util.Script;
 import com.mongodb.MongoClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mapping.context.MappingContext;
@@ -27,9 +30,26 @@ import static java.lang.System.getProperty;
         "com.alphasystem.morphologicalanalysis.morphology.repository"})
 public class MongoConfig {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MongoConfig.class);
+    private static final String SCRIPT_TYPE_PROPERTY = "script";
     public static final String MONGO_DB_NAME_PROPERTY = "mongo.db.name";
-    public static final String MONGO_HOST_NAME_PROPERTY = "mongo.host.url";
+    private static final String MONGO_HOST_NAME_PROPERTY = "mongo.host.url";
     private static final String LOCAL_HOST = "127.0.0.1";
+    private static final Script DEFAULT_SCRIPT = Script.SIMPLE_ENHANCED;
+
+    public static Script getCurrentScript(){
+        Script script = DEFAULT_SCRIPT;
+        String scriptName = getProperty(SCRIPT_TYPE_PROPERTY);
+        try {
+            if (scriptName != null) {
+                script = Script.valueOf(scriptName);
+            }
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("Illegal value \"{}\" for script, defaulting to \"SIMPLE_ENHANCED\" script", scriptName);
+            script = DEFAULT_SCRIPT;
+        }
+        return script;
+    }
 
     @Bean
     public MongoClient mongoClient() throws UnknownHostException {
@@ -38,8 +58,9 @@ public class MongoConfig {
 
     @Bean
     public MongoDbFactory mongoDbFactory() throws Exception {
-        return new SimpleMongoDbFactory(this.mongoClient(),
-                getProperty(MONGO_DB_NAME_PROPERTY, "__DEFAULT__"));
+        Script script = getCurrentScript();
+        LOGGER.info("Connecting to database: {}", script.getDbName());
+        return new SimpleMongoDbFactory(this.mongoClient(), script.getDbName());
     }
 
     @Bean
@@ -67,22 +88,4 @@ public class MongoConfig {
         return new GridFsTemplate(mongoDbFactory(), mongoConverter());
     }
 
-    /*@Bean
-    public Morphia morphia(){
-        Morphia morphia = new Morphia();
-        morphia.mapPackage("com.alphasystem.persistence.model");
-        morphia.mapPackage("com.alphasystem.morphologicalanalysis.wordbyword.model");
-        morphia.mapPackage("com.alphasystem.morphologicalanalysis.morphology.model");
-        morphia.mapPackage("com.alphasystem.morphologicalanalysis.graph.model");
-        return morphia;
-    }*/
-
-    /*@Bean
-    public Datastore datastore() throws Exception{
-        Datastore datastore = morphia().createDatastore(mongoClient(),
-                getProperty(MONGO_DB_NAME_PROPERTY, "__DEFAULT__"));
-        datastore.ensureCaps();
-        datastore.ensureIndexes();
-        return datastore;
-    }*/
 }
