@@ -79,8 +79,7 @@ public class MorphologicalAnalysisRepositoryUtil {
 
     public MorphologicalAnalysisRepositoryUtil() {
         findAllChaptersQuery = new Query();
-        findAllChaptersQuery.fields().include("chapterNumber")
-                .include("verseCount").include("chapterName");
+        findAllChaptersQuery.fields().include("chapterNumber").include("verseCount").include("chapterName");
     }
 
     private static Token getToken(Integer chapterNumber, Integer verseNumber, Integer tokenNumber, boolean next,
