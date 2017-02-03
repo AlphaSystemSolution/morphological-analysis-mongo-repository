@@ -172,7 +172,7 @@ public class MorphologicalAnalysisRepositoryUtil {
 
     private void removeCurrent(final List<Token> tokens) {
         tokens.forEach(token -> {
-            LOGGER.info("Current token: \"{}:{}\" with token text \"{}\"", token, token.getId(), token.getTokenWord().toBuckWalter());
+            LOGGER.info("Current token: \"{}:{}\" with token text \"{}\"", token, token.getId(), token.tokenWord().toBuckWalter());
             final List<Location> locations = token.getLocations();
             locations.forEach(location -> {
                 LOGGER.info("    Current location: \"{}:{}\"", location, location.getId());
@@ -221,7 +221,7 @@ public class MorphologicalAnalysisRepositoryUtil {
             newTokens.add(newToken);
             locationRepository.save(newLocation);
             tokenRepository.save(newToken);
-            LOGGER.info("NEW \"{}:{}:{}\", \"{}:{}\"", newToken, newToken.getId(), newToken.getTokenWord().toBuckWalter(), newLocation, newLocation.getId());
+            LOGGER.info("NEW \"{}:{}:{}\", \"{}:{}\"", newToken, newToken.getId(), newToken.tokenWord().toBuckWalter(), newLocation, newLocation.getId());
             tokenNumber++;
             index++;
         }
@@ -299,7 +299,7 @@ public class MorphologicalAnalysisRepositoryUtil {
         Token token = tokenRepository.findByChapterNumberAndVerseNumberAndTokenNumber(location.getChapterNumber(),
                 location.getVerseNumber(), location.getTokenNumber());
         if (token != null) {
-            locationWord = ArabicWord.getSubWord(token.getTokenWord(), location.getStartIndex(), location.getEndIndex());
+            locationWord = ArabicWord.getSubWord(token.tokenWord(), location.getStartIndex(), location.getEndIndex());
         }
 
         return locationWord;
