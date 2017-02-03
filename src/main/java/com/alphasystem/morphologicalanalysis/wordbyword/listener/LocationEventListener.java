@@ -25,17 +25,25 @@ public class LocationEventListener extends DocumentEventListener<Location> {
         super.onAfterConvert(event);
 
         Location source = event.getSource();
-        final String text = source.getText();
-        if (StringUtils.isNotBlank(text)) {
-            return;
+        ArabicWord locationWord = null;
+        String text = source.getText();
+        if (StringUtils.isBlank(text)) {
+            locationWord = repositoryUtil.getLocationWord(source);
+            if (locationWord != null) {
+                logger.info("Setting text for \"{}\" for location \"{}\"", locationWord.toBuckWalter(), source.getDisplayName());
+                source.setText(locationWord.toUnicode());
+            }
         }
-
-        ArabicWord locationWord = repositoryUtil.getLocationWord(source);
-        if (locationWord != null) {
-            logger.info("Setting text for \"{}\" for location \"{}\"", locationWord.toBuckWalter(), source.getDisplayName());
-            source.setText(locationWord.toUnicode());
+        text = source.getDerivedText();
+        if (StringUtils.isBlank(text)) {
+            if (locationWord == null) {
+                locationWord = repositoryUtil.getLocationWord(source);
+            }
+            if (locationWord != null) {
+                logger.info("Setting derived text for \"{}\" for location \"{}\"", locationWord.toBuckWalter(), source.getDisplayName());
+                source.setDerivedText(locationWord.toUnicode());
+            }
         }
-
     }
 
     @Override
