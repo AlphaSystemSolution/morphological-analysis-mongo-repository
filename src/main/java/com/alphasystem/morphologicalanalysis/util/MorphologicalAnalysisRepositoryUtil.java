@@ -60,21 +60,21 @@ public class MorphologicalAnalysisRepositoryUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MorphologicalAnalysisRepositoryUtil.class);
 
-    private MongoTemplate mongoTemplate;
-    private ChapterRepository chapterRepository;
-    private VerseRepository verseRepository;
-    private TokenRepository tokenRepository;
-    private LocationRepository locationRepository;
-    private DependencyGraphRepository dependencyGraphRepository;
-    private TerminalNodeRepository terminalNodeRepository;
-    private ImpliedNodeRepository impliedNodeRepository;
-    private HiddenNodeRepository hiddenNodeRepository;
-    private ReferenceNodeRepository referenceNodeRepository;
-    private PartOfSpeechNodeRepository partOfSpeechNodeRepository;
-    private PhraseNodeRepository phraseNodeRepository;
-    private RelationshipNodeRepository relationshipNodeRepository;
-    private MorphologicalEntryRepository morphologicalEntryRepository;
-    private DictionaryNotesRepository dictionaryNotesRepository;
+    @Autowired private MongoTemplate mongoTemplate;
+    @Autowired private ChapterRepository chapterRepository;
+    @Autowired private VerseRepository verseRepository;
+    @Autowired private TokenRepository tokenRepository;
+    @Autowired private LocationRepository locationRepository;
+    @Autowired private DependencyGraphRepository dependencyGraphRepository;
+    @Autowired private TerminalNodeRepository terminalNodeRepository;
+    @Autowired private ImpliedNodeRepository impliedNodeRepository;
+    @Autowired private HiddenNodeRepository hiddenNodeRepository;
+    @Autowired private ReferenceNodeRepository referenceNodeRepository;
+    @Autowired private PartOfSpeechNodeRepository partOfSpeechNodeRepository;
+    @Autowired private PhraseNodeRepository phraseNodeRepository;
+    @Autowired private RelationshipNodeRepository relationshipNodeRepository;
+    @Autowired private MorphologicalEntryRepository morphologicalEntryRepository;
+    @Autowired private DictionaryNotesRepository dictionaryNotesRepository;
     private Query findAllChaptersQuery;
 
     public MorphologicalAnalysisRepositoryUtil() {
@@ -379,162 +379,31 @@ public class MorphologicalAnalysisRepositoryUtil {
         return findMorphologicalEntry(new MorphologicalEntry(src, form));
     }
 
-    // Getter & Setters
-    public ChapterRepository getChapterRepository() {
-        return chapterRepository;
-    }
-
-    @Autowired
-    public void setChapterRepository(ChapterRepository chapterRepository) {
-        this.chapterRepository = chapterRepository;
-    }
-
-    public LocationRepository getLocationRepository() {
-        return locationRepository;
-    }
-
-    @Autowired
-    public void setLocationRepository(LocationRepository locationRepository) {
-        this.locationRepository = locationRepository;
-    }
-
-    @Autowired
-    public void setMongoTemplate(MongoTemplate mongoTemplate) {
-        this.mongoTemplate = mongoTemplate;
-    }
-
-    public TokenRepository getTokenRepository() {
-        return tokenRepository;
-    }
-
-    @Autowired
-    public void setTokenRepository(TokenRepository tokenRepository) {
-        this.tokenRepository = tokenRepository;
-    }
-
-    public VerseRepository getVerseRepository() {
-        return verseRepository;
-    }
-
-    @Autowired
-    public void setVerseRepository(VerseRepository verseRepository) {
-        this.verseRepository = verseRepository;
-    }
-
-    public DependencyGraphRepository getDependencyGraphRepository() {
-        return dependencyGraphRepository;
-    }
-
-    @Autowired
-    public void setDependencyGraphRepository(DependencyGraphRepository dependencyGraphRepository) {
-        this.dependencyGraphRepository = dependencyGraphRepository;
-    }
-
-    public TerminalNodeRepository getTerminalNodeRepository() {
-        return terminalNodeRepository;
-    }
-
-    @Autowired
-    public void setTerminalNodeRepository(TerminalNodeRepository terminalNodeRepository) {
-        this.terminalNodeRepository = terminalNodeRepository;
-    }
-
-    private ImpliedNodeRepository getImpliedNodeRepository() {
-        return impliedNodeRepository;
-    }
-
-    @Autowired
-    public void setImpliedNodeRepository(ImpliedNodeRepository impliedNodeRepository) {
-        this.impliedNodeRepository = impliedNodeRepository;
-    }
-
-    private HiddenNodeRepository getHiddenNodeRepository() {
-        return hiddenNodeRepository;
-    }
-
-    @Autowired
-    public void setHiddenNodeRepository(HiddenNodeRepository hiddenNodeRepository) {
-        this.hiddenNodeRepository = hiddenNodeRepository;
-    }
-
-    private ReferenceNodeRepository getReferenceNodeRepository() {
-        return referenceNodeRepository;
-    }
-
-    @Autowired
-    public void setReferenceNodeRepository(ReferenceNodeRepository referenceNodeRepository) {
-        this.referenceNodeRepository = referenceNodeRepository;
-    }
-
-    public PartOfSpeechNodeRepository getPartOfSpeechNodeRepository() {
-        return partOfSpeechNodeRepository;
-    }
-
-    @Autowired
-    public void setPartOfSpeechNodeRepository(PartOfSpeechNodeRepository partOfSpeechNodeRepository) {
-        this.partOfSpeechNodeRepository = partOfSpeechNodeRepository;
-    }
-
-    private PhraseNodeRepository getPhraseNodeRepository() {
-        return phraseNodeRepository;
-    }
-
-    @Autowired
-    public void setPhraseNodeRepository(PhraseNodeRepository phraseNodeRepository) {
-        this.phraseNodeRepository = phraseNodeRepository;
-    }
-
-    private RelationshipNodeRepository getRelationshipNodeRepository() {
-        return relationshipNodeRepository;
-    }
-
-    @Autowired
-    public void setRelationshipNodeRepository(RelationshipNodeRepository relationshipNodeRepository) {
-        this.relationshipNodeRepository = relationshipNodeRepository;
-    }
-
-    public MorphologicalEntryRepository getMorphologicalEntryRepository() {
-        return morphologicalEntryRepository;
-    }
-
-    @Autowired
-    public void setMorphologicalEntryRepository(MorphologicalEntryRepository morphologicalEntryRepository) {
-        this.morphologicalEntryRepository = morphologicalEntryRepository;
-    }
-
-    public DictionaryNotesRepository getDictionaryNotesRepository() {
-        return dictionaryNotesRepository;
-    }
-
-    @Autowired
-    public void setDictionaryNotesRepository(DictionaryNotesRepository dictionaryNotesRepository) {
-        this.dictionaryNotesRepository = dictionaryNotesRepository;
-    }
 
     @SuppressWarnings("unchecked")
     public <N extends GraphNode, R extends GraphNodeRepository<N>> R getRepository(GraphNodeType nodeType) {
         R repository = null;
         switch (nodeType) {
             case TERMINAL:
-                repository = (R) getTerminalNodeRepository();
+                repository = (R) terminalNodeRepository;
                 break;
             case PART_OF_SPEECH:
-                repository = (R) getPartOfSpeechNodeRepository();
+                repository = (R) partOfSpeechNodeRepository;
                 break;
             case PHRASE:
-                repository = (R) getPhraseNodeRepository();
+                repository = (R) phraseNodeRepository;
                 break;
             case RELATIONSHIP:
-                repository = (R) getRelationshipNodeRepository();
+                repository = (R) relationshipNodeRepository;
                 break;
             case REFERENCE:
-                repository = (R) getReferenceNodeRepository();
+                repository = (R) referenceNodeRepository;
                 break;
             case HIDDEN:
-                repository = (R) getHiddenNodeRepository();
+                repository = (R) hiddenNodeRepository;
                 break;
             case IMPLIED:
-                repository = (R) getImpliedNodeRepository();
+                repository = (R) impliedNodeRepository;
                 break;
             case ROOT:
                 break;
@@ -556,7 +425,7 @@ public class MorphologicalAnalysisRepositoryUtil {
                 TerminalNode tn = (TerminalNode) graphNode;
                 tn.getPartOfSpeechNodes().forEach(partOfSpeechNode -> {
                     if (partOfSpeechNode != null) {
-                        getPartOfSpeechNodeRepository().delete(partOfSpeechNode.getId());
+                        partOfSpeechNodeRepository.delete(partOfSpeechNode.getId());
                     }
                 });
                 break;
