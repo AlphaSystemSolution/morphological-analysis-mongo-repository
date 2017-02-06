@@ -28,6 +28,7 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.QToken;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.QVerse;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Token;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Verse;
+import com.alphasystem.morphologicalanalysis.wordbyword.model.support.WordType;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.ChapterRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.LocationRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.repository.TokenRepository;
@@ -216,7 +217,7 @@ public class MorphologicalAnalysisRepositoryUtil {
                 }
             }
             Token newToken = new Token(chapterNumber, verseNumber, tokenNumber, tokenText);
-            Location newLocation = new Location(chapterNumber, verseNumber, tokenNumber, 1);
+            Location newLocation = new Location(chapterNumber, verseNumber, tokenNumber, 1, WordType.NOUN);
             newToken.addLocation(newLocation);
             newTokens.add(newToken);
             locationRepository.save(newLocation);
