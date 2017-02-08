@@ -7,7 +7,6 @@ import com.alphasystem.morphologicalanalysis.wordbyword.model.Location;
 import com.alphasystem.persistence.mongo.repository.DocumentEventListener;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.mapping.event.AfterConvertEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeConvertEvent;
 import org.springframework.stereotype.Component;
 
@@ -19,32 +18,6 @@ public class LocationEventListener extends DocumentEventListener<Location> {
 
     @Autowired
     private MorphologicalAnalysisRepositoryUtil repositoryUtil;
-
-    @Override
-    public void onAfterConvert(AfterConvertEvent<Location> event) {
-        super.onAfterConvert(event);
-
-        Location source = event.getSource();
-        ArabicWord locationWord = null;
-        String text = source.getText();
-        if (StringUtils.isBlank(text)) {
-            locationWord = repositoryUtil.getLocationWord(source);
-            if (locationWord != null) {
-                logger.info("Setting text for \"{}\" for location \"{}\"", locationWord.toBuckWalter(), source.getDisplayName());
-                source.setText(locationWord.toUnicode());
-            }
-        }
-        text = source.getDerivedText();
-        if (StringUtils.isBlank(text)) {
-            if (locationWord == null) {
-                locationWord = repositoryUtil.getLocationWord(source);
-            }
-            if (locationWord != null) {
-                logger.info("Setting derived text for \"{}\" for location \"{}\"", locationWord.toBuckWalter(), source.getDisplayName());
-                source.setDerivedText(locationWord.toUnicode());
-            }
-        }
-    }
 
     @Override
     public void onBeforeConvert(BeforeConvertEvent<Location> event) {
