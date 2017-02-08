@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.alphasystem.morphologicalanalysis.spring.support;
 
 import org.springframework.context.annotation.ComponentScan;
