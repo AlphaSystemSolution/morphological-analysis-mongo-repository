@@ -80,7 +80,9 @@ public class MorphologicalAnalysisRepositoryUtil {
 
     public MorphologicalAnalysisRepositoryUtil() {
         findAllChaptersQuery = new Query();
-        findAllChaptersQuery.fields().include("chapterNumber").include("verseCount").include("chapterName");
+        final QChapter chapter = QChapter.chapter;
+        findAllChaptersQuery.fields().include(chapter.chapterNumber.getMetadata().getName())
+                .include(chapter.verseCount.getMetadata().getName()).include(chapter.chapterName.getMetadata().getName());
     }
 
     private static Token getToken(Integer chapterNumber, Integer verseNumber, Integer tokenNumber, boolean next,
@@ -150,8 +152,7 @@ public class MorphologicalAnalysisRepositoryUtil {
      * @return all chapters
      */
     public List<Chapter> findAllChapters() {
-        List<Chapter> chapters = mongoTemplate.find(findAllChaptersQuery,
-                Chapter.class, Chapter.class.getSimpleName().toLowerCase());
+        List<Chapter> chapters = mongoTemplate.find(findAllChaptersQuery, Chapter.class, Chapter.class.getSimpleName().toLowerCase());
         sort(chapters, new ChapterComparator());
         return chapters;
     }
@@ -273,22 +274,28 @@ public class MorphologicalAnalysisRepositoryUtil {
         if (pairs == null || pairs.isEmpty()) {
             return new ArrayList<>();
         }
-        VerseTokensPair pair = pairs.get(0);
         QToken qToken = QToken.token1;
-        BooleanExpression predicate = qToken.verseNumber.eq(pair.getVerseNumber()).
-                and(qToken.tokenNumber.between(pair.getFirstTokenIndex(), pair.getLastTokenIndex()));
+        BooleanExpression predicate = getPredicateByVerseTokensPair(qToken, pairs.get(0));
         for (int i = 1; i < pairs.size(); i++) {
-            pair = pairs.get(i);
-            BooleanExpression predicate1 = qToken.verseNumber.eq(pair.getVerseNumber())
-                    .and(qToken.tokenNumber.between(pair.getFirstTokenIndex(), pair.getLastTokenIndex()));
-            predicate = predicate.or(predicate1);
+            predicate = predicate.or(getPredicateByVerseTokensPair(qToken, pairs.get(i)));
         }
         predicate = qToken.chapterNumber.eq(group.getChapterNumber()).and(predicate);
         if (group.isIncludeHidden()) {
-            predicate = predicate.and(qToken.hidden.eq(true));
+            predicate = predicate.and(qToken.hidden.eq(true).or(qToken.hidden.eq(false)));
+        } else {
+            predicate = predicate.and(qToken.hidden.eq(false));
         }
         LOGGER.info(format("Query for \"getTokens\" is {%s}", predicate));
         return (List<Token>) tokenRepository.findAll(predicate);
+    }
+
+    private BooleanExpression getPredicateByVerseTokensPair(QToken qToken, VerseTokensPair pair) {
+        BooleanExpression predicate = qToken.verseNumber.eq(pair.getVerseNumber());
+        final Integer lastTokenIndex = pair.getLastTokenIndex();
+        if (lastTokenIndex > 0) {
+            predicate = predicate.and(qToken.tokenNumber.between(pair.getFirstTokenIndex(), lastTokenIndex));
+        }
+        return predicate;
     }
 
     public ArabicWord getLocationWord(Location location) {
