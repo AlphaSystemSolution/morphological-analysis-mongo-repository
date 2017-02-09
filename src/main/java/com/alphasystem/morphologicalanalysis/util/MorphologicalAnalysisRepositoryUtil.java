@@ -271,15 +271,17 @@ public class MorphologicalAnalysisRepositoryUtil {
 
     public List<Token> getTokens(VerseTokenPairGroup group) {
         List<VerseTokensPair> pairs = group.getPairs();
-        if (pairs == null || pairs.isEmpty()) {
-            return new ArrayList<>();
-        }
         QToken qToken = QToken.token1;
-        BooleanExpression predicate = getPredicateByVerseTokensPair(qToken, pairs.get(0));
-        for (int i = 1; i < pairs.size(); i++) {
-            predicate = predicate.or(getPredicateByVerseTokensPair(qToken, pairs.get(i)));
+        BooleanExpression predicate;
+        if (pairs != null && !pairs.isEmpty()) {
+            predicate = getPredicateByVerseTokensPair(qToken, pairs.get(0));
+            for (int i = 1; i < pairs.size(); i++) {
+                predicate = predicate.or(getPredicateByVerseTokensPair(qToken, pairs.get(i)));
+            }
+            predicate = qToken.chapterNumber.eq(group.getChapterNumber()).and(predicate);
+        } else {
+            predicate = qToken.chapterNumber.eq(group.getChapterNumber());
         }
-        predicate = qToken.chapterNumber.eq(group.getChapterNumber()).and(predicate);
         if (group.isIncludeHidden()) {
             predicate = predicate.and(qToken.hidden.eq(true).or(qToken.hidden.eq(false)));
         } else {
