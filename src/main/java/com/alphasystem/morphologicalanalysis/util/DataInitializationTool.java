@@ -64,7 +64,7 @@ public class DataInitializationTool {
         if (chapterNumber < FIRST_CHAPTER_NUMBER || chapterNumber > LAST_CHAPTER_NUMBER) {
             throw new InvalidChapterException(chapterNumber);
         }
-        LOGGER.debug("Start creating chapter {}", chapterNumber);
+        LOGGER.info("Start creating chapter {}", chapterNumber);
         Document document = getDocument(script);
         com.alphasystem.tanzil.model.Chapter ch = document.getChapters().get(chapterNumber - 1);
         Chapter chapter = new Chapter(chapterNumber, ch.getName());
@@ -75,7 +75,7 @@ public class DataInitializationTool {
             chapter.addVerse(createVerse(chapterNumber, null, verses.get(verseNumber - 1)));
         } // end of verse loop
         chapterRepository.save(chapter);
-        LOGGER.debug("Finished creating chapter {}", chapterNumber);
+        LOGGER.info("Finished creating chapter {}", chapterNumber);
     }
 
     public com.alphasystem.morphologicalanalysis.wordbyword.model.Verse createVerse(int chapterNumber,
@@ -93,12 +93,15 @@ public class DataInitializationTool {
         int tokenNumber = 1;
         List<ArabicWord> tokens = vs.getTokens();
         for (ArabicWord aw : tokens) {
-            Token token = new Token(chapterNumber, verseNumber, tokenNumber, aw.toUnicode());
+            final String text = aw.toUnicode();
+            Token token = new Token(chapterNumber, verseNumber, tokenNumber, text);
             LOGGER.debug("Token \"{}\" created with text \"{}\".", token, token.tokenWord().toUnicode());
             // we will create one location for each token
             Location location = new Location(chapterNumber, verseNumber, tokenNumber, 1, WordType.NOUN);
             location.setStartIndex(0);
             location.setEndIndex(aw.getLength());
+            location.setText(text);
+            location.setDerivedText(text);
             token.addLocation(location);
             verse.addToken(token);
             tokenNumber++;
