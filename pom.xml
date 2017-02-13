@@ -12,7 +12,7 @@
     <dependencies>
         <dependency>
             <groupId>com.alphasystem.arabic</groupId>
-            <artifactId>morphological-analysis-model</artifactId>
+            <artifactId>morphological-analysis-entity-model</artifactId>
             <version>${ma-model.version}</version>
         </dependency>
         <dependency>
@@ -26,10 +26,8 @@
         </dependency>
     </dependencies>
     <properties>
-        <base.version>3.0.0-SNAPSHOT</base.version>
-        <mongo-repository.version>${base.version}</mongo-repository.version>
+        <mongo-repository.version>${project.version}</mongo-repository.version>
         <ma-model.version>${project.version}</ma-model.version>
-        <tanzil-adapter.version>${base.version}</tanzil-adapter.version>
         <maven.test.skip>true</maven.test.skip>
     </properties>
 </project>
