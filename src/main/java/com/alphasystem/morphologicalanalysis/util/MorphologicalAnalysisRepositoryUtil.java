@@ -1,7 +1,6 @@
 package com.alphasystem.morphologicalanalysis.util;
 
 import com.alphasystem.arabic.model.ArabicWord;
-import com.alphasystem.arabic.model.NamedTemplate;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokenPairGroup;
 import com.alphasystem.morphologicalanalysis.common.model.VerseTokensPair;
 import com.alphasystem.morphologicalanalysis.graph.model.DependencyGraph;
@@ -18,7 +17,6 @@ import com.alphasystem.morphologicalanalysis.graph.repository.ReferenceNodeRepos
 import com.alphasystem.morphologicalanalysis.graph.repository.RelationshipNodeRepository;
 import com.alphasystem.morphologicalanalysis.graph.repository.TerminalNodeRepository;
 import com.alphasystem.morphologicalanalysis.morphology.model.MorphologicalEntry;
-import com.alphasystem.morphologicalanalysis.morphology.model.RootLetters;
 import com.alphasystem.morphologicalanalysis.morphology.repository.DictionaryNotesRepository;
 import com.alphasystem.morphologicalanalysis.morphology.repository.MorphologicalEntryRepository;
 import com.alphasystem.morphologicalanalysis.wordbyword.model.Chapter;
@@ -379,16 +377,6 @@ public class MorphologicalAnalysisRepositoryUtil {
     public DependencyGraph getDependencyGraph(String displayName) {
         return dependencyGraphRepository.findByDisplayName(displayName);
     }
-
-    public MorphologicalEntry findMorphologicalEntry(MorphologicalEntry src) {
-        src.initDisplayName();
-        return morphologicalEntryRepository.findByDisplayName(src.getDisplayName());
-    }
-
-    public MorphologicalEntry findMorphologicalEntry(RootLetters src, NamedTemplate form) {
-        return findMorphologicalEntry(new MorphologicalEntry(src, form));
-    }
-
 
     @SuppressWarnings("unchecked")
     public <N extends GraphNode, R extends GraphNodeRepository<N>> R getRepository(GraphNodeType nodeType) {
