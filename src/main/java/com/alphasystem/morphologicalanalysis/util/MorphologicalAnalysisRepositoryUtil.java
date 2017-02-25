@@ -180,7 +180,7 @@ public class MorphologicalAnalysisRepositoryUtil {
                 if (morphologicalEntry != null) {
                     LOGGER.info("        MorphologicalEntry \"{}\" is not null for location \"{}:{}\".", morphologicalEntry, location, location.getId());
                     final MorphologicalEntry entry = morphologicalEntryRepository.findOne(morphologicalEntry.getId());
-                    final Iterator<Location> iterator = entry.getLocations().iterator();
+                    final Iterator<Location> iterator = new ArrayList<Location>().iterator(); //entry.getLocations().iterator();
                     while (iterator.hasNext()) {
                         final Location location1 = iterator.next();
                         if (location1.equals(location)) {
