@@ -292,7 +292,9 @@ public class MorphologicalAnalysisRepositoryUtil {
     private BooleanExpression getPredicateByVerseTokensPair(QToken qToken, VerseTokensPair pair) {
         BooleanExpression predicate = qToken.verseNumber.eq(pair.getVerseNumber());
         final Integer lastTokenIndex = pair.getLastTokenIndex();
-        if (lastTokenIndex > 0) {
+        if (lastTokenIndex <= -1) {
+            predicate = predicate.and(qToken.tokenNumber.goe(pair.getFirstTokenIndex()));
+        } else {
             predicate = predicate.and(qToken.tokenNumber.between(pair.getFirstTokenIndex(), lastTokenIndex));
         }
         return predicate;
